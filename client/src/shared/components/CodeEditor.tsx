@@ -1,5 +1,6 @@
 import Editor from '@monaco-editor/react'
 import '@/shared/monaco/setupMonaco'
+import { useTheme } from '@/shared/theme/ThemeContext'
 
 interface CodeEditorProps {
   filePath: string
@@ -9,6 +10,8 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ filePath, language, value, onChange }: CodeEditorProps) {
+  const { theme } = useTheme()
+
   return (
     <Editor
       height="100%"
@@ -35,7 +38,7 @@ export function CodeEditor({ filePath, language, value, onChange }: CodeEditorPr
         wordWrap: 'on',
       }}
       path={`${language}/${filePath}`}
-      theme="psel-lab-dark"
+      theme={theme === 'dark' ? 'psel-lab-dark' : 'psel-lab-light'}
       value={value}
     />
   )

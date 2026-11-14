@@ -222,14 +222,16 @@ Returns the validated challenge summaries ordered by title. Each summary omits s
     "type": "Coding",
     "estimatedMinutes": 30,
     "languages": [
-      { "id": "csharp", "name": "C#" },
-      { "id": "python", "name": "Python" }
+      { "id": "csharp", "name": "C#", "canExecute": true },
+      { "id": "python", "name": "Python", "canExecute": true }
     ],
     "prerequisiteSlugs": ["algorithm-foundations", "data-structures"],
     "competencySlugs": ["algorithm-decomposition", "correctness-reasoning"]
   }
 ]
 ```
+
+`languages[].canExecute` on a summary allows the client to distinguish practice-ready packages from read-only ones without fetching every detail. A package such as `api-validation` reports `false` because it has no trusted execution harness.
 
 ### `GET /api/challenges/{slug}`
 
@@ -330,7 +332,7 @@ Returns one challenge with its statement, hints, objectives, constraints, exampl
 - The workspace renders `statementMarkdown` and `hintsMarkdown` with `react-markdown`; raw HTML stays disabled.
 - These endpoints are read-only. Submission endpoints are documented below.
 
-## 6. Languages
+## 6. Languages and runtime
 
 ### `GET /api/languages`
 
@@ -347,6 +349,34 @@ Returns the languages the server is configured to execute. This is server config
 ```
 
 The endpoint does not imply that every challenge supports every language. Use `languages[].canExecute` on the challenge detail.
+
+### `GET /api/runtime`
+
+Returns read-only runtime diagnostics for the Settings page. The response is limited to values that are already server-owned and safe to display. Docker executable paths, workspace roots, container users, and database locations are never included.
+
+**Response: 200 OK**
+
+```json
+{
+  "executionEnabled": true,
+  "languages": [
+    { "id": "csharp", "name": "C#", "image": "mcr.microsoft.com/dotnet/sdk:10.0" },
+    { "id": "python", "name": "Python", "image": "python:3.13-slim" },
+    { "id": "sql", "name": "SQL", "image": "python:3.13-slim" }
+  ],
+  "limits": {
+    "timeLimitSeconds": 60,
+    "memoryLimitMb": 512,
+    "cpuLimit": 1.0,
+    "pidsLimit": 128,
+    "maxOutputBytes": 65536,
+    "maxConcurrentExecutions": 2,
+    "maxQueuedExecutions": 64
+  }
+}
+```
+
+The endpoint does not accept input and cannot change configuration. Images and limits come from the `Execution` configuration section, so a deployment overrides them through environment variables or `appsettings` and restarts the API.
 
 ## 7. Submissions
 
@@ -798,7 +828,7 @@ Internal exception details must not be returned to the client. Diagnostic detail
 
 ## 12. Planned endpoints
 
-All MVP endpoints listed in [PROJECT_SPEC.md](../PROJECT_SPEC.md) are implemented through Phase 8. SQL challenges deliberately reuse `POST /api/submissions` and the existing result endpoints; there are no separate database-execution endpoints.
+All MVP endpoints listed in [PROJECT_SPEC.md](../PROJECT_SPEC.md) are implemented through Phase 8. SQL challenges deliberately reuse `POST /api/submissions` and the existing result endpoints; there are no separate database-execution endpoints. The post-MVP Phase 9 Settings page reads `GET /api/health` and the read-only `GET /api/runtime` diagnostics; there is no endpoint that mutates server configuration.
 
 Submission responses distinguish automated results from rubric-based judgments. Automated assessment is implemented; rubric-based authoring and review remain out of scope.
 

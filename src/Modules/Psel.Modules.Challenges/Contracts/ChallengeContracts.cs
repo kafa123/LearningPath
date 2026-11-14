@@ -4,7 +4,7 @@ namespace Psel.Modules.Challenges.Contracts;
 /// Client-facing projections of challenge packages. Hidden tests, reference
 /// solutions, and internal package paths are deliberately absent.
 /// </summary>
-public sealed record ChallengeLanguageSummary(string Id, string Name);
+public sealed record ChallengeLanguageSummary(string Id, string Name, bool CanExecute);
 
 public sealed record ChallengeSummary(
     string Slug,

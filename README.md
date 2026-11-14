@@ -2,7 +2,7 @@
 
 > **Train. Build. Test. Understand.**
 
-PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, eight validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, automated tests, and the project documentation baseline.
+PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer plus post-MVP settings and runtime diagnostics on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, eight validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, read-only runtime diagnostics, automated tests, and the project documentation baseline.
 
 The canonical product and architecture specification is [PROJECT_SPEC.md](PROJECT_SPEC.md).
 
@@ -18,6 +18,7 @@ The canonical product and architecture specification is [PROJECT_SPEC.md](PROJEC
 | 6 | Python runtime | Implemented |
 | 7 | Progress and examination | Implemented |
 | 8 | Database engineering challenges | Implemented |
+| 9 (post-MVP) | Settings and read-only runtime diagnostics | Implemented |
 
 Phase 4 adds submission persistence, a bounded in-memory execution queue, a background execution worker, a Docker-backed C# runner, server-side execution harnesses, resource limits, and cleanup. Submitted code is never compiled or run in the API process. When Docker is unavailable, the API still starts and submissions are recorded with an `ExecutionUnavailable` result rather than crashing.
 
@@ -28,6 +29,12 @@ Phase 6 adds a second language runtime behind the existing `ILanguageRunner` bou
 Phase 7 adds the `Psel.Modules.Progress` module. It derives competency states on read from append-only assessment evidence, exposes assessment history, and runs server-controlled examination sessions. A challenge maps to competencies through `competencySlugs`, and an optional `examination.variants` block supplies the variants and time limits the server selects from. Examination attempts use the existing submission pipeline with `purpose: "Submit"`; the server validates the session, records the attempt link, and returns a hint-free challenge projection. Competency states are `NotStarted`, `Learning`, `Practicing`, `AssessmentRequired`, and `Mastered`.
 
 Phase 8 adds database engineering challenges without a second execution pipeline. A package gains an optional `sql` block that declares a schema file and an optional seed file, and the `sql` language is executable only when that block is valid. The server injects the schema and seed into each test's trusted data, supplies a built-in SQLite harness, and runs the learner's single `.sql` file in a disposable container against a fresh in-memory database. Assessment compares result rows, optional column names, ordering, and selected `EXPLAIN QUERY PLAN` constraints, so correctness and index-usage exercises share the same submission, worker, runner, and grading rules as C# and Python. The learner query runs with `PRAGMA query_only`, a read-only authorizer, and row, column, and time caps; the application's own SQLite database is never mounted or opened.
+
+The web application exposes learning paths, the full challenge catalog, a practice page, examinations, progress, and a read-only Settings page. Practice combines the catalog with derived competency states and recent assessments, recommends challenges whose mapped competencies need attention, and hides packages that have no trusted execution harness. Every practice card opens the same workspace used for assessment.
+
+The post-MVP Settings page reports API health plus the safe subset of execution configuration: whether execution is enabled, the image for each language, and the time, memory, CPU, process, output, and queue limits. `GET /api/runtime` never returns Docker executable paths, workspace roots, container users, or database locations, and there is no endpoint that mutates configuration. Server-owned settings still change through `appsettings` or environment variables followed by an API restart.
+
+The interface ships with dark and light themes. A toggle in the sidebar and an Appearance section in Settings switch the palette, and the choice is stored in the browser. The light theme remaps the same Tailwind color tokens, so every page, card, and status badge follows without a second component tree; Monaco uses a matching light editor theme.
 
 ## Technology baseline
 
@@ -259,7 +266,7 @@ npm run test:run
 npm run build
 ```
 
-The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the Phase 8 baseline there are 152 backend tests and 42 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
+The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the Phase 8 and post-MVP Phase 9 baseline there are 154 backend tests and 51 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
 
 ## Project structure
 

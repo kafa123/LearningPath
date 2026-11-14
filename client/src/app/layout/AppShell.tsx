@@ -1,12 +1,13 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { navigationItems } from '@/app/navigation'
 import { NavGlyph } from '@/shared/components/NavGlyph'
+import { ThemeToggle } from '@/shared/theme/ThemeToggle'
 
 export function AppShell() {
   return (
     <div className="min-h-screen text-slate-100">
       <a
-        className="sr-only z-50 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-950 focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+        className="sr-only z-50 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-[#04121f] focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
         href="#main-content"
       >
         Skip to content
@@ -32,6 +33,13 @@ export function AppShell() {
             <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-emerald-200 uppercase lg:hidden">
               Phase 8
             </span>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+            <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
+              Appearance
+            </span>
+            <ThemeToggle />
           </div>
 
           <nav

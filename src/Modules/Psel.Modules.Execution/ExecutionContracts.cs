@@ -43,3 +43,24 @@ public sealed record ExecutionOutcome(
     bool OutputTruncated);
 
 public sealed record SupportedLanguage(string Id, string Name);
+
+/// <summary>
+/// Read-only runtime diagnostics for the local Settings page. Only values that
+/// are already server-owned and safe to display are included; Docker
+/// executable paths, workspace roots, and container identities are omitted.
+/// </summary>
+public sealed record RuntimeLanguage(string Id, string Name, string Image);
+
+public sealed record RuntimeLimits(
+    int TimeLimitSeconds,
+    int MemoryLimitMb,
+    double CpuLimit,
+    int PidsLimit,
+    int MaxOutputBytes,
+    int MaxConcurrentExecutions,
+    int MaxQueuedExecutions);
+
+public sealed record ExecutionRuntimeInfo(
+    bool ExecutionEnabled,
+    IReadOnlyList<RuntimeLanguage> Languages,
+    RuntimeLimits Limits);

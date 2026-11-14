@@ -3,6 +3,7 @@ import { getJson } from '@/shared/api/http'
 export interface ChallengeLanguageSummary {
   id: string
   name: string
+  canExecute: boolean
 }
 
 export interface ChallengeSummary {

@@ -44,4 +44,33 @@ monaco.editor.defineTheme('psel-lab-dark', {
   },
 })
 
+monaco.editor.defineTheme('psel-lab-light', {
+  base: 'vs',
+  inherit: true,
+  rules: [
+    { token: 'comment', foreground: '94a3b8', fontStyle: 'italic' },
+    { token: 'keyword', foreground: '047857' },
+    { token: 'string', foreground: 'b45309' },
+    { token: 'number', foreground: '0369a1' },
+    { token: 'type', foreground: '6d28d9' },
+    { token: 'delimiter', foreground: '475569' },
+  ],
+  colors: {
+    'editor.background': '#fbfdff',
+    'editor.foreground': '#1e293b',
+    'editorLineNumber.foreground': '#94a3b8',
+    'editorLineNumber.activeForeground': '#047857',
+    'editor.selectionBackground': '#99f6e466',
+    'editor.inactiveSelectionBackground': '#99f6e433',
+    'editor.lineHighlightBackground': '#0f172a08',
+    'editorCursor.foreground': '#059669',
+    'editorIndentGuide.background1': '#0f172a14',
+    'editorIndentGuide.activeBackground1': '#05966955',
+    'editorWidget.background': '#ffffff',
+    'editorGutter.background': '#fbfdff',
+    'scrollbarSlider.background': '#0f172a14',
+    'scrollbarSlider.hoverBackground': '#0f172a24',
+  },
+})
+
 loader.config({ monaco })

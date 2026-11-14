@@ -284,7 +284,9 @@ This roadmap follows [PROJECT_SPEC.md](../PROJECT_SPEC.md). Build incrementally.
 - Query-plan checks run against `EXPLAIN QUERY PLAN`; result comparison supports ordered or unordered rows and numeric tolerance.
 - Compile-like SQL failures emit `PSEL_SQL_COMPILE_ERROR` and map to `CompilationError`; per-test SQL failures become errored observations and `RuntimeError`.
 - Two repository packages: `order-revenue` for joins, aggregation, and NULL semantics, and `order-index-plan` for a composite-index query-plan exercise.
-- SQL runner, loader, and submission endpoint tests; frontend SQL workspace coverage; README, architecture, database, API, security, roadmap, challenge authoring, and ADR updates.
+- A completed Practice route that lists practice-ready challenges, recommends the next challenge from competency evidence, filters by domain, difficulty, and type, and links to the shared workspace. Read-only packages remain in the full Challenges catalog.
+- Challenge summaries expose a per-language `canExecute` flag so the client can separate practice-ready packages from read-only ones without fetching every detail.
+- SQL runner, loader, and submission endpoint tests; frontend SQL workspace and practice-page coverage; README, architecture, database, API, security, roadmap, challenge authoring, and ADR updates.
 
 ### Exit criteria
 
@@ -306,6 +308,35 @@ This roadmap follows [PROJECT_SPEC.md](../PROJECT_SPEC.md). Build incrementally.
 - The execution database is a disposable `:memory:` SQLite instance created inside the container. The application database is never mounted or attached.
 - SQL statements are restricted to a single read-only statement. A write attempt or a syntax error is a compilation-class failure, not a learner-visible database mutation.
 - The design is recorded in [ADR-0010](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md).
+
+## Phase 9 — Settings and runtime diagnostics (post-MVP)
+
+This phase extends beyond the eight phases defined in [PROJECT_SPEC.md](../PROJECT_SPEC.md). It does not change the MVP acceptance criteria.
+
+### Delivered
+
+- A read-only Settings page that replaces the former placeholder route. It reuses the health hook for API status and loads the new runtime diagnostics endpoint.
+- `GET /api/runtime` returns execution availability, the configured image for each supported language, and the server-owned time, memory, CPU, process, output, concurrency, and queue limits.
+- The runtime projection omits Docker executable paths, workspace roots, container users, and database locations. The endpoint accepts no input and cannot mutate configuration.
+- The page states that configuration is server-owned through `appsettings` or environment variables and requires an API restart.
+- Dark and light themes with a sidebar toggle, an Appearance section in Settings, `localStorage` persistence, a matching Monaco light theme, and a pre-paint theme script to avoid a flash.
+- Runtime endpoint and Settings-page tests, plus README, architecture, API, security, and roadmap updates.
+
+### Exit criteria
+
+- A learner or operator can inspect the safe subset of runtime configuration without gaining a way to change it.
+- No sensitive execution or persistence configuration is exposed to the client.
+
+### Out of scope
+
+- Editing runtime configuration from the browser.
+- Authentication or role-based access for the Settings page.
+- Live Docker daemon probing or container status streaming.
+
+### Notes
+
+- Keeping diagnostics read-only preserves the server-controlled execution boundary: clients can observe limits but cannot lower or raise them.
+- A future authenticated settings phase could add validated editing without changing the current contract.
 
 ## MVP acceptance mapping
 

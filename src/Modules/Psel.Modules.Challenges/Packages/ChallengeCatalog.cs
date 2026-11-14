@@ -24,7 +24,10 @@ internal sealed class ChallengeCatalog(ChallengePackageLoader loader)
                 detail.Type,
                 detail.EstimatedMinutes,
                 detail.Languages
-                    .Select(language => new ChallengeLanguageSummary(language.Id, language.Name))
+                    .Select(language => new ChallengeLanguageSummary(
+                        language.Id,
+                        language.Name,
+                        language.CanExecute))
                     .ToList(),
                 detail.PrerequisiteSlugs,
                 detail.CompetencySlugs))

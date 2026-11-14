@@ -10,8 +10,8 @@ export const twoSumSummary: ChallengeSummary = {
   type: 'Coding',
   estimatedMinutes: 30,
   languages: [
-    { id: 'csharp', name: 'C#' },
-    { id: 'python', name: 'Python' },
+    { id: 'csharp', name: 'C#', canExecute: true },
+    { id: 'python', name: 'Python', canExecute: true },
   ],
   prerequisiteSlugs: ['algorithm-foundations', 'data-structures'],
   competencySlugs: [
@@ -31,7 +31,7 @@ export const apiValidationSummary: ChallengeSummary = {
   difficulty: 'Intermediate',
   type: 'API',
   estimatedMinutes: 45,
-  languages: [{ id: 'csharp', name: 'C#' }],
+  languages: [{ id: 'csharp', name: 'C#', canExecute: false }],
   prerequisiteSlugs: ['http-api-design'],
   competencySlugs: [
     'input-validation',
@@ -51,7 +51,7 @@ export const orderRevenueSummary: ChallengeSummary = {
   difficulty: 'Intermediate',
   type: 'SQL',
   estimatedMinutes: 30,
-  languages: [{ id: 'sql', name: 'SQL' }],
+  languages: [{ id: 'sql', name: 'SQL', canExecute: true }],
   prerequisiteSlugs: ['sql-querying'],
   competencySlugs: ['sql-composition', 'null-semantics'],
 }

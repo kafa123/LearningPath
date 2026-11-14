@@ -70,6 +70,12 @@ public sealed class ChallengeEndpointTests
             challenges,
             challenge => challenge.Slug == "two-sum");
         Assert.Equal(["csharp", "python"], twoSum.Languages.Select(language => language.Id));
+        Assert.All(twoSum.Languages, language => Assert.True(language.CanExecute));
+
+        var apiValidation = Assert.Single(
+            challenges,
+            challenge => challenge.Slug == "api-validation");
+        Assert.All(apiValidation.Languages, language => Assert.False(language.CanExecute));
 
         Assert.DoesNotContain("tests/hidden", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("solutions/", body, StringComparison.OrdinalIgnoreCase);
@@ -197,7 +203,7 @@ public sealed class ChallengeEndpointTests
         Assert.Contains("Challenge not found.", body, StringComparison.Ordinal);
     }
 
-    private sealed record ChallengeLanguageSummaryDto(string Id, string Name);
+    private sealed record ChallengeLanguageSummaryDto(string Id, string Name, bool CanExecute);
 
     private sealed record ChallengeSummaryDto(
         string Slug,

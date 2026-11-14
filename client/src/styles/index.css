@@ -184,3 +184,124 @@ button {
   border: 0;
   border-top: 1px solid rgb(255 255 255 / 0.1);
 }
+
+/* ------------------------------------------------------------------ */
+/* Light theme                                                         */
+/*                                                                     */
+/* The application is written with the dark palette as its base. The   */
+/* light theme remaps the Tailwind color tokens instead of duplicating */
+/* a second set of utility classes in every component. `--color-white` */
+/* acts as the ink token, so translucent white borders and surfaces    */
+/* flip to subtle dark lines and washes automatically.                 */
+/* ------------------------------------------------------------------ */
+html[data-theme='light'] {
+  color-scheme: light;
+
+  --color-white: #0b1220;
+
+  --color-slate-50: #020617;
+  --color-slate-100: #0f172a;
+  --color-slate-200: #1e293b;
+  --color-slate-300: #334155;
+  --color-slate-400: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-600: #94a3b8;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #ffffff;
+
+  --color-emerald-100: #064e3b;
+  --color-emerald-200: #047857;
+  --color-emerald-300: #059669;
+
+  --color-sky-100: #075985;
+  --color-sky-200: #0369a1;
+  --color-sky-300: #0284c7;
+
+  --color-amber-100: #92400e;
+  --color-amber-200: #b45309;
+  --color-amber-300: #d97706;
+
+  --color-rose-100: #9f1239;
+  --color-rose-200: #be123c;
+  --color-rose-300: #e11d48;
+
+  --color-violet-100: #5b21b6;
+  --color-violet-200: #6d28d9;
+  --color-violet-300: #7c3aed;
+}
+
+html[data-theme='light'] {
+  background-color: #f6f8fb;
+}
+
+html[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 18% 0%, rgb(16 185 129 / 0.1), transparent 32rem),
+    radial-gradient(circle at 88% 8%, rgb(56 189 248 / 0.1), transparent 28rem),
+    #f6f8fb;
+}
+
+html[data-theme='light'] ::selection {
+  background-color: rgb(16 185 129 / 0.28);
+  color: #052e22;
+}
+
+html[data-theme='light'] .learning-prose h1,
+html[data-theme='light'] .learning-prose h2,
+html[data-theme='light'] .learning-prose h3,
+html[data-theme='light'] .learning-prose h4,
+html[data-theme='light'] .learning-prose strong {
+  color: #0f172a;
+}
+
+html[data-theme='light'] .learning-prose h2 {
+  border-top-color: rgb(15 23 42 / 0.1);
+}
+
+html[data-theme='light'] .learning-prose a {
+  color: #047857;
+  text-decoration-color: rgb(4 120 87 / 0.35);
+}
+
+html[data-theme='light'] .learning-prose a:hover {
+  text-decoration-color: rgb(4 120 87 / 0.8);
+}
+
+html[data-theme='light'] .learning-prose li::marker {
+  color: rgb(5 150 105 / 0.75);
+}
+
+html[data-theme='light'] .learning-prose blockquote {
+  border-left-color: rgb(5 150 105 / 0.4);
+}
+
+html[data-theme='light'] .learning-prose code {
+  border-color: rgb(15 23 42 / 0.12);
+  background: rgb(15 23 42 / 0.05);
+  color: #065f46;
+}
+
+html[data-theme='light'] .learning-prose pre {
+  border-color: rgb(15 23 42 / 0.12);
+  background: #eef2f7;
+}
+
+html[data-theme='light'] .learning-prose pre code {
+  color: #1e293b;
+}
+
+html[data-theme='light'] .learning-prose th,
+html[data-theme='light'] .learning-prose td {
+  border-color: rgb(15 23 42 / 0.12);
+}
+
+html[data-theme='light'] .learning-prose th {
+  background: rgb(15 23 42 / 0.04);
+  color: #0f172a;
+}
+
+html[data-theme='light'] .learning-prose hr {
+  border-top-color: rgb(15 23 42 / 0.12);
+}

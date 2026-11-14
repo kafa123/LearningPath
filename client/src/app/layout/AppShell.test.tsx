@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderApp } from '@/test/renderApp'
@@ -81,5 +81,22 @@ describe('AppShell', () => {
     renderApp(['/does-not-exist'])
 
     expect(screen.getByRole('heading', { name: 'Page not found' })).toBeInTheDocument()
+  })
+
+  it('toggles the color theme and remembers the choice', async () => {
+    const user = userEvent.setup()
+    renderApp()
+
+    await waitFor(() => {
+      expect(document.documentElement.dataset.theme).toBe('dark')
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Switch to light theme' }))
+
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(window.localStorage.getItem('psel-theme')).toBe('light')
+    expect(
+      screen.getByRole('button', { name: 'Switch to dark theme' }),
+    ).toBeInTheDocument()
   })
 })

@@ -107,6 +107,8 @@ The following values come from `ExecutionOptions` (configuration section `Execut
 
 Pull the language images before execution so a run does not depend on registry access at execution time; the container itself has no network, so it cannot restore additional packages. A missing image or failed pull surfaces as a container start failure, not as a learner result.
 
+`GET /api/runtime` exposes only a safe subset of these values: `Enabled`, the image assigned to each supported language, and the limits. `DockerExecutable`, `ContainerUser`, `WorkspaceRoot`, and database locations are deliberately omitted. The endpoint is read-only and accepts no input, so observing a limit never lets a client change it.
+
 ## 6. Implemented Docker controls
 
 `ProcessDockerEngine.BuildRunArguments` applies these flags to every run:

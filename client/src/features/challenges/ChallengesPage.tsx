@@ -144,8 +144,9 @@ export function ChallengesPage() {
           Practice with a real workspace.
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-          Open a challenge to read its statement, inspect public tests, and edit starter code
-          in Monaco. Isolated execution and submissions arrive in Phase 4.
+          Browse every validated challenge package. Open one to read its statement, inspect
+          public tests, and edit starter code in Monaco. Executable languages run in an
+          isolated container; read-only packages remain available for review.
         </p>
       </header>
 

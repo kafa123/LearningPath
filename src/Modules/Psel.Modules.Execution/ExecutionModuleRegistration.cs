@@ -45,6 +45,12 @@ public static class ExecutionModuleRegistration
             .WithName("ListLanguages")
             .WithSummary("List the languages the server is configured to execute.");
 
+        var runtimeGroup = endpoints.MapGroup("/api/runtime").WithTags("Runtime");
+
+        runtimeGroup.MapGet("", GetRuntime)
+            .WithName("GetRuntimeInfo")
+            .WithSummary("Describe the safe subset of server-owned execution configuration.");
+
         return endpoints;
     }
 
@@ -52,6 +58,35 @@ public static class ExecutionModuleRegistration
         ILanguageCatalog catalog)
     {
         return TypedResults.Ok(catalog.GetLanguages());
+    }
+
+    private static Ok<ExecutionRuntimeInfo> GetRuntime(
+        ILanguageCatalog catalog,
+        IOptions<ExecutionOptions> options)
+    {
+        var settings = options.Value;
+        var images = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["csharp"] = settings.CSharpImage,
+            ["python"] = settings.PythonImage,
+            ["sql"] = settings.SqlImage
+        };
+        var languages = catalog.GetLanguages()
+            .Select(language => new RuntimeLanguage(
+                language.Id,
+                language.Name,
+                images.TryGetValue(language.Id, out var image) ? image : "unconfigured"))
+            .ToList();
+        var limits = new RuntimeLimits(
+            settings.TimeLimitSeconds,
+            settings.MemoryLimitMb,
+            settings.CpuLimit,
+            settings.PidsLimit,
+            settings.MaxOutputBytes,
+            settings.MaxConcurrentExecutions,
+            settings.MaxQueuedExecutions);
+
+        return TypedResults.Ok(new ExecutionRuntimeInfo(settings.Enabled, languages, limits));
     }
 }
 

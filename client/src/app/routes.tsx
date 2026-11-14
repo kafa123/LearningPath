@@ -13,8 +13,9 @@ import { LearningPathsPage } from '@/features/learning/LearningPathsPage'
 import { LearningPathPage } from '@/features/learning/LearningPathPage'
 import { ModulePage } from '@/features/learning/ModulePage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
-import { PlaceholderPage } from '@/features/placeholders/PlaceholderPage'
+import { PracticePage } from '@/features/practice/PracticePage'
 import { ProgressPage } from '@/features/progress/ProgressPage'
+import { SettingsPage } from '@/features/settings/SettingsPage'
 import { PageLoading } from '@/shared/components/PageLoading'
 
 export const appRoutes: RouteObject[] = [
@@ -53,17 +54,7 @@ export const appRoutes: RouteObject[] = [
           },
         ],
       },
-      {
-        path: 'practice',
-        element: (
-          <PlaceholderPage
-            description="Work through realistic tasks with limited hints and public test feedback."
-            phase="Phase 3–5"
-            planned="Practice mode depends on challenge packages, the execution pipeline, and the assessment engine."
-            title="Practice"
-          />
-        ),
-      },
+      { path: 'practice', element: <PracticePage /> },
       {
         path: 'examinations',
         children: [
@@ -79,17 +70,7 @@ export const appRoutes: RouteObject[] = [
         ],
       },
       { path: 'progress', element: <ProgressPage /> },
-      {
-        path: 'settings',
-        element: (
-          <PlaceholderPage
-            description="Configure local runtimes, execution limits, and application preferences."
-            phase="Planned"
-            planned="Settings will follow the language runtime and execution phases so that only supported, server-validated options are exposed."
-            title="Settings"
-          />
-        ),
-      },
+      { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

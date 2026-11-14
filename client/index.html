@@ -9,6 +9,22 @@
       content="Personal Software Engineering Lab — learn, practice, and assess software engineering skills."
     />
     <title>PSEL — Personal Software Engineering Lab</title>
+    <script>
+      ;(() => {
+        try {
+          const stored = localStorage.getItem('psel-theme')
+          const theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark'
+          document.documentElement.dataset.theme = theme
+        } catch {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
