@@ -1,0 +1,7 @@
+{
+  "input": {
+    "text": "beta alpha gamma alpha beta gamma delta",
+    "count": 4
+  },
+  "expected": ["alpha", "beta", "gamma", "delta"]
+}

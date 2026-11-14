@@ -1,0 +1,8 @@
+{
+  "input": {
+    "numbers": [1, 2, 3, 4, 5],
+    "start": 0,
+    "end": 4
+  },
+  "expected": 15
+}

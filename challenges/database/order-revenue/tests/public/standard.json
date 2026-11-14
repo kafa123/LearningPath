@@ -1,0 +1,10 @@
+{
+  "columns": ["name", "completed_orders", "revenue"],
+  "expected": [
+    ["Alice", 2, 250.0],
+    ["Bob", 1, 100.0],
+    ["Carol", 1, 75.5],
+    ["Dave", 0, 0.0],
+    ["Erin", 0, 0.0]
+  ]
+}

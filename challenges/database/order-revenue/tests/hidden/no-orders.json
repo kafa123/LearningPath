@@ -1,0 +1,9 @@
+{
+  "seed": "INSERT INTO customers (id, name, country) VALUES\n  (1, 'Nadia', 'ID'),\n  (2, 'Omar', 'MY'),\n  (3, 'Pia', 'SG');",
+  "columns": ["name", "completed_orders", "revenue"],
+  "expected": [
+    ["Nadia", 0, 0.0],
+    ["Omar", 0, 0.0],
+    ["Pia", 0, 0.0]
+  ]
+}

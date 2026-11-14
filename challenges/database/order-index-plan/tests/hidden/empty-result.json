@@ -1,0 +1,9 @@
+{
+  "seed": "INSERT INTO orders (id, customer_id, ordered_at, total_cents) VALUES\n  (1, 42, '2025-06-01', 100),\n  (2, 43, '2026-06-01', 200);",
+  "columns": ["id", "ordered_at", "total_cents"],
+  "expected": [],
+  "plan": {
+    "mustContain": ["USING INDEX idx_orders_customer_date"],
+    "mustNotContain": ["SCAN orders"]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "input": {
+    "text": "the cat and the dog",
+    "count": 2
+  },
+  "expected": ["the", "and"]
+}

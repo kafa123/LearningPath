@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Psel.Api/Psel.Api.csproj" />
+    <Project Path="src/Psel.Infrastructure/Psel.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/Psel.Modules.Assessment/Psel.Modules.Assessment.csproj" />
+    <Project Path="src/Modules/Psel.Modules.Challenges/Psel.Modules.Challenges.csproj" />
+    <Project Path="src/Modules/Psel.Modules.Execution/Psel.Modules.Execution.csproj" />
+    <Project Path="src/Modules/Psel.Modules.Learning/Psel.Modules.Learning.csproj" />
+    <Project Path="src/Modules/Psel.Modules.Progress/Psel.Modules.Progress.csproj" />
+    <Project Path="src/Modules/Psel.Modules.Submissions/Psel.Modules.Submissions.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Psel.Api.Tests/Psel.Api.Tests.csproj" />
+  </Folder>
+</Solution>

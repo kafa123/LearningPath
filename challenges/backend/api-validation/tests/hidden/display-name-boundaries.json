@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "displayName": "A",
+      "expectedStatus": 400,
+      "expectedFields": ["displayName"]
+    },
+    {
+      "displayName": "   ",
+      "expectedStatus": 400,
+      "expectedFields": ["displayName"]
+    },
+    {
+      "displayName": "  Ada  ",
+      "expectedStatus": 201,
+      "expectedFields": []
+    }
+  ]
+}

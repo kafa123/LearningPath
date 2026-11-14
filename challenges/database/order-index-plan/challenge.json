@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "slug": "order-index-plan",
+  "title": "Use the composite order index",
+  "summary": "Write a customer and date-range query that uses a composite index instead of scanning the orders table.",
+  "domainSlug": "database-engineering",
+  "topic": "Indexes and query plans",
+  "difficulty": "Advanced",
+  "type": "Performance",
+  "estimatedMinutes": 35,
+  "objectives": [
+    "Read an EXPLAIN QUERY PLAN result and identify an index search.",
+    "Align a query predicate and sort order with a composite index.",
+    "Avoid a full table scan for a selective customer and date range."
+  ],
+  "prerequisites": [
+    "indexes-and-query-plans"
+  ],
+  "competencySlugs": [
+    "index-design",
+    "plan-interpretation"
+  ],
+  "constraints": [
+    "Return exactly the columns id, ordered_at, and total_cents in that order.",
+    "Return only orders for customer_id 42 with ordered_at on or after 2026-01-01.",
+    "Order rows by ordered_at ascending.",
+    "The query plan must use the idx_orders_customer_date index and must not scan the orders table."
+  ],
+  "examples": [
+    {
+      "input": "customer_id = 42, ordered_at = '2026-01-05'",
+      "output": "id = 2, ordered_at = '2026-01-05', total_cents = 1500",
+      "explanation": "The composite index covers the customer filter and the date range."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Customer 42 after the cutoff",
+        "description": "Returns the matching orders using the composite index.",
+        "source": "tests/public/customer-42.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Cutoff boundary",
+        "description": "An order one day before the cutoff must be excluded.",
+        "source": "tests/hidden/cutoff-boundary.json"
+      },
+      {
+        "name": "Other customers excluded",
+        "description": "Orders for other customers must not appear.",
+        "source": "tests/hidden/other-customers.json"
+      },
+      {
+        "name": "Empty result keeps the plan",
+        "description": "The query still uses the index when no rows match.",
+        "source": "tests/hidden/empty-result.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "age": 12,
+      "expectedStatus": 400,
+      "expectedFields": ["age"]
+    },
+    {
+      "age": 13,
+      "expectedStatus": 201,
+      "expectedFields": []
+    },
+    {
+      "age": 120,
+      "expectedStatus": 201,
+      "expectedFields": []
+    },
+    {
+      "age": 121,
+      "expectedStatus": 400,
+      "expectedFields": ["age"]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "two-sum",
+  "title": "Two Sum",
+  "summary": "Return the indices of the two numbers that add up to a target value.",
+  "domainSlug": "programming-fundamentals",
+  "topic": "Arrays and hash maps",
+  "difficulty": "Beginner",
+  "type": "Coding",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Translate a problem statement into an explicit function contract.",
+    "Use a hash map to trade memory for a faster lookup.",
+    "Check boundary cases such as duplicate values and negative numbers."
+  ],
+  "prerequisites": [
+    "algorithm-foundations",
+    "data-structures"
+  ],
+  "competencySlugs": [
+    "algorithm-decomposition",
+    "correctness-reasoning",
+    "structure-selection",
+    "asymptotic-analysis"
+  ],
+  "constraints": [
+    "Each input has exactly one valid answer.",
+    "The same element may not be used twice.",
+    "Return the indices in ascending order."
+  ],
+  "examples": [
+    {
+      "input": "numbers = [2, 7, 11, 15], target = 9",
+      "output": "[0, 1]",
+      "explanation": "numbers[0] + numbers[1] = 2 + 7 = 9."
+    },
+    {
+      "input": "numbers = [3, 2, 4], target = 6",
+      "output": "[1, 2]",
+      "explanation": "numbers[1] + numbers[2] = 2 + 4 = 6."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Example 1",
+        "description": "The first pair adds up to the target.",
+        "source": "tests/public/example-1.json"
+      },
+      {
+        "name": "Example 2",
+        "description": "The matching pair is not at the start of the array.",
+        "source": "tests/public/example-2.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Duplicate values",
+        "description": "Repeated values must still produce two distinct indices.",
+        "source": "tests/hidden/duplicate-values.json"
+      },
+      {
+        "name": "Negative numbers",
+        "description": "The target can be reached with negative values.",
+        "source": "tests/hidden/negative-numbers.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

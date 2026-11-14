@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "slug": "order-revenue",
+  "title": "Completed revenue per customer",
+  "summary": "Aggregate completed order revenue for every customer, including customers with no orders.",
+  "domainSlug": "database-engineering",
+  "topic": "Joins, grouping, and NULL semantics",
+  "difficulty": "Intermediate",
+  "type": "SQL",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Use a LEFT JOIN to keep customers that have no matching orders.",
+    "Filter order rows in the join condition without removing customers.",
+    "Aggregate currency values and handle empty groups with COALESCE."
+  ],
+  "prerequisites": [
+    "sql-querying"
+  ],
+  "competencySlugs": [
+    "sql-composition",
+    "null-semantics"
+  ],
+  "constraints": [
+    "Return exactly the columns name, completed_orders, and revenue in that order.",
+    "Include every customer, even when the completed order count is zero.",
+    "Revenue is stored in cents and must be returned in dollars.",
+    "Order rows by revenue descending, then by customer name ascending."
+  ],
+  "examples": [
+    {
+      "input": "A customer with two completed orders worth 12000 and 13000 cents.",
+      "output": "name = 'Alice', completed_orders = 2, revenue = 250.0",
+      "explanation": "Completed revenue is summed and divided by 100."
+    },
+    {
+      "input": "A customer whose only orders are cancelled or pending.",
+      "output": "completed_orders = 0, revenue = 0.0",
+      "explanation": "The customer still appears because the query starts from the customers table."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Standard customer set",
+        "description": "Every seeded customer is returned with completed revenue.",
+        "source": "tests/public/standard.json"
+      },
+      {
+        "name": "Single customer",
+        "description": "One customer with one completed order produces one row.",
+        "source": "tests/public/single-customer.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Customers without orders",
+        "description": "Customers with no orders still appear with zero revenue.",
+        "source": "tests/hidden/no-orders.json"
+      },
+      {
+        "name": "Non-completed orders only",
+        "description": "Cancelled and pending orders are excluded from the aggregate.",
+        "source": "tests/hidden/non-completed.json"
+      },
+      {
+        "name": "Revenue ordering",
+        "description": "Ties are broken by customer name and revenue is ordered descending.",
+        "source": "tests/hidden/revenue-ordering.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      }
+    ]
+  }
+}

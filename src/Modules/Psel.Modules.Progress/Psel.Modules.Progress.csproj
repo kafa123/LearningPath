@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Psel.Infrastructure\Psel.Infrastructure.csproj" />
+    <ProjectReference Include="..\Psel.Modules.Assessment\Psel.Modules.Assessment.csproj" />
+    <ProjectReference Include="..\Psel.Modules.Challenges\Psel.Modules.Challenges.csproj" />
+    <ProjectReference Include="..\Psel.Modules.Learning\Psel.Modules.Learning.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Psel.Api.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "call": "ApplyDiscount",
+      "price": 500,
+      "tier": "vip",
+      "expected": 500
+    },
+    {
+      "call": "ApplyDiscountToAll",
+      "prices": [25, 500],
+      "tier": "",
+      "expected": [25, 500]
+    }
+  ]
+}

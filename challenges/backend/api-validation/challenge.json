@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "slug": "api-validation",
+  "title": "Add Request Validation to an Endpoint",
+  "summary": "Harden a registration endpoint with explicit validation and ProblemDetails responses.",
+  "domainSlug": "backend-engineering",
+  "topic": "HTTP API design",
+  "difficulty": "Intermediate",
+  "type": "API",
+  "estimatedMinutes": 45,
+  "objectives": [
+    "Translate a field contract into explicit validation rules.",
+    "Return a consistent validation response for invalid input.",
+    "Keep validation close to the endpoint that owns the request."
+  ],
+  "prerequisites": [
+    "http-api-design"
+  ],
+  "competencySlugs": [
+    "input-validation",
+    "safe-error-responses",
+    "resource-modeling",
+    "http-semantics"
+  ],
+  "constraints": [
+    "Return 201 Created for a valid request.",
+    "Return 400 Bad Request with field-level errors for invalid input.",
+    "Do not accept an invalid request and store it anyway.",
+    "Keep the route and request record unchanged."
+  ],
+  "examples": [
+    {
+      "input": "POST /registrations with {\"email\":\"ada@example.com\",\"displayName\":\"Ada\",\"age\":36}",
+      "output": "201 Created",
+      "explanation": "Every field satisfies the contract."
+    },
+    {
+      "input": "POST /registrations with {\"email\":\"not-an-email\",\"displayName\":\"A\",\"age\":12}",
+      "output": "400 Bad Request",
+      "explanation": "The email, display name, and age all violate their rules."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "starterFiles": [
+        {
+          "path": "Program.cs",
+          "source": "starter/csharp/Program.cs"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Valid registration",
+        "description": "A complete request creates a registration.",
+        "source": "tests/public/valid.json"
+      },
+      {
+        "name": "Invalid email and age",
+        "description": "Validation reports each failing field.",
+        "source": "tests/public/invalid-email-age.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Display name boundaries",
+        "description": "Names shorter than two or longer than fifty characters are rejected.",
+        "source": "tests/hidden/display-name-boundaries.json"
+      },
+      {
+        "name": "Age boundaries",
+        "description": "Ages below thirteen and above one hundred twenty are rejected.",
+        "source": "tests/hidden/age-boundaries.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "Hybrid",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 512
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 1200
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1500
+      }
+    ]
+  }
+}

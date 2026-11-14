@@ -1,0 +1,7 @@
+{
+  "input": {
+    "numbers": [3, 3],
+    "target": 6
+  },
+  "expected": [0, 1]
+}

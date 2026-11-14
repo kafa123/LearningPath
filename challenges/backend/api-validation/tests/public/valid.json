@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/registrations",
+    "body": {
+      "email": "ada@example.com",
+      "displayName": "Ada",
+      "age": 36
+    }
+  },
+  "expectedStatus": 201
+}

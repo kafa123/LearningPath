@@ -1,0 +1,10 @@
+{
+  "seed": "INSERT INTO customers (id, name, country) VALUES\n  (1, 'Zoe', 'US'),\n  (2, 'Amir', 'EG'),\n  (3, 'Bea', 'BR'),\n  (4, 'Cleo', 'GR');\nINSERT INTO orders (id, customer_id, status, total_cents, ordered_at) VALUES\n  (1, 1, 'completed', 5000, '2026-01-01'),\n  (2, 2, 'completed', 12500, '2026-01-02'),\n  (3, 3, 'completed', 12500, '2026-01-03'),\n  (4, 4, 'cancelled', 50000, '2026-01-04');",
+  "columns": ["name", "completed_orders", "revenue"],
+  "expected": [
+    ["Amir", 1, 125.0],
+    ["Bea", 1, 125.0],
+    ["Zoe", 1, 50.0],
+    ["Cleo", 0, 0.0]
+  ]
+}

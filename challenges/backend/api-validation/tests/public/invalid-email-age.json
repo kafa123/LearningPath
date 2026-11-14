@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/registrations",
+    "body": {
+      "email": "not-an-email",
+      "displayName": "A",
+      "age": 12
+    }
+  },
+  "expectedStatus": 400,
+  "expectedFields": ["email", "displayName", "age"]
+}

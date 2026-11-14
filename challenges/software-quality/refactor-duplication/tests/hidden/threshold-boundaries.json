@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "call": "ApplyDiscount",
+      "price": 100,
+      "tier": "standard",
+      "expected": 90
+    },
+    {
+      "call": "ApplyDiscount",
+      "price": 50,
+      "tier": "premium",
+      "expected": 40
+    },
+    {
+      "call": "ApplyDiscount",
+      "price": 99.99,
+      "tier": "standard",
+      "expected": 99.99
+    }
+  ]
+}

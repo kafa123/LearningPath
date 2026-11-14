@@ -1,0 +1,6 @@
+{
+  "input": {
+    "text": "if (items[0] == {value}) { return true; }"
+  },
+  "expected": true
+}

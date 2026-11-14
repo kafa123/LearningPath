@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-off-by-one",
+  "title": "Debug an Off-by-One Sum",
+  "summary": "Find and fix a loop boundary defect in a range-summing function.",
+  "domainSlug": "software-quality",
+  "topic": "Debugging and root cause",
+  "difficulty": "Beginner",
+  "type": "Debugging",
+  "estimatedMinutes": 20,
+  "objectives": [
+    "Reproduce a defect with a minimal failing example.",
+    "Read a loop boundary against its written contract.",
+    "Fix the root cause instead of special-casing one input."
+  ],
+  "prerequisites": [
+    "testing-foundations"
+  ],
+  "competencySlugs": [
+    "boundary-analysis",
+    "systematic-debugging",
+    "regression-prevention",
+    "correctness-reasoning"
+  ],
+  "constraints": [
+    "The range is inclusive: both start and end are included.",
+    "Do not change the public function signature.",
+    "The fix should work for every valid range, not just the failing example."
+  ],
+  "examples": [
+    {
+      "input": "numbers = [1, 2, 3, 4], start = 1, end = 3",
+      "output": "9",
+      "explanation": "The included values are 2 + 3 + 4 = 9."
+    },
+    {
+      "input": "numbers = [5], start = 0, end = 0",
+      "output": "5",
+      "explanation": "A single-element range includes that element."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Middle range",
+        "description": "Includes the value at the end index.",
+        "source": "tests/public/example-1.json"
+      },
+      {
+        "name": "Single element",
+        "description": "A range where start equals end.",
+        "source": "tests/public/example-2.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Full array",
+        "description": "The range covers every element.",
+        "source": "tests/hidden/full-array.json"
+      },
+      {
+        "name": "Negative values",
+        "description": "The defect is not caused by positive values.",
+        "source": "tests/hidden/negative-values.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 128
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

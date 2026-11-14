@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "balanced-brackets",
+  "title": "Balanced Brackets",
+  "summary": "Decide whether every opening bracket in a string is closed in the correct order.",
+  "domainSlug": "programming-fundamentals",
+  "topic": "Stacks and parsing",
+  "difficulty": "Beginner",
+  "type": "Coding",
+  "estimatedMinutes": 25,
+  "objectives": [
+    "Model a parsing rule as an explicit invariant.",
+    "Use a stack to match nested structure.",
+    "Reject input early when a closing bracket has no matching opener."
+  ],
+  "prerequisites": [
+    "algorithm-foundations",
+    "data-structures"
+  ],
+  "competencySlugs": [
+    "algorithm-decomposition",
+    "correctness-reasoning",
+    "structure-selection",
+    "structure-implementation"
+  ],
+  "constraints": [
+    "The input contains only brackets, letters, digits, spaces, and punctuation.",
+    "Bracket pairs are (), [], and {}.",
+    "An empty string is balanced."
+  ],
+  "examples": [
+    {
+      "input": "\"()[]{}\"",
+      "output": "true",
+      "explanation": "Every opening bracket is closed in the same order."
+    },
+    {
+      "input": "\"(]\"",
+      "output": "false",
+      "explanation": "The closing bracket does not match the most recent opener."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Nested and sequential pairs",
+        "description": "Several well-formed bracket groups in one string.",
+        "source": "tests/public/example-1.json"
+      },
+      {
+        "name": "Mismatched pair",
+        "description": "The closing bracket does not match the opener.",
+        "source": "tests/public/example-2.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Unclosed opener",
+        "description": "An opening bracket is never closed.",
+        "source": "tests/hidden/unclosed.json"
+      },
+      {
+        "name": "Interleaved text",
+        "description": "Brackets are mixed with ordinary characters.",
+        "source": "tests/hidden/interleaved-text.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 128
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

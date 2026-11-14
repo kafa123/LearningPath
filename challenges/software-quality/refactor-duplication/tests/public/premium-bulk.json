@@ -1,0 +1,10 @@
+{
+  "cases": [
+    {
+      "call": "ApplyDiscountToAll",
+      "prices": [40, 60],
+      "tier": "premium",
+      "expected": [40, 48]
+    }
+  ]
+}

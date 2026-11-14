@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "slug": "word-frequency",
+  "title": "Word Frequency",
+  "summary": "Count words in a text and return the most frequent ones with deterministic tie-breaking.",
+  "domainSlug": "programming-fundamentals",
+  "topic": "Hash maps and sorting",
+  "difficulty": "Intermediate",
+  "type": "Coding",
+  "estimatedMinutes": 35,
+  "objectives": [
+    "Normalize text before comparing values.",
+    "Aggregate counts with a hash map.",
+    "Combine ordering rules so output is deterministic."
+  ],
+  "prerequisites": [
+    "data-structures",
+    "complexity-analysis"
+  ],
+  "competencySlugs": [
+    "algorithm-decomposition",
+    "structure-selection",
+    "structure-implementation",
+    "performance-tradeoffs",
+    "asymptotic-analysis"
+  ],
+  "constraints": [
+    "Words are separated by whitespace.",
+    "Treat words case-insensitively and compare them in lowercase.",
+    "Ignore punctuation attached to a word's edges.",
+    "Break count ties alphabetically.",
+    "Return at most count words."
+  ],
+  "examples": [
+    {
+      "input": "text = \"the cat and the dog\", count = 2",
+      "output": "[\"the\", \"and\"]",
+      "explanation": "the appears twice; and and cat and dog each appear once, so the alphabetical tie-break selects and."
+    },
+    {
+      "input": "text = \"One one TWO\", count = 3",
+      "output": "[\"one\", \"two\"]",
+      "explanation": "Only two distinct words remain after normalization; the result may contain fewer than count entries."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Basic frequency",
+        "description": "A repeated word wins over the remaining words.",
+        "source": "tests/public/example-1.json"
+      },
+      {
+        "name": "Case normalization",
+        "description": "Different casing counts as the same word.",
+        "source": "tests/public/example-2.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Alphabetical tie-break",
+        "description": "Equal counts are ordered alphabetically.",
+        "source": "tests/hidden/tie-break.json"
+      },
+      {
+        "name": "Punctuation edges",
+        "description": "Trailing punctuation is removed before counting.",
+        "source": "tests/hidden/punctuation.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 1200
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1500
+      }
+    ]
+  }
+}

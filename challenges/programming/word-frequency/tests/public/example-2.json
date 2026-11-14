@@ -1,0 +1,7 @@
+{
+  "input": {
+    "text": "One one TWO",
+    "count": 3
+  },
+  "expected": ["one", "two"]
+}

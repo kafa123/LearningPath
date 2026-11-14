@@ -1,0 +1,12 @@
+{
+  "columns": ["id", "ordered_at", "total_cents"],
+  "expected": [
+    [2, "2026-01-05", 1500],
+    [3, "2026-01-19", 1700],
+    [4, "2026-02-10", 2500]
+  ],
+  "plan": {
+    "mustContain": ["USING INDEX idx_orders_customer_date"],
+    "mustNotContain": ["SCAN orders"]
+  }
+}
