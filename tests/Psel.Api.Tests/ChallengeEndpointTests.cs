@@ -138,6 +138,7 @@ public sealed class ChallengeEndpointTests
         Assert.Equal("AutomatedTests", challenge.Evaluation.Kind);
         Assert.Equal(5, challenge.Evaluation.TimeLimitSeconds);
         Assert.Equal(256, challenge.Evaluation.MemoryLimitMb);
+        Assert.Null(challenge.Rubric);
 
         Assert.DoesNotContain("tests/hidden", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("solutions/", body, StringComparison.OrdinalIgnoreCase);
@@ -181,6 +182,42 @@ public sealed class ChallengeEndpointTests
             Assert.NotEmpty(challenge.Languages);
             Assert.NotEmpty(challenge.PublicTests);
         }
+    }
+
+    [Fact]
+    public async Task GetChallenge_ReturnsServerOwnedRubricWhenDefined()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(
+            "/api/challenges/refactor-duplication",
+            cancellationToken);
+        var challenge = await response.Content.ReadFromJsonAsync<ChallengeDetailDto>(
+            JsonOptions,
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(challenge);
+        Assert.NotNull(challenge.Rubric);
+        Assert.Equal("Hybrid", challenge.Evaluation.Kind);
+        Assert.Equal(
+            ["behavior-preservation", "single-source-of-truth", "clarity", "test-confidence"],
+            challenge.Rubric.Criteria.Select(criterion => criterion.Id));
+        Assert.All(
+            challenge.Rubric.Criteria,
+            criterion =>
+            {
+                Assert.False(string.IsNullOrWhiteSpace(criterion.Title));
+                Assert.False(string.IsNullOrWhiteSpace(criterion.Description));
+                Assert.Equal(10, criterion.MaxPoints);
+                Assert.InRange(criterion.Weight, 1, 10);
+            });
+
+        var behavior = challenge.Rubric.Criteria[0];
+        Assert.Equal(3, behavior.Weight);
+        Assert.Equal("Behavior preservation", behavior.Title);
     }
 
     [Fact]
@@ -238,6 +275,15 @@ public sealed class ChallengeEndpointTests
         int? TimeLimitSeconds,
         int? MemoryLimitMb);
 
+    private sealed record RubricCriterionDto(
+        string Id,
+        string Title,
+        string? Description,
+        int MaxPoints,
+        int Weight);
+
+    private sealed record ChallengeRubricDto(List<RubricCriterionDto> Criteria);
+
     private sealed record ChallengeDetailDto(
         string Slug,
         string Title,
@@ -254,6 +300,7 @@ public sealed class ChallengeEndpointTests
         List<ChallengeLanguageDto> Languages,
         List<PublicTestSummaryDto> PublicTests,
         ChallengeEvaluationDto Evaluation,
+        ChallengeRubricDto? Rubric,
         string StatementMarkdown,
         string? HintsMarkdown);
 }

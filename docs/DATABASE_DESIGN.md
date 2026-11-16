@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-This document describes the persistence design through Phase 8. It defines the learning schema, the submission schema, the assessment schema, and the progress/examination schema, and records that challenge content is deliberately filesystem-backed. SQL challenges execute against disposable in-memory SQLite databases and are not persisted as application tables.
+This document describes the persistence design through Phase 10. It defines the learning schema, the submission schema, the assessment schema, the progress/examination schema, and the rubric-review schema, and records that challenge content is deliberately filesystem-backed. SQL challenges execute against disposable in-memory SQLite databases and are not persisted as application tables.
 
 ## 2. Technology
 
@@ -58,7 +58,7 @@ The restrict behavior on the prerequisite target prevents deleting a module that
 
 ### Seed content
 
-`LearningDataSeeder` runs after migration and inserts the initial catalog once:
+`LearningDataSeeder` runs after migration and synchronizes the catalog as an upsert:
 
 | Entity | Count |
 |---|---|
@@ -69,7 +69,7 @@ The restrict behavior on the prerequisite target prevents deleting a module that
 | Objectives | 36 |
 | Prerequisite links | 7 |
 
-The seeder is idempotent by checking whether any domain exists. It is deliberately simple for the local single-user application; a future authoring feature will need explicit upsert and versioning rules rather than a count check.
+The synchronizer matches domains, modules, materials, and competencies by slug and objectives by `(ModuleId, SortOrder)`. Missing rows and prerequisite links are inserted, changed scalar fields are updated, and rows removed from the seed are deliberately left in place. Because rows are updated rather than recreated, restarting the API to add or edit learning content preserves submissions, assessments, examination sessions, progress evidence, and rubric reviews. A future authoring feature will still need explicit delete and rename rules.
 
 The database health check verifies that EF Core can open a connection to the configured SQLite database.
 
@@ -161,6 +161,17 @@ Because the schema and seed are trusted package content, the loader validates th
 
 The SQL runner passes only `query.sql`, the server-resolved harness, and the server-selected test manifest into the workspace. `PRAGMA query_only` and the harness authorizer prevent the query from modifying the execution database; the container has no network and no mount of the application database, so the query has no path to application data even if those controls were bypassed.
 
+### Phase 10 — rubric reviews
+
+The `RubricReview` migration adds two tables owned by the submissions module. Rubric criteria themselves are trusted package content and are not stored; only the learner's review and its criterion snapshots are persisted.
+
+| Table | Purpose | Keys and constraints |
+|---|---|---|
+| `RubricReviews` | One advisory self-review per terminal submission | `Id` PK; unique `SubmissionId` FK → `Submissions` (cascade); `ChallengeSlug` (max 100), `Score`, `Band` (max 40), `Note` (max 2000), `CreatedAtUtc`, `UpdatedAtUtc`; index on `UpdatedAtUtc` |
+| `RubricCriterionScores` | Snapshot of one criterion score at review time | `Id` PK; `RubricReviewId` FK → `RubricReviews` (cascade); `CriterionId` (max 60), `Title` (max 120), `Points`, `MaxPoints`, `Weight`, `SortOrder`; index on `(RubricReviewId, SortOrder)` |
+
+`Score` and `Band` are derived by the server from the weighted criteria and persisted for stable reads. `Title`, `MaxPoints`, and `Weight` are copied from the package rubric when the review is saved, so an older review remains explainable if the package changes. The unique `SubmissionId` enforces the one-review-per-submission upsert contract. A review never writes to `Assessments`, `Submissions`, or progress; deleting a submission cascades to its review and criterion rows.
+
 
 ## 5. Migration workflow
 
@@ -200,7 +211,7 @@ Review every generated migration before committing it. SQLite has limited `ALTER
 3. Logs successful initialization.
 4. Fails startup with a clear error if the database cannot be initialized.
 
-`LearningDataSeeder` is registered as a hosted service after the database initializer. It resolves a scope, checks for existing learning domains, and inserts the seed catalog only when the catalog is absent.
+`LearningDataSeeder` is registered as a hosted service after the database initializer. It resolves a scope and applies the seed catalog as an upsert, so startup can add or refresh content without duplicating rows or deleting learner data.
 
 This is a deliberate local-first choice. It assumes one application instance. A multi-instance deployment should move migration execution to a controlled deployment step.
 
@@ -213,7 +224,7 @@ Module data ownership follows these rules:
 - The single `PselDbContext` remains the transaction boundary for the modular monolith.
 - Cross-module foreign keys should be deliberate; modules should not depend directly on each other's internal persistence types.
 - `Psel.Modules.Challenges` owns no entities and contributes no configurations. Its catalog lifecycle is filesystem-to-memory, not database-backed. SQL schema and seed files are part of that catalog and are injected only into execution test data.
-- `Psel.Modules.Submissions` owns the `Submission` entity and its configuration. It participates in the shared `PselDbContext` through the module assembly registry.
+- `Psel.Modules.Submissions` owns the `Submission`, `RubricReview`, and `RubricCriterionScore` entities and their configurations. It participates in the shared `PselDbContext` through the module assembly registry.
 - `Psel.Modules.Assessment` owns the `Assessment` and `AssessmentTestResult` entities and their configurations. It participates in the shared `PselDbContext` through the module assembly registry.
 - `Psel.Modules.Progress` owns the `ExaminationSession` and `ExaminationAttempt` entities and their configurations. It participates in the shared `PselDbContext` through the module assembly registry. It reads assessment evidence for derivation but does not own or mutate assessment rows.
 
@@ -227,6 +238,7 @@ The specification identifies these eventual entities. The learning entities are 
 - `TestResult` — implemented as `AssessmentTestResult` in Phase 5.
 - `Assessment` — implemented in Phase 5.
 - `ExaminationSession` and `ExaminationAttempt` — implemented in Phase 7.
+- `RubricReview` and `RubricCriterionScore` — implemented in Phase 10 as advisory review evidence attached to a submission.
 - No `UserProgress` table exists. Competency progress is derived on read from append-only assessment and examination evidence.
 
 Any future need to query challenges relationally must be reconciled with the filesystem source of truth before adding tables.

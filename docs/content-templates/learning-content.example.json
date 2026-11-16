@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "domains": [
+    {
+      "slug": "programming-fundamentals",
+      "name": "Programming Fundamentals",
+      "description": "Algorithms, data structures, complexity, and the core techniques behind reliable programs.",
+      "sortOrder": 1,
+      "modules": [
+        {
+          "slug": "sorting-and-searching",
+          "title": "Sorting and Searching",
+          "summary": "Choose a search strategy that matches the data and the constraints.",
+          "level": "Intermediate",
+          "estimatedMinutes": 50,
+          "sortOrder": 4,
+          "objectives": [
+            {
+              "sortOrder": 1,
+              "text": "Compare linear and binary search trade-offs."
+            },
+            {
+              "sortOrder": 2,
+              "text": "Explain when sorting first is worth the extra cost."
+            }
+          ],
+          "competencies": [
+            {
+              "slug": "search-strategy",
+              "name": "Search strategy",
+              "description": "Pick an approach based on ordering, input size, and update frequency.",
+              "sortOrder": 1
+            }
+          ],
+          "materials": [
+            {
+              "slug": "sorting-and-searching-lesson",
+              "title": "Choosing a search strategy",
+              "kind": "Lesson",
+              "estimatedMinutes": 20,
+              "sortOrder": 1,
+              "bodyMarkdown": "## Choosing a search strategy\n\nBinary search is fast on sorted data, but sorting has a cost. Decide whether the data is already ordered before optimizing.\n\n### Questions to ask\n\n- Is the data already sorted, or does it change often?\n- Is a linear scan fast enough for the expected size?\n- Can the collection be indexed once and queried many times?"
+            }
+          ],
+          "prerequisites": [
+            "algorithm-foundations"
+          ]
+        }
+      ]
+    }
+  ]
+}

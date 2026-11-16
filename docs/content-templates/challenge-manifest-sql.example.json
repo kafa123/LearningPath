@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "orders-by-status",
+  "title": "Orders by Status",
+  "summary": "Return orders with a given status, newest first.",
+  "domainSlug": "database-engineering",
+  "topic": "Query writing",
+  "difficulty": "Intermediate",
+  "type": "SQL",
+  "estimatedMinutes": 25,
+  "objectives": [
+    "Filter rows with a parameterized predicate.",
+    "Order results deterministically.",
+    "Select only the requested columns."
+  ],
+  "prerequisites": [
+    "sql-querying"
+  ],
+  "competencySlugs": [
+    "sql-composition",
+    "null-semantics"
+  ],
+  "constraints": [
+    "Return exactly the columns id, status, and total_cents in that order.",
+    "Return only orders whose status matches the requested value.",
+    "Order rows by ordered_at descending, then by id ascending.",
+    "Use a single SELECT statement."
+  ],
+  "examples": [
+    {
+      "input": "status = 'paid'",
+      "output": "id = 3, status = 'paid', total_cents = 2500",
+      "explanation": "Only paid orders are returned, newest first."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Paid orders",
+        "description": "Returns paid orders in the required order.",
+        "source": "tests/public/paid-orders.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Status with no rows",
+        "description": "An unused status returns an empty result with the same columns.",
+        "source": "tests/hidden/empty-status.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  }
+}

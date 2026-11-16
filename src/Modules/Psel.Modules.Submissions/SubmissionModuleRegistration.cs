@@ -18,6 +18,7 @@ public static class SubmissionModuleRegistration
     {
         services.AddSingleton<SubmissionQueue>();
         services.AddScoped<SubmissionService>();
+        services.AddScoped<RubricReviewService>();
         services.AddHostedService<SubmissionRecoveryService>();
         services.AddHostedService<SubmissionWorker>();
 

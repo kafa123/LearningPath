@@ -39,7 +39,7 @@ describe('PracticePage', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Practice deliberately. Then prove it.',
+        name: 'Practice',
       }),
     ).toBeInTheDocument()
 

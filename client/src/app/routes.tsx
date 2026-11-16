@@ -7,6 +7,7 @@ import {
   MaterialPage,
 } from './lazyPages'
 import { ChallengesPage } from '@/features/challenges/ChallengesPage'
+import { AuthoringPage } from '@/features/authoring/AuthoringPage'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { ExaminationsPage } from '@/features/examinations/ExaminationsPage'
 import { LearningPathsPage } from '@/features/learning/LearningPathsPage'
@@ -70,6 +71,7 @@ export const appRoutes: RouteObject[] = [
         ],
       },
       { path: 'progress', element: <ProgressPage /> },
+      { path: 'authoring', element: <AuthoringPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

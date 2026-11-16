@@ -30,3 +30,31 @@ public sealed record SubmissionDetail(
     string? FailureMessage,
     bool OutputTruncated,
     string Purpose);
+
+public sealed record RubricCriterionInput(string? Id, int? Points);
+
+/// <summary>
+/// A learner-supplied self-review. Only per-criterion points and a note are
+/// accepted; totals, bands, and criterion metadata are server-owned.
+/// </summary>
+public sealed record SaveRubricReviewRequest(
+    IReadOnlyList<RubricCriterionInput>? Criteria,
+    string? Note);
+
+public sealed record RubricCriterionReview(
+    string Id,
+    string Title,
+    string? Description,
+    int MaxPoints,
+    int Weight,
+    int Points);
+
+public sealed record RubricReviewDetail(
+    Guid SubmissionId,
+    string ChallengeSlug,
+    int Score,
+    string Band,
+    string? Note,
+    IReadOnlyList<RubricCriterionReview> Criteria,
+    DateTimeOffset CreatedAtUtc,
+    DateTimeOffset UpdatedAtUtc);

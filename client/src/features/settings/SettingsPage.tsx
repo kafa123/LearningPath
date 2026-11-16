@@ -5,10 +5,10 @@ import { useHealth, type HealthState } from '@/features/dashboard/useHealth'
 import { Breadcrumbs, ErrorPanel, LoadingPanel } from '@/shared/components/QueryState'
 import { useTheme } from '@/shared/theme/ThemeContext'
 
-const healthStyles: Record<HealthStatus, string> = {
-  Healthy: 'border-emerald-400/25 bg-emerald-400/10 text-emerald-200',
-  Degraded: 'border-amber-400/25 bg-amber-400/10 text-amber-200',
-  Unhealthy: 'border-rose-400/25 bg-rose-400/10 text-rose-200',
+const healthDot: Record<HealthStatus, string> = {
+  Healthy: 'bg-emerald-400',
+  Degraded: 'bg-amber-400',
+  Unhealthy: 'bg-rose-400',
 }
 
 function formatTimestamp(value: string): string {
@@ -34,11 +34,9 @@ function formatBytes(bytes: number): string {
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
-      <dt className="text-[10px] font-medium tracking-[0.16em] text-slate-500 uppercase">
-        {label}
-      </dt>
-      <dd className="mt-1.5 font-mono text-sm text-slate-100">{value}</dd>
+    <div className="rounded-md border border-white/[0.07] bg-white/[0.02] p-3">
+      <dt className="text-[11px] text-slate-500">{label}</dt>
+      <dd className="mt-1 font-mono text-sm text-slate-200">{value}</dd>
     </div>
   )
 }
@@ -53,38 +51,27 @@ function HealthSection({
   return (
     <section
       aria-labelledby="settings-health-heading"
-      className="rounded-2xl border border-white/10 bg-slate-900/55 p-5 sm:p-6"
+      className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-emerald-300 uppercase">
-            System status
-          </p>
-          <h2 className="mt-2 text-lg font-semibold text-white" id="settings-health-heading">
-            API health
-          </h2>
-        </div>
+        <h2 className="text-base font-semibold text-white" id="settings-health-heading">
+          API health
+        </h2>
 
         {state.status === 'success' ? (
-          <span
-            className={[
-              'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase',
-              healthStyles[state.data.status],
-            ].join(' ')}
-          >
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
+          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+            <span
+              aria-hidden="true"
+              className={['size-1.5 rounded-full', healthDot[state.data.status]].join(' ')}
+            />
             {state.data.status}
           </span>
         ) : null}
         {state.status === 'loading' ? (
-          <span className="rounded-full border border-sky-400/25 bg-sky-400/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-sky-200 uppercase">
-            Checking
-          </span>
+          <span className="text-xs text-slate-500">Checking</span>
         ) : null}
         {state.status === 'error' ? (
-          <span className="rounded-full border border-rose-400/25 bg-rose-400/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-rose-200 uppercase">
-            Unavailable
-          </span>
+          <span className="text-xs text-rose-300">Unavailable</span>
         ) : null}
       </div>
 
@@ -97,13 +84,13 @@ function HealthSection({
       {state.status === 'error' ? (
         <div className="mt-4" role="alert">
           <p className="text-sm text-rose-200">The API is currently unavailable.</p>
-          <p className="mt-2 max-w-xl text-xs leading-5 text-slate-500">{state.message}</p>
+          <p className="mt-1.5 max-w-xl text-xs leading-5 text-slate-500">{state.message}</p>
           <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">
             Make sure the backend is running on{' '}
             <code className="text-slate-400">http://localhost:5080</code>.
           </p>
           <button
-            className="mt-4 rounded-lg border border-rose-300/20 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-100 transition hover:bg-rose-400/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300"
+            className="mt-4 rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-white/[0.18] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
             onClick={onRetry}
             type="button"
           >
@@ -117,7 +104,7 @@ function HealthSection({
           <p className="text-xs text-slate-500">
             The API and local database responded successfully.
           </p>
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile label="API" value={state.data.status} />
             <StatTile
               label="Database"
@@ -131,11 +118,11 @@ function HealthSection({
           </dl>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-slate-500">
-              {Math.round(state.data.totalDurationMs)} ms total · served by{' '}
+              {Math.round(state.data.totalDurationMs)} ms total ·{' '}
               <code className="text-slate-400">/api/health</code>
             </p>
             <button
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+              className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-white/[0.18] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
               onClick={onRetry}
               type="button"
             >
@@ -158,14 +145,11 @@ function RuntimeSection({
   return (
     <section
       aria-labelledby="settings-runtime-heading"
-      className="rounded-2xl border border-white/10 bg-slate-900/55 p-5 sm:p-6"
+      className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-emerald-300 uppercase">
-            Execution runtime
-          </p>
-          <h2 className="mt-2 text-lg font-semibold text-white" id="settings-runtime-heading">
+          <h2 className="text-base font-semibold text-white" id="settings-runtime-heading">
             Runtimes and limits
           </h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">
@@ -174,14 +158,14 @@ function RuntimeSection({
         </div>
 
         {state.status === 'success' ? (
-          <span
-            className={[
-              'rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase',
-              state.data.executionEnabled
-                ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-200'
-                : 'border-amber-300/25 bg-amber-300/10 text-amber-100',
-            ].join(' ')}
-          >
+          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+            <span
+              aria-hidden="true"
+              className={[
+                'size-1.5 rounded-full',
+                state.data.executionEnabled ? 'bg-emerald-400' : 'bg-amber-400',
+              ].join(' ')}
+            />
             {state.data.executionEnabled ? 'Execution enabled' : 'Execution disabled'}
           </span>
         ) : null}
@@ -208,20 +192,19 @@ function RuntimeSection({
       {state.status === 'success' ? (
         <div className="mt-5 space-y-6">
           <div>
-            <h3 className="text-[11px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-              Languages
-            </h3>
-            <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <h3 className="text-xs font-medium text-slate-400">Languages</h3>
+            <ul className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {state.data.languages.map((language) => (
                 <li
-                  className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3"
+                  className="rounded-md border border-white/[0.07] bg-white/[0.02] p-3"
                   key={language.id}
                 >
-                  <p className="text-sm font-medium text-slate-100">{language.name}</p>
-                  <p className="mt-1 text-[10px] tracking-[0.12em] text-slate-500 uppercase">
-                    {language.id}
-                  </p>
-                  <code className="mt-2 block truncate text-xs text-slate-400" title={language.image}>
+                  <p className="text-sm text-slate-100">{language.name}</p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">{language.id}</p>
+                  <code
+                    className="mt-1.5 block truncate text-xs text-slate-400"
+                    title={language.image}
+                  >
                     {language.image}
                   </code>
                 </li>
@@ -230,10 +213,8 @@ function RuntimeSection({
           </div>
 
           <div>
-            <h3 className="text-[11px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-              Limits
-            </h3>
-            <dl className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <h3 className="text-xs font-medium text-slate-400">Limits</h3>
+            <dl className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               <StatTile label="Time limit" value={`${state.data.limits.timeLimitSeconds}s`} />
               <StatTile label="Memory" value={`${state.data.limits.memoryLimitMb} MB`} />
               <StatTile label="CPU" value={state.data.limits.cpuLimit.toFixed(1)} />
@@ -262,31 +243,25 @@ export function SettingsPage() {
       <Breadcrumbs items={[{ label: 'Settings' }]} />
 
       <header>
-        <p className="text-[10px] font-semibold tracking-[0.24em] text-emerald-300 uppercase">
-          Settings
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Know your runtime.
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
           Inspect the local API, execution languages, and resource limits. Configuration stays
-          server-owned through appsettings and environment variables, so nothing here can weaken
-          the execution sandbox.
+          server-owned through appsettings and environment variables.
         </p>
       </header>
 
-      <div className="rounded-2xl border border-sky-400/20 bg-sky-400/[0.06] px-4 py-3 text-xs leading-5 text-sky-100">
+      <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-xs leading-5 text-slate-400">
         This page is read-only. Change runtime images and limits in{' '}
-        <code className="text-sky-100">appsettings.json</code> or the corresponding environment
+        <code className="text-slate-300">appsettings.json</code> or the corresponding environment
         variables, then restart the API.
       </div>
 
       <section
         aria-labelledby="settings-appearance-heading"
-        className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/55 px-5 py-4"
+        className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-white/[0.08] bg-white/[0.02] px-5 py-4"
       >
         <div>
-          <h2 className="text-sm font-semibold text-white" id="settings-appearance-heading">
+          <h2 className="text-sm font-medium text-white" id="settings-appearance-heading">
             Appearance
           </h2>
           <p className="mt-1 text-xs text-slate-500">
@@ -301,10 +276,10 @@ export function SettingsPage() {
               <button
                 aria-pressed={isActive}
                 className={[
-                  'rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+                  'rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
                   isActive
-                    ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100'
-                    : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-white/20 hover:text-white',
+                    ? 'border-white/[0.18] bg-white/[0.06] text-white'
+                    : 'border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/[0.18] hover:text-slate-100',
                 ].join(' ')}
                 key={option}
                 onClick={() => setTheme(option)}

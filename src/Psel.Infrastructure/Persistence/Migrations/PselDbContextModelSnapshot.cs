@@ -396,6 +396,86 @@ namespace Psel.Infrastructure.Persistence.Migrations
                     b.ToTable("ExaminationSessions", (string)null);
                 });
 
+            modelBuilder.Entity("Psel.Modules.Submissions.Domain.RubricCriterionScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CriterionId")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxPoints")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("RubricReviewId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RubricReviewId", "SortOrder");
+
+                    b.ToTable("RubricCriterionScores", (string)null);
+                });
+
+            modelBuilder.Entity("Psel.Modules.Submissions.Domain.RubricReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Band")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ChallengeSlug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SubmissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubmissionId")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedAtUtc");
+
+                    b.ToTable("RubricReviews", (string)null);
+                });
+
             modelBuilder.Entity("Psel.Modules.Submissions.Domain.Submission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -548,6 +628,24 @@ namespace Psel.Infrastructure.Persistence.Migrations
                     b.Navigation("Examination");
                 });
 
+            modelBuilder.Entity("Psel.Modules.Submissions.Domain.RubricCriterionScore", b =>
+                {
+                    b.HasOne("Psel.Modules.Submissions.Domain.RubricReview", null)
+                        .WithMany("CriterionScores")
+                        .HasForeignKey("RubricReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Psel.Modules.Submissions.Domain.RubricReview", b =>
+                {
+                    b.HasOne("Psel.Modules.Submissions.Domain.Submission", null)
+                        .WithOne()
+                        .HasForeignKey("Psel.Modules.Submissions.Domain.RubricReview", "SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Psel.Modules.Assessment.Domain.Assessment", b =>
                 {
                     b.Navigation("TestResults");
@@ -572,6 +670,11 @@ namespace Psel.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Psel.Modules.Progress.Domain.ExaminationSession", b =>
                 {
                     b.Navigation("Attempts");
+                });
+
+            modelBuilder.Entity("Psel.Modules.Submissions.Domain.RubricReview", b =>
+                {
+                    b.Navigation("CriterionScores");
                 });
 #pragma warning restore 612, 618
         }

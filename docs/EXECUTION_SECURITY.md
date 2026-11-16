@@ -85,6 +85,10 @@ A submission carrying `examinationId` is checked by `IExaminationPolicy` before 
 
 The examination detail response embeds the normal client challenge projection with `HintsMarkdown` removed. Hidden test names, descriptions, identifiers, data, reference solutions, and harness source remain server-side, exactly as in a practice `Submit`. After the session is completed or expires, submissions are rejected; the server does not rely on the browser to enforce the limit.
 
+### Rubric reviews
+
+Rubric reviews are advisory data, not an execution path. `PUT /api/submissions/{id}/rubric` accepts only criterion identifiers, integer points, and a note; the client cannot supply criterion titles, maxima, weights, totals, bands, or submission identifiers from the body. The server resolves the rubric from the trusted package, rejects unknown or duplicated criteria, clamps validation to `0..maxPoints`, computes the weighted score, and writes the review only after the submission is terminal. Reviews never change submission status, assessment rows, or progress evidence, and no review value is passed to a runner or container.
+
 ## 5. Server-controlled configuration
 
 The following values come from `ExecutionOptions` (configuration section `Execution`) and are never part of any request contract:
@@ -210,6 +214,7 @@ The automated suite runs without a live Docker daemon:
 - Recovery tests verify stale rows become `Interrupted`.
 - Progress tests verify derived competency states and assessment history without exposing hidden test material.
 - Examination tests verify server-selected variants, `Submit`-only attempts, challenge matching, expiry with a controllable clock, finish behavior, and the hint-free challenge projection.
+- Rubric tests verify server-projected criteria, weighted scoring and bands, one-review upsert semantics, rejection of invalid criteria and non-terminal submissions, and that a review never alters assessment evidence.
 
 Live C# container execution was also verified manually with Docker Desktop 29.9.2 and `mcr.microsoft.com/dotnet/sdk:10.0`:
 

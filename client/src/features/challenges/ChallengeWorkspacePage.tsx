@@ -14,33 +14,22 @@ import {
 } from '@/shared/api/submissions'
 import { CodeEditor } from '@/shared/components/CodeEditor'
 import { Breadcrumbs, ErrorPanel, LoadingPanel } from '@/shared/components/QueryState'
+import { RubricReviewPanel } from '@/features/challenges/RubricReviewPanel'
 
 function draftKey(languageId: string, filePath: string) {
   return `${languageId}:${filePath}`
 }
 
-function MetaBadge({ children }: { children: string }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-slate-400 uppercase">
-      {children}
-    </span>
-  )
-}
-
 function statusTone(status: string) {
   if (status === 'Succeeded' || status === 'Accepted') {
-    return 'border-emerald-400/25 bg-emerald-400/10 text-emerald-100'
+    return 'text-emerald-300'
   }
 
-  if (
-    status === 'Queued'
-    || status === 'Running'
-    || status === 'WrongAnswer'
-  ) {
-    return 'border-amber-300/25 bg-amber-300/10 text-amber-100'
+  if (status === 'Queued' || status === 'Running' || status === 'WrongAnswer') {
+    return 'text-amber-300'
   }
 
-  return 'border-rose-400/25 bg-rose-400/10 text-rose-100'
+  return 'text-rose-300'
 }
 
 function testStatusTone(status: string) {
@@ -179,7 +168,7 @@ export function ChallengeWorkspace({
 
   if (!activeLanguage || !starterFile) {
     return (
-      <div className="rounded-2xl border border-rose-400/20 bg-rose-400/[0.06] p-6" role="alert">
+      <div className="rounded-lg border border-rose-400/20 bg-rose-400/[0.04] p-5" role="alert">
         <p className="text-sm font-medium text-rose-100">
           This challenge has no editable starter files.
         </p>
@@ -287,25 +276,28 @@ export function ChallengeWorkspace({
 
   return (
     <div className="space-y-6">
-      <header className="border-b border-white/10 pb-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <MetaBadge>{challenge.difficulty}</MetaBadge>
-          <MetaBadge>{challenge.type}</MetaBadge>
-          <MetaBadge>{`${challenge.estimatedMinutes} min`}</MetaBadge>
-          <span className="text-[11px] text-slate-500">{challenge.topic}</span>
+      <header className="border-b border-white/[0.08] pb-5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+          <span>{challenge.difficulty}</span>
+          <span aria-hidden="true">·</span>
+          <span>{challenge.type}</span>
+          <span aria-hidden="true">·</span>
+          <span>{challenge.estimatedMinutes} min</span>
+          <span aria-hidden="true">·</span>
+          <span>{challenge.topic}</span>
         </div>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white">
           {challenge.title}
         </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">{challenge.summary}</p>
+        <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-400">{challenge.summary}</p>
       </header>
 
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
-        <article className="rounded-2xl border border-white/10 bg-slate-900/45 p-5 xl:sticky xl:top-8 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto">
+        <article className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 xl:sticky xl:top-8 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto">
           {challenge.objectives.length > 0 ? (
             <section aria-labelledby="challenge-objectives">
               <h2
-                className="text-[10px] font-semibold tracking-[0.2em] text-emerald-300 uppercase"
+                className="text-sm font-semibold text-white"
                 id="challenge-objectives"
               >
                 Learning objectives
@@ -315,7 +307,7 @@ export function ChallengeWorkspace({
                   <li className="flex gap-2 text-xs leading-5 text-slate-400" key={objective}>
                     <span
                       aria-hidden="true"
-                      className="mt-2 size-1 shrink-0 rounded-full bg-emerald-400/70"
+                      className="mt-2 size-1 shrink-0 rounded-full bg-slate-500"
                     />
                     <span>{objective}</span>
                   </li>
@@ -329,7 +321,7 @@ export function ChallengeWorkspace({
             className="mt-6 border-t border-white/[0.07] pt-6"
           >
             <h2
-              className="text-[10px] font-semibold tracking-[0.2em] text-emerald-300 uppercase"
+              className="text-sm font-semibold text-white"
               id="challenge-statement"
             >
               Statement
@@ -358,7 +350,7 @@ export function ChallengeWorkspace({
                     className="flex gap-2 text-xs leading-5 text-slate-400"
                     key={constraint}
                   >
-                    <span aria-hidden="true" className="text-emerald-400/80">
+                    <span aria-hidden="true" className="text-slate-500">
                       •
                     </span>
                     <span>{constraint}</span>
@@ -379,23 +371,23 @@ export function ChallengeWorkspace({
               <div className="mt-3 space-y-3">
                 {challenge.examples.map((example, index) => (
                   <div
-                    className="rounded-xl border border-white/[0.08] bg-slate-950/45 p-3"
+                    className="rounded-md border border-white/[0.07] bg-white/[0.02] p-3"
                     key={`${example.input}-${index}`}
                   >
                     <dl className="space-y-2 text-xs">
                       <div>
-                        <dt className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
+                        <dt className="text-[11px] text-slate-500">
                           Input
                         </dt>
-                        <dd className="mt-1 font-mono text-[11px] whitespace-pre-wrap text-slate-300">
+                        <dd className="mt-0.5 font-mono text-[11px] whitespace-pre-wrap text-slate-300">
                           {example.input}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
+                        <dt className="text-[11px] text-slate-500">
                           Output
                         </dt>
-                        <dd className="mt-1 font-mono text-[11px] whitespace-pre-wrap text-emerald-200">
+                        <dd className="mt-0.5 font-mono text-[11px] whitespace-pre-wrap text-slate-200">
                           {example.output}
                         </dd>
                       </div>
@@ -412,8 +404,8 @@ export function ChallengeWorkspace({
           ) : null}
 
           {!isExamination && challenge.hintsMarkdown ? (
-            <details className="mt-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-              <summary className="cursor-pointer text-xs font-medium text-emerald-200">
+            <details className="mt-6 rounded-md border border-white/[0.07] bg-white/[0.02] p-4">
+              <summary className="cursor-pointer text-xs font-medium text-slate-300">
                 Show hints
               </summary>
               <div className="learning-prose mt-3">
@@ -435,14 +427,14 @@ export function ChallengeWorkspace({
               <h2 className="text-sm font-semibold text-white" id="challenge-public-tests">
                 Public tests
               </h2>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] tracking-[0.12em] text-slate-500 uppercase">
+              <span className="text-[11px] text-slate-500">
                 {challenge.publicTests.length}
               </span>
             </div>
             <ul className="mt-3 space-y-2">
               {challenge.publicTests.map((test) => (
                 <li
-                  className="rounded-lg border border-white/[0.07] bg-slate-950/40 px-3 py-2"
+                  className="rounded-md border border-white/[0.07] bg-white/[0.02] px-3 py-2"
                   key={test.name}
                 >
                   <p className="text-xs font-medium text-slate-300">{test.name}</p>
@@ -463,7 +455,7 @@ export function ChallengeWorkspace({
 
         <section
           aria-label="Code workspace"
-          className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/55"
+          className="overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02]"
         >
           <div className="border-b border-white/[0.07] px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -475,10 +467,10 @@ export function ChallengeWorkspace({
                     <button
                       aria-pressed={isActive}
                       className={[
-                        'rounded-lg px-2.5 py-1.5 text-xs font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+                        'rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
                         isActive
-                          ? 'bg-emerald-400/15 text-emerald-100 ring-1 ring-emerald-400/25'
-                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200',
+                          ? 'bg-white/[0.06] text-slate-100'
+                          : 'text-slate-400 hover:bg-white/[0.03] hover:text-slate-200',
                       ].join(' ')}
                       key={language.id}
                       onClick={() => selectLanguage(language.id)}
@@ -512,10 +504,10 @@ export function ChallengeWorkspace({
                   <button
                     aria-selected={isActive}
                     className={[
-                      'flex items-center gap-1.5 rounded-md px-2.5 py-1 font-mono text-[11px] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+                      'flex items-center gap-1.5 rounded-sm px-2 py-1 font-mono text-[11px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
                       isActive
                         ? 'bg-white/[0.07] text-slate-100'
-                        : 'text-slate-500 hover:bg-white/[0.04] hover:text-slate-300',
+                        : 'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300',
                     ].join(' ')}
                     key={file.path}
                     onClick={() => setActiveFilePath(file.path)}
@@ -536,7 +528,7 @@ export function ChallengeWorkspace({
             </div>
           </div>
 
-          <div className="h-[540px] bg-[#07101d]">
+          <div className="h-[540px] bg-slate-950">
             <CodeEditor
               filePath={starterFile.path}
               language={activeLanguage.editorLanguage}
@@ -551,7 +543,7 @@ export function ChallengeWorkspace({
                 <button
                   aria-describedby="execution-note"
                   className={[
-                    'rounded-lg border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+                    'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
                     activeLanguage.canExecute && !isRunning
                       ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100 hover:bg-emerald-400/15'
                       : 'cursor-not-allowed border-white/10 bg-white/[0.03] text-slate-500',
@@ -568,7 +560,7 @@ export function ChallengeWorkspace({
               <button
                 aria-describedby="execution-note"
                 className={[
-                  'rounded-lg border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+                  'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
                   activeLanguage.canExecute && !isRunning && submissionAllowed
                     ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100 hover:bg-emerald-400/15'
                     : 'cursor-not-allowed border-white/10 bg-white/[0.03] text-slate-500',
@@ -583,7 +575,7 @@ export function ChallengeWorkspace({
               </button>
               <span aria-hidden="true" className="mx-1 h-4 w-px bg-white/10" />
               <button
-                className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+                className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-white/[0.18] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
                 disabled={!isDirty}
                 onClick={resetCurrentFile}
                 type="button"
@@ -591,7 +583,7 @@ export function ChallengeWorkspace({
                 Reset file
               </button>
               <button
-                className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+                className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-white/[0.18] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
                 disabled={modifiedCount === 0}
                 onClick={resetAllFiles}
                 type="button"
@@ -620,7 +612,7 @@ export function ChallengeWorkspace({
 
               {runStatus === 'error' && runError ? (
                 <p
-                  className="rounded-lg border border-rose-400/20 bg-rose-400/[0.06] px-3 py-2 text-xs text-rose-100"
+                  className="rounded-md border border-rose-400/20 bg-rose-400/[0.04] px-3 py-2 text-xs text-rose-200"
                   role="alert"
                 >
                   {runError}
@@ -630,15 +622,16 @@ export function ChallengeWorkspace({
               {submission ? (
                 <section
                   aria-label="Execution result"
-                  className="rounded-xl border border-white/[0.08] bg-slate-950/45 p-3"
+                  className="rounded-md border border-white/[0.07] bg-white/[0.02] p-3"
                 >
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span
                       className={[
-                        'rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase',
+                        'inline-flex items-center gap-1.5 text-xs font-medium',
                         statusTone(submission.status),
                       ].join(' ')}
                     >
+                      <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
                       {submission.status}
                     </span>
                     {submission.durationMs != null ? (
@@ -661,10 +654,8 @@ export function ChallengeWorkspace({
 
                   {submission.standardOutput ? (
                     <div className="mt-3">
-                      <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                        Output
-                      </p>
-                      <pre className="mt-1 max-h-56 overflow-auto rounded-lg bg-black/30 p-3 font-mono text-[11px] whitespace-pre-wrap text-slate-200">
+                      <p className="text-[11px] text-slate-500">Output</p>
+                      <pre className="mt-1 max-h-56 overflow-auto rounded-md bg-slate-950/50 p-3 font-mono text-[11px] whitespace-pre-wrap text-slate-300">
                         {submission.standardOutput}
                       </pre>
                     </div>
@@ -672,10 +663,8 @@ export function ChallengeWorkspace({
 
                   {submission.standardError ? (
                     <div className="mt-3">
-                      <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                        Diagnostics
-                      </p>
-                      <pre className="mt-1 max-h-56 overflow-auto rounded-lg bg-black/30 p-3 font-mono text-[11px] whitespace-pre-wrap text-amber-100">
+                      <p className="text-[11px] text-slate-500">Diagnostics</p>
+                      <pre className="mt-1 max-h-56 overflow-auto rounded-md bg-slate-950/50 p-3 font-mono text-[11px] whitespace-pre-wrap text-amber-200">
                         {submission.standardError}
                       </pre>
                     </div>
@@ -697,7 +686,7 @@ export function ChallengeWorkspace({
 
               {assessmentError ? (
                 <p
-                  className="rounded-lg border border-amber-300/20 bg-amber-300/[0.06] px-3 py-2 text-xs text-amber-100"
+                  className="rounded-md border border-amber-300/20 bg-amber-300/[0.04] px-3 py-2 text-xs text-amber-200"
                   role="alert"
                 >
                   {assessmentError}
@@ -707,15 +696,16 @@ export function ChallengeWorkspace({
               {assessment ? (
                 <section
                   aria-label="Assessment result"
-                  className="rounded-xl border border-white/[0.08] bg-slate-950/45 p-3"
+                  className="rounded-md border border-white/[0.07] bg-white/[0.02] p-3"
                 >
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span
                       className={[
-                        'rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase',
+                        'inline-flex items-center gap-1.5 text-xs font-medium',
                         statusTone(assessment.outcome),
                       ].join(' ')}
                     >
+                      <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
                       {assessment.outcome}
                     </span>
                     <span className="text-[11px] text-slate-500">
@@ -727,27 +717,21 @@ export function ChallengeWorkspace({
                   </div>
 
                   <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                    <div className="rounded-lg bg-white/[0.03] px-2.5 py-2">
-                      <dt className="text-[10px] tracking-[0.14em] text-slate-500 uppercase">
-                        Passed
-                      </dt>
-                      <dd className="mt-0.5 text-slate-200">
+                    <div className="rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-2">
+                      <dt className="text-[11px] text-slate-500">Passed</dt>
+                      <dd className="mt-0.5 text-slate-300">
                         {assessment.passedTests} / {assessment.totalTests}
                       </dd>
                     </div>
-                    <div className="rounded-lg bg-white/[0.03] px-2.5 py-2">
-                      <dt className="text-[10px] tracking-[0.14em] text-slate-500 uppercase">
-                        Public
-                      </dt>
-                      <dd className="mt-0.5 text-slate-200">
+                    <div className="rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-2">
+                      <dt className="text-[11px] text-slate-500">Public</dt>
+                      <dd className="mt-0.5 text-slate-300">
                         {assessment.publicPassed} / {assessment.publicTotal}
                       </dd>
                     </div>
-                    <div className="rounded-lg bg-white/[0.03] px-2.5 py-2">
-                      <dt className="text-[10px] tracking-[0.14em] text-slate-500 uppercase">
-                        Hidden
-                      </dt>
-                      <dd className="mt-0.5 text-slate-200">
+                    <div className="rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-2">
+                      <dt className="text-[11px] text-slate-500">Hidden</dt>
+                      <dd className="mt-0.5 text-slate-300">
                         {assessment.hiddenPassed} / {assessment.hiddenTotal}
                       </dd>
                     </div>
@@ -755,19 +739,17 @@ export function ChallengeWorkspace({
 
                   {assessment.publicTests.length > 0 ? (
                     <div className="mt-3">
-                      <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                        Public test outcomes
-                      </p>
+                      <p className="text-[11px] text-slate-500">Public test outcomes</p>
                       <ul className="mt-1.5 space-y-1">
                         {assessment.publicTests.map((test) => (
                           <li
-                            className="flex items-center justify-between gap-3 rounded-md bg-black/20 px-2.5 py-1.5 text-xs"
+                            className="flex items-center justify-between gap-3 rounded-sm bg-white/[0.03] px-2.5 py-1.5 text-xs"
                             key={test.name}
                           >
                             <span className="text-slate-300">{test.name}</span>
                             <span
                               className={[
-                                'font-mono text-[10px] tracking-[0.08em] uppercase',
+                                'font-mono text-[10px]',
                                 testStatusTone(test.status),
                               ].join(' ')}
                             >
@@ -785,6 +767,16 @@ export function ChallengeWorkspace({
                     </p>
                   ) : null}
                 </section>
+              ) : null}
+
+              {submission?.isTerminal
+              && challenge.rubric
+              && challenge.rubric.criteria.length > 0 ? (
+                <RubricReviewPanel
+                  key={submission.id}
+                  rubric={challenge.rubric}
+                  submissionId={submission.id}
+                />
               ) : null}
             </div>
           </div>

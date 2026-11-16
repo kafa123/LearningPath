@@ -51,7 +51,7 @@ describe('SettingsPage', () => {
     renderApp(['/settings'])
 
     expect(
-      await screen.findByRole('heading', { name: 'Know your runtime.' }),
+      await screen.findByRole('heading', { name: 'Settings' }),
     ).toBeInTheDocument()
 
     expect(screen.getByText(/this page is read-only/i)).toBeInTheDocument()

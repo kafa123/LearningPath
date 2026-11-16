@@ -19,33 +19,18 @@ const foundationItems = [
 
 export function FoundationCard() {
   return (
-    <section className="rounded-2xl border border-white/10 bg-slate-900/45 p-5 sm:p-6">
-      <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
-        Phase 1 foundation
-      </p>
-      <h2 className="mt-2 text-lg font-semibold text-white">What is ready</h2>
+    <section className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+      <h2 className="text-base font-semibold text-white">Foundation</h2>
 
-      <ul className="mt-5 space-y-3.5">
+      <ul className="mt-4 space-y-3">
         {foundationItems.map((item) => (
-          <li className="flex gap-3" key={item.title}>
+          <li className="flex gap-2.5" key={item.title}>
             <span
               aria-hidden="true"
-              className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-emerald-400/25 bg-emerald-400/10 text-emerald-300"
-            >
-              <svg
-                className="size-3"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="m5 12 4 4L19 6" />
-              </svg>
-            </span>
+              className="mt-2 size-1 shrink-0 rounded-full bg-slate-500"
+            />
             <span>
-              <span className="block text-sm font-medium text-slate-200">{item.title}</span>
+              <span className="block text-sm text-slate-200">{item.title}</span>
               <span className="mt-0.5 block text-xs leading-5 text-slate-500">{item.detail}</span>
             </span>
           </li>

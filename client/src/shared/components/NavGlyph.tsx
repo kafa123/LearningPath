@@ -7,6 +7,7 @@ export type NavGlyphName =
   | 'practice'
   | 'examinations'
   | 'progress'
+  | 'authoring'
   | 'settings'
 
 const glyphs: Record<NavGlyphName, ReactNode> = {
@@ -51,6 +52,12 @@ const glyphs: Record<NavGlyphName, ReactNode> = {
       <path d="M10 20V4" />
       <path d="M16 20v-7" />
       <path d="M2 20h20" />
+    </>
+  ),
+  authoring: (
+    <>
+      <path d="M4 20h4L20 8l-4-4L4 16z" />
+      <path d="m13 7 4 4" />
     </>
   ),
   settings: (

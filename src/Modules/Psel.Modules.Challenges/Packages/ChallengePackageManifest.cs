@@ -40,6 +40,8 @@ internal sealed class ChallengePackageManifest
 
     public ChallengeEvaluationManifest? Evaluation { get; set; }
 
+    public ChallengeRubricManifest? Rubric { get; set; }
+
     public ChallengeExaminationManifest? Examination { get; set; }
 
     public ChallengeSqlManifest? Sql { get; set; }
@@ -104,6 +106,24 @@ internal sealed class ChallengeEvaluationManifest
     public int? TimeLimitSeconds { get; set; }
 
     public int? MemoryLimitMb { get; set; }
+}
+
+internal sealed class ChallengeRubricManifest
+{
+    public List<ChallengeRubricCriterionManifest>? Criteria { get; set; }
+}
+
+internal sealed class ChallengeRubricCriterionManifest
+{
+    public string? Id { get; set; }
+
+    public string? Title { get; set; }
+
+    public string? Description { get; set; }
+
+    public int? MaxPoints { get; set; }
+
+    public int? Weight { get; set; }
 }
 
 internal sealed class ChallengeExaminationManifest

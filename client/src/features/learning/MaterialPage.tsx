@@ -49,11 +49,9 @@ export function MaterialPage() {
 
       {state.status === 'success' ? (
         <article>
-          <header className="border-b border-white/10 pb-6">
-            <p className="text-[10px] font-semibold tracking-[0.24em] text-emerald-300 uppercase">
-              {state.data.kind}
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <header className="border-b border-white/[0.08] pb-6">
+            <p className="text-[11px] text-slate-500">{state.data.kind}</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
               {state.data.title}
             </h1>
             <p className="mt-2 text-xs text-slate-500">

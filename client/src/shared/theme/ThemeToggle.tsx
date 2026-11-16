@@ -35,7 +35,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     <button
       aria-label={`Switch to ${nextTheme} theme`}
       className={[
-        'inline-flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
+        'inline-flex size-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] text-slate-400 transition-colors hover:border-white/[0.18] hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300',
         className,
       ].join(' ')}
       onClick={toggleTheme}

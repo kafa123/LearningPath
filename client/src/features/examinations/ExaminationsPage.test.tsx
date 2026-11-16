@@ -62,7 +62,7 @@ describe('ExaminationsPage', () => {
     const { router } = renderApp(['/examinations'])
 
     expect(
-      await screen.findByRole('heading', { name: 'Prove competency under constraints.' }),
+      await screen.findByRole('heading', { name: 'Examinations' }),
     ).toBeInTheDocument()
     expect(await screen.findByText('Standard examination')).toBeInTheDocument()
     expect(screen.getByText('1 attempt')).toBeInTheDocument()
@@ -108,7 +108,7 @@ describe('ExaminationsPage', () => {
 
     renderApp(['/examinations'])
 
-    await screen.findByRole('heading', { name: 'Prove competency under constraints.' })
+    await screen.findByRole('heading', { name: 'Examinations' })
     await user.click(screen.getByRole('button', { name: 'Start examination' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(

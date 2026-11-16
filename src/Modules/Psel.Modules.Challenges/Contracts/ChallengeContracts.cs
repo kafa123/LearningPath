@@ -41,6 +41,19 @@ public sealed record ChallengeEvaluationSummary(
     int? MemoryLimitMb);
 
 /// <summary>
+/// One explicit review criterion. Criteria and weights are server-owned, so a
+/// client can score points against them but can never change the rubric.
+/// </summary>
+public sealed record RubricCriterion(
+    string Id,
+    string Title,
+    string? Description,
+    int MaxPoints,
+    int Weight);
+
+public sealed record ChallengeRubric(IReadOnlyList<RubricCriterion> Criteria);
+
+/// <summary>
 /// One server-defined examination variant. The variant and its limit are
 /// selected by the server when an examination starts; clients never supply an
 /// arbitrary duration or variant identifier.
@@ -70,6 +83,7 @@ public sealed record ChallengeDetail(
     IReadOnlyList<ChallengeLanguage> Languages,
     IReadOnlyList<PublicTestSummary> PublicTests,
     ChallengeEvaluationSummary Evaluation,
+    ChallengeRubric? Rubric,
     ChallengeExaminationSummary Examination,
     string StatementMarkdown,
     string? HintsMarkdown);

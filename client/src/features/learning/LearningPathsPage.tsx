@@ -1,42 +1,49 @@
 import { Link } from 'react-router'
 import { useApiQuery } from '@/shared/hooks/useApiQuery'
 import type { LearningPathSummary } from '@/shared/api/learning'
+import type { ChallengeSummary } from '@/shared/api/challenges'
 import { ErrorPanel, LoadingPanel } from '@/shared/components/QueryState'
+import { relatedChallenges, uniqueCompetencySlugs } from './relatedChallenges'
 
-function LearningPathCard({ path }: { path: LearningPathSummary }) {
+function LearningPathCard({
+  path,
+  challengeCount,
+}: {
+  path: LearningPathSummary
+  challengeCount: number
+}) {
   return (
     <Link
-      className="group flex h-full flex-col rounded-2xl border border-white/10 bg-slate-900/55 p-5 transition hover:-translate-y-0.5 hover:border-emerald-400/30 hover:bg-slate-900/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+      className="group flex h-full flex-col rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 transition-colors hover:border-white/[0.16] hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
       to={`/learning/${path.slug}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-          Learning path
-        </span>
-        <span className="text-[11px] font-medium text-slate-500">
+      <div className="flex items-start justify-between gap-3 text-[11px]">
+        <span className="text-slate-500">Learning path</span>
+        <span className="text-slate-500">
           {path.modules.length} {path.modules.length === 1 ? 'module' : 'modules'}
+          {challengeCount > 0
+            ? ` · ${challengeCount} challenge${challengeCount === 1 ? '' : 's'}`
+            : ''}
         </span>
       </div>
 
-      <h2 className="mt-5 text-lg font-semibold text-white transition group-hover:text-emerald-100">
+      <h2 className="mt-3 text-sm font-semibold text-white transition-colors group-hover:text-slate-200">
         {path.name}
       </h2>
-      <p className="mt-2 text-xs leading-5 text-slate-400">{path.description}</p>
+      <p className="mt-1.5 text-xs leading-5 text-slate-400">{path.description}</p>
 
-      <ul className="mt-5 space-y-2 border-t border-white/[0.07] pt-4">
+      <ul className="mt-4 space-y-1.5 border-t border-white/[0.07] pt-3 text-[11px] text-slate-500">
         {path.modules.slice(0, 3).map((module) => (
-          <li className="flex items-center gap-2 text-xs text-slate-400" key={module.slug}>
-            <span aria-hidden="true" className="size-1 rounded-full bg-emerald-400/70" />
+          <li className="flex items-center gap-2" key={module.slug}>
+            <span aria-hidden="true" className="size-1 rounded-full bg-slate-500" />
             <span className="truncate">{module.title}</span>
           </li>
         ))}
       </ul>
 
-      <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-xs font-medium text-emerald-300">
+      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[11px] text-slate-400">
         Browse path
-        <span aria-hidden="true" className="transition group-hover:translate-x-0.5">
-          →
-        </span>
+        <span aria-hidden="true">→</span>
       </span>
     </Link>
   )
@@ -44,19 +51,16 @@ function LearningPathCard({ path }: { path: LearningPathSummary }) {
 
 export function LearningPathsPage() {
   const { state, refresh } = useApiQuery<LearningPathSummary[]>('/api/learning-paths')
+  const challengesQuery = useApiQuery<ChallengeSummary[]>('/api/challenges')
+  const challenges = challengesQuery.state.status === 'success' ? challengesQuery.state.data : []
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <header>
-        <p className="text-[10px] font-semibold tracking-[0.24em] text-emerald-300 uppercase">
-          Learning paths
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Build understanding from the ground up.
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-          Five domains connect theory to practice. Each module lists objectives,
-          competencies, prerequisites, and a lesson you can read in the lab.
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Learning paths</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+          Five domains connect theory to practice. Each module lists objectives, competencies,
+          prerequisites, and a lesson you can read in the lab.
         </p>
       </header>
 
@@ -69,7 +73,13 @@ export function LearningPathsPage() {
       {state.status === 'success' ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {state.data.map((path) => (
-            <LearningPathCard key={path.slug} path={path} />
+            <LearningPathCard
+              challengeCount={
+                relatedChallenges(challenges, uniqueCompetencySlugs(path.modules)).length
+              }
+              key={path.slug}
+              path={path}
+            />
           ))}
         </div>
       ) : null}

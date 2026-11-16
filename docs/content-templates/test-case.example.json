@@ -1,0 +1,6 @@
+{
+  "input": {
+    "text": "Hello World"
+  },
+  "expected": 3
+}

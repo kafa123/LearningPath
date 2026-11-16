@@ -2,10 +2,22 @@ import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderApp } from '@/test/renderApp'
 import { jsonResponse, moduleFixture } from '@/test/learningFixtures'
+import { twoSumSummary } from '@/test/challengeFixtures'
 
 describe('ModulePage', () => {
-  it('renders objectives, materials, competencies, and prerequisites', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(moduleFixture)))
+  it('renders objectives, materials, competencies, prerequisites, and practice', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+
+        if (url.includes('/api/challenges')) {
+          return Promise.resolve(jsonResponse([twoSumSummary]))
+        }
+
+        return Promise.resolve(jsonResponse(moduleFixture))
+      }),
+    )
 
     renderApp(['/learning/programming-fundamentals/complexity-analysis'])
 
@@ -30,6 +42,14 @@ describe('ModulePage', () => {
     expect(
       screen.getByRole('link', { name: /algorithm foundations/i }),
     ).toHaveAttribute('href', '/learning/programming-fundamentals/algorithm-foundations')
+
+    expect(
+      screen.getByRole('heading', { name: 'Practice these competencies' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /two sum/i })).toHaveAttribute(
+      'href',
+      '/challenges/two-sum',
+    )
   })
 
   it('shows an error state for an unknown module', async () => {

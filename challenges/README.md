@@ -8,6 +8,9 @@ serves the validated catalog read-only.
 A package that fails validation prevents the API from starting. Invalid
 packages never become browsable and never partially load.
 
+For the end-to-end workflow, including learning content, competency mapping, and
+database resets, see [docs/ADDING_CONTENT.md](../docs/ADDING_CONTENT.md).
+
 ## Directory layout
 
 ```text
@@ -156,6 +159,42 @@ rejected. `schemaVersion` must be `1`.
 | `evaluation.memoryLimitMb` | Integer from 32 to 4096. |
 | `examination` | Optional. When absent, the challenge exposes one default `standard` variant with no time limit. |
 | `examination.variants` | Zero to 5 entries when present. Each variant has a unique `id` (max 60), a `label` (max 120), and an optional `timeLimitSeconds` from 60 to 7200. The server selects a variant; clients cannot request one. |
+| `rubric` | Optional. Allowed only when `evaluation.kind` is `Rubric` or `Hybrid`; required for `Rubric` and rejected for `AutomatedTests`. |
+| `rubric.criteria` | One to 12 unique criteria. Each has an `id` slug (max 60), a `title` (max 120), an optional `description` (max 500), `maxPoints` from 1 to 100, and an optional `weight` from 1 to 10 (default `1`). |
+
+### Rubric criteria
+
+A package that combines automated tests with reflective review can declare a rubric:
+
+```json
+{
+  "evaluation": {
+    "kind": "Hybrid",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "id": "behavior-preservation",
+        "title": "Behavior preservation",
+        "description": "Public behavior stays identical for every tier and price.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "clarity",
+        "title": "Clarity",
+        "description": "Names and structure make the rule easy to read.",
+        "maxPoints": 10,
+        "weight": 2
+      }
+    ]
+  }
+}
+```
+
+Criteria are server-owned and returned with the challenge detail. A learner may later score a terminal submission against them; the server computes the weighted 0–100 score and band, and the review never changes the automated assessment. Criteria ids are unique case-insensitively. Use `Hybrid` when a challenge has automated tests plus reflective review. A `Rubric` package must declare a rubric; stand-alone rubric-only review without an executable submission is not implemented yet.
 
 ### Path rules
 
@@ -448,7 +487,7 @@ See `challenges/database/order-revenue` for a correctness package and
 ## Competency mapping and examinations
 
 
-`competencySlugs` connects a challenge to the seeded competency model. Use slugs that already exist in the learning seed; the API derives progress by matching assessment evidence from this challenge to those competencies.
+`competencySlugs` connects a challenge to the seeded competency model. Use slugs that already exist in the learning seed; the API derives progress by matching assessment evidence from this challenge to those competencies, and the learning pages use the same field to surface related practice.
 
 - A challenge with no `competencySlugs` remains fully playable but contributes no competency evidence.
 - Evidence is recorded only for `Run` and `Submit` assessments. Progress states are derived by the server, not written by the challenge.

@@ -71,7 +71,7 @@ describe('AppShell', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Build understanding from the ground up.',
+        name: 'Learning paths',
       }),
     ).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/learning')

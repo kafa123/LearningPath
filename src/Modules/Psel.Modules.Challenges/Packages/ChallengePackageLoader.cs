@@ -270,6 +270,7 @@ internal sealed class ChallengePackageLoader(ChallengeLocation location)
         }
 
         var evaluation = ReadEvaluation(manifest.Evaluation, errors);
+        var rubric = ReadRubric(manifest.Rubric, evaluation.Kind, errors);
         var sql = ReadSql(manifest.Sql, packageRoot, errors);
         var languages = ReadLanguages(
             manifest.Languages,
@@ -309,6 +310,7 @@ internal sealed class ChallengePackageLoader(ChallengeLocation location)
             languages,
             publicTests,
             evaluation,
+            rubric,
             examination,
             statement ?? string.Empty,
             hints);
@@ -359,6 +361,80 @@ internal sealed class ChallengePackageLoader(ChallengeLocation location)
         }
 
         return new ChallengeExaminationSummary(variants);
+    }
+
+    private static ChallengeRubric? ReadRubric(
+        ChallengeRubricManifest? manifest,
+        string evaluationKind,
+        List<string> errors)
+    {
+        if (manifest is null)
+        {
+            if (string.Equals(evaluationKind, "Rubric", StringComparison.Ordinal))
+            {
+                errors.Add("rubric is required when evaluation.kind is Rubric.");
+            }
+
+            return null;
+        }
+
+        if (string.Equals(evaluationKind, "AutomatedTests", StringComparison.Ordinal))
+        {
+            errors.Add("rubric requires evaluation.kind Rubric or Hybrid.");
+        }
+
+        if (manifest.Criteria is null || manifest.Criteria.Count == 0)
+        {
+            errors.Add("rubric.criteria must contain at least one entry.");
+            return null;
+        }
+
+        if (manifest.Criteria.Count > 12)
+        {
+            errors.Add("rubric.criteria must contain at most 12 entries.");
+        }
+
+        var criteria = new List<RubricCriterion>();
+        var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        for (var index = 0; index < manifest.Criteria.Count; index++)
+        {
+            var criterion = manifest.Criteria[index];
+            var field = $"rubric.criteria[{index}]";
+            var id = RequireSlug(criterion.Id, $"{field}.id", 60, errors);
+            var title = RequireText(criterion.Title, $"{field}.title", 120, errors);
+
+            if (id is not null && !ids.Add(id))
+            {
+                errors.Add($"{field}.id '{id}' is duplicated.");
+            }
+
+            var description = string.IsNullOrWhiteSpace(criterion.Description)
+                ? null
+                : RequireText(criterion.Description, $"{field}.description", 500, errors);
+
+            if (criterion.MaxPoints is null or < 1 or > 100)
+            {
+                errors.Add($"{field}.maxPoints must be between 1 and 100.");
+            }
+
+            if (criterion.Weight is < 1 or > 10)
+            {
+                errors.Add($"{field}.weight must be between 1 and 10 when provided.");
+            }
+
+            if (id is not null && title is not null && criterion.MaxPoints is >= 1 and <= 100)
+            {
+                criteria.Add(new RubricCriterion(
+                    id,
+                    title,
+                    description,
+                    criterion.MaxPoints.Value,
+                    criterion.Weight ?? 1));
+            }
+        }
+
+        return criteria.Count == 0 ? null : new ChallengeRubric(criteria);
     }
 
     private static ChallengeEvaluationSummary ReadEvaluation(
@@ -570,7 +646,11 @@ internal sealed class ChallengePackageLoader(ChallengeLocation location)
     {
         if (manifest is null)
         {
-            errors.Add("tests is required.");
+            if (!string.Equals(evaluationKind, "Rubric", StringComparison.Ordinal))
+            {
+                errors.Add("tests is required.");
+            }
+
             return [];
         }
 

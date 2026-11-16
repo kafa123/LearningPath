@@ -22,7 +22,8 @@ public sealed record ModuleSummary(
     string Summary,
     string Level,
     int EstimatedMinutes,
-    IReadOnlyList<string> PrerequisiteSlugs);
+    IReadOnlyList<string> PrerequisiteSlugs,
+    IReadOnlyList<string> CompetencySlugs);
 
 public sealed record DomainReference(string Slug, string Name);
 

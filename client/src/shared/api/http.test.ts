@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ApiError, getJson, postJson } from '@/shared/api/http'
+import { ApiError, getJson, postForm, postJson } from '@/shared/api/http'
 
 describe('getJson', () => {
   it('parses a successful JSON response', async () => {
@@ -107,5 +107,63 @@ describe('postJson', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
 
     await expect(postJson('/api/test', {})).rejects.toBeInstanceOf(ApiError)
+  })
+})
+
+describe('postForm', () => {
+  it('posts a FormData body without setting a content type', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ slug: 'balanced-brackets' }),
+    } as Response)
+    vi.stubGlobal('fetch', fetchMock)
+
+    const form = new FormData()
+    form.append(
+      'file',
+      new File(['{}'], 'learning.json', { type: 'application/json' }),
+    )
+
+    await expect(postForm('/api/authoring/learning-content', form)).resolves.toEqual({
+      slug: 'balanced-brackets',
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/authoring/learning-content',
+      expect.objectContaining({
+        method: 'POST',
+        body: form,
+        headers: { Accept: 'application/json' },
+      }),
+    )
+  })
+
+  it('uses the problem detail as the error message', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: async () => ({
+          title: 'Challenge package conflict.',
+          detail: 'A package already exists.',
+        }),
+      } as Response),
+    )
+
+    await expect(postForm('/api/test', new FormData())).rejects.toEqual(
+      expect.objectContaining({
+        name: 'ApiError',
+        status: 409,
+        message: 'A package already exists.',
+      }),
+    )
+  })
+
+  it('turns a network failure into an ApiError', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+
+    await expect(postForm('/api/test', new FormData())).rejects.toBeInstanceOf(ApiError)
   })
 })

@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-This document defines the Phase 8 HTTP contract. The health endpoint, read-only learning catalog, read-only challenge catalog, language catalog, submission endpoints, assessment result endpoint, progress endpoints, and examination endpoints are implemented. SQL challenges reuse the language and submission contracts; there is no SQL-specific endpoint.
+This document defines the HTTP contract through post-MVP Phase 10. The health endpoint, read-only learning catalog, read-only challenge catalog, language catalog, submission endpoints, assessment result endpoint, rubric review endpoints, progress endpoints, examination endpoints, and local authoring endpoints are implemented. SQL challenges reuse the language and submission contracts; there is no SQL-specific endpoint.
 
 ## 2. Conventions
 
@@ -85,7 +85,7 @@ Returns the learning domains ordered by catalog order, with a module count for b
 
 ### `GET /api/learning-paths`
 
-Returns every learning path with its modules and prerequisite slugs. The response is ordered by domain order and module order.
+Returns every learning path with its modules, prerequisite slugs, and competency slugs. The competency slugs let clients connect a module to the challenges that assess the same competencies. The response is ordered by domain order and module order.
 
 **Response: 200 OK**
 
@@ -102,7 +102,8 @@ Returns every learning path with its modules and prerequisite slugs. The respons
         "summary": "Compare algorithms by how their work grows as the input grows.",
         "level": "Intermediate",
         "estimatedMinutes": 50,
-        "prerequisiteSlugs": ["algorithm-foundations"]
+        "prerequisiteSlugs": ["algorithm-foundations"],
+        "competencySlugs": ["asymptotic-analysis", "performance-tradeoffs"]
       }
     ]
   }
@@ -299,6 +300,7 @@ Returns one challenge with its statement, hints, objectives, constraints, exampl
     "timeLimitSeconds": 5,
     "memoryLimitMb": 256
   },
+  "rubric": null,
   "examination": {
     "variants": [
       { "id": "standard", "label": "Standard examination", "timeLimitSeconds": 600 },
@@ -311,6 +313,26 @@ Returns one challenge with its statement, hints, objectives, constraints, exampl
 ```
 
 `languages[].editorLanguage` is the Monaco language id. `starterFiles[].path` is a display path inside the package; `content` is the starter text. `languages[].canExecute` reports whether the server has a trusted execution harness for that language. `competencySlugs` maps the challenge to seeded competencies for progress derivation. `examination.variants` lists the server-selectable variants; a manifest without the block exposes one untimed `standard` variant. Response property names use camelCase. Harness source is never part of this response. A SQL challenge is a normal detail whose language has `"id": "sql"`, `"editorLanguage": "sql"`, and `"canExecute": true`; its SQL schema and seed are not returned.
+
+A package with `evaluation.kind` `Rubric` or `Hybrid` may also declare server-owned review criteria:
+
+```json
+{
+  "rubric": {
+    "criteria": [
+      {
+        "id": "behavior-preservation",
+        "title": "Behavior preservation",
+        "description": "Public behavior stays identical for every tier and price.",
+        "maxPoints": 10,
+        "weight": 3
+      }
+    ]
+  }
+}
+```
+
+`rubric` is `null` when the package declares no criteria. Criteria ids are unique slugs, `maxPoints` is 1–100, and `weight` defaults to `1` and must be 1–10. The loader rejects a rubric on `AutomatedTests`, requires one for `Rubric`, and forbids more than 12 criteria. Weights never leave the server; clients submit points only.
 
 **Response: 404 Not Found** when no challenge matches the slug. The body is `application/problem+json`:
 
@@ -595,6 +617,65 @@ Scoring rules:
 - Reference solutions and execution harnesses are never returned.
 - Submitted source text is never returned.
 
+### `GET /api/submissions/{id}/rubric`
+
+Returns the advisory rubric self-review for one submission, when one has been saved. A review exists only for a challenge whose trusted package declares a rubric, and only after the submission reaches a terminal state.
+
+**Response: 200 OK**
+
+```json
+{
+  "submissionId": "0f1d2b5e-6f5a-4a0e-9a4b-1c2d3e4f5a6b",
+  "challengeSlug": "refactor-duplication",
+  "score": 86,
+  "band": "Exemplary",
+  "note": "Extracted the shared rule and kept the tests green.",
+  "criteria": [
+    {
+      "id": "behavior-preservation",
+      "title": "Behavior preservation",
+      "description": "Public behavior stays identical for every tier and price.",
+      "maxPoints": 10,
+      "weight": 3,
+      "points": 10
+    }
+  ],
+  "createdAtUtc": "2026-11-14T12:34:00Z",
+  "updatedAtUtc": "2026-11-14T12:34:00Z"
+}
+```
+
+Criterion title, maximum, and weight are snapshotted when the review is saved, so an older review stays explainable if the package rubric changes later. The current criterion description is projected from the package when available.
+
+**Response: 404 Not Found** when the submission has no review yet.
+
+### `PUT /api/submissions/{id}/rubric`
+
+Creates or replaces the single self-review for a terminal submission.
+
+**Request body**
+
+```json
+{
+  "criteria": [
+    { "id": "behavior-preservation", "points": 10 },
+    { "id": "single-source-of-truth", "points": 8 }
+  ],
+  "note": "Extracted the shared rule."
+}
+```
+
+The client submits exactly one point value per rubric criterion and an optional note of at most 2000 characters. Weights, maximum points, total score, and band are server-owned. `score` is the weighted sum of awarded points divided by the weighted maximum, scaled to 0–100 and rounded away from zero. `band` is `Beginning` below 50, `Developing` from 50–69, `Proficient` from 70–84, and `Exemplary` at 85 or above.
+
+**Responses**
+
+- `200 OK` with the same shape as `GET`.
+- `404 Not Found` for an unknown submission.
+- `409 Conflict` while the submission has not reached a terminal state.
+- `400 Bad Request` when the challenge has no rubric, criteria are missing, duplicated, unknown, or outside `0..maxPoints`, or the note is too long.
+
+A review never changes the deterministic assessment, the submission status, or progress evidence.
+
 ## 8. Progress
 
 Progress endpoints are unauthenticated and local-only, like the rest of the API. Progress is derived on read from append-only assessment evidence and examination attempts; there is no mutable progress row.
@@ -811,7 +892,112 @@ Closes an active session. The request has no body.
 
 Finishing an already completed or expired session returns its current state without reopening it. After a session is closed, submissions for that `examinationId` are rejected.
 
-## 11. Error handling
+## 11. Authoring
+
+These endpoints are part of the local-first authoring flow. They are unauthenticated and write to the workspace, so the API must only be exposed on a trusted machine. Learning content is written to the application database; challenge packages are written under `Challenges:Path`.
+
+### `POST /api/authoring/learning-content`
+
+Upserts a learning content pack. Accepts `application/json` or `multipart/form-data` with the file in a field named `file`. Maximum request size is 2 MiB.
+
+**Request body** (same shape as `docs/content-templates/learning-content.example.json`):
+
+```json
+{
+  "schemaVersion": 1,
+  "domains": [
+    {
+      "slug": "security-engineering",
+      "name": "Security Engineering",
+      "description": "Threat modeling and defensive coding.",
+      "sortOrder": 6,
+      "modules": [
+        {
+          "slug": "threat-modeling",
+          "title": "Threat Modeling",
+          "summary": "Find the trust boundaries before writing code.",
+          "level": "Beginner",
+          "estimatedMinutes": 40,
+          "sortOrder": 1,
+          "objectives": [{ "sortOrder": 1, "text": "List assets and trust boundaries." }],
+          "competencies": [
+            {
+              "slug": "threat-modeling",
+              "name": "Threat modeling",
+              "description": "Identify threats and choose a mitigation.",
+              "sortOrder": 1
+            }
+          ],
+          "materials": [
+            {
+              "slug": "threat-modeling-lesson",
+              "title": "Start with boundaries",
+              "kind": "Lesson",
+              "estimatedMinutes": 20,
+              "sortOrder": 1,
+              "bodyMarkdown": "## Trust boundaries\n\nList what crosses each boundary."
+            }
+          ],
+          "prerequisites": ["algorithm-foundations"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response: 200 OK**
+
+```json
+{ "added": 3, "updated": 12, "domainCount": 1, "moduleCount": 2 }
+```
+
+Rules:
+
+- `schemaVersion` must be `1`; unknown fields are rejected.
+- Slugs identify rows. Existing modules, materials, and competencies may be edited but cannot be moved to another domain or module by an import.
+- Objectives are keyed by module and `sortOrder`.
+- Every prerequisite must exist in the database or in the same pack.
+- Imports never delete rows. Missing rows remain until removed manually.
+- The whole pack is validated before writing; one error leaves all rows unchanged.
+
+Errors: `400` for validation failures, `413` for oversized uploads, and `415` for an unsupported content type.
+
+### `POST /api/authoring/challenge-packages`
+
+Validates and installs one challenge package from a ZIP archive. The request is `multipart/form-data` with the archive in a field named `file`. Maximum archive size is 25 MiB; the archive may contain at most 1000 entries, expand to at most 50 MiB, and each file may be at most 5 MiB.
+
+**Query parameters**
+
+| Name | Type | Default | Meaning |
+|---|---|---|---|
+| `replace` | boolean | `false` | Overwrite an existing package with the same slug |
+
+**Response: 200 OK**
+
+```json
+{
+  "slug": "balanced-brackets",
+  "title": "Balanced Brackets",
+  "domainSlug": "programming-fundamentals",
+  "challengeCount": 9,
+  "replaced": false
+}
+```
+
+`challengeCount` is the total number of packages in the catalog after the reload.
+
+Rules:
+
+- The archive must contain exactly one `challenge.json`, either at its root or inside a single package folder.
+- Absolute paths, `..` segments, symbolic links, duplicate entries, and archives that expand beyond the limits are rejected.
+- The package is validated by the same loader used at startup in a temporary directory. If validation fails, nothing under `Challenges:Path` changes.
+- The package is installed at `challenges/<domainSlug>/<slug>` and the in-memory catalog is reloaded without restarting the API. Requests keep using the previous snapshot until the new one is ready.
+- The response never contains filesystem paths, hidden tests, reference solutions, or harnesses.
+
+Errors: `400` for an invalid archive or manifest, `409` when the slug already exists and `replace` is not enabled, and `413` for oversized uploads.
+
+## 12. Error handling
 
 Unhandled API errors are returned as ProblemDetails:
 
@@ -826,13 +1012,13 @@ Unhandled API errors are returned as ProblemDetails:
 
 Internal exception details must not be returned to the client. Diagnostic details belong in server logs.
 
-## 12. Planned endpoints
+## 13. Endpoint status
 
-All MVP endpoints listed in [PROJECT_SPEC.md](../PROJECT_SPEC.md) are implemented through Phase 8. SQL challenges deliberately reuse `POST /api/submissions` and the existing result endpoints; there are no separate database-execution endpoints. The post-MVP Phase 9 Settings page reads `GET /api/health` and the read-only `GET /api/runtime` diagnostics; there is no endpoint that mutates server configuration.
+All MVP endpoints listed in [PROJECT_SPEC.md](../PROJECT_SPEC.md) are implemented through Phase 8. SQL challenges deliberately reuse `POST /api/submissions` and the existing result endpoints; there are no separate database-execution endpoints. The post-MVP Phase 9 Settings page reads `GET /api/health` and the read-only `GET /api/runtime` diagnostics; there is no endpoint that mutates server configuration. Phase 10 adds `GET` and `PUT /api/submissions/{id}/rubric` for advisory self-reviews; rubric criteria are authored in trusted packages and cannot be created or edited through the API. Local authoring adds `POST /api/authoring/learning-content` and `POST /api/authoring/challenge-packages`; both are unauthenticated and intended for a trusted local machine.
 
-Submission responses distinguish automated results from rubric-based judgments. Automated assessment is implemented; rubric-based authoring and review remain out of scope.
+Submission responses distinguish automated results from rubric-based judgments. Automated assessment remains the only source of truth for pass/fail and score. A rubric review is a separate, learner-authored advisory record attached to an existing terminal submission; it does not alter the assessment result.
 
-## 13. Validation and safety rules
+## 14. Validation and safety rules
 
 - Validate all incoming data.
 - Validate challenge IDs and language IDs against trusted server-side configuration. This is implemented for submissions.

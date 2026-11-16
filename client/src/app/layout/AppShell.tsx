@@ -7,53 +7,36 @@ export function AppShell() {
   return (
     <div className="min-h-screen text-slate-100">
       <a
-        className="sr-only z-50 rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-[#04121f] focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+        className="sr-only z-50 rounded-md bg-emerald-400 px-4 py-2 font-medium text-[#04121f] focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
         href="#main-content"
       >
         Skip to content
       </a>
 
-      <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col lg:flex-row">
-        <aside className="border-b border-white/10 bg-slate-900/55 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:shrink-0 lg:border-r lg:border-b-0 lg:px-5 lg:py-8">
-          <div className="flex items-center justify-between gap-4 lg:block">
-            <Link className="group flex items-center gap-3" to="/">
-              <span className="grid size-10 place-items-center rounded-xl border border-emerald-300/30 bg-emerald-400/10 font-mono text-sm font-bold text-emerald-300 transition group-hover:bg-emerald-400/15">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col lg:flex-row">
+        <aside className="border-b border-white/[0.08] px-4 py-4 lg:sticky lg:top-0 lg:h-screen lg:w-60 lg:shrink-0 lg:border-r lg:border-b-0 lg:px-5 lg:py-6">
+          <div className="flex items-center justify-between gap-4">
+            <Link className="flex items-center gap-2.5" to="/">
+              <span className="grid size-8 place-items-center rounded-md border border-white/[0.12] font-mono text-[11px] font-semibold text-slate-300">
                 PS
               </span>
-              <span>
-                <span className="block text-sm font-semibold tracking-[0.24em] text-emerald-300">
-                  PSEL
-                </span>
-                <span className="mt-0.5 block text-xs text-slate-500">
-                  Software Engineering Lab
-                </span>
-              </span>
+              <span className="text-sm font-semibold tracking-tight text-slate-100">PSEL</span>
             </Link>
-
-            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-emerald-200 uppercase lg:hidden">
-              Phase 8
-            </span>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-            <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
-              Appearance
-            </span>
             <ThemeToggle />
           </div>
 
           <nav
             aria-label="Main navigation"
-            className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:mt-10 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:pb-0"
+            className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0"
           >
             {navigationItems.map((item) => (
               <NavLink
                 className={({ isActive }) =>
                   [
-                    'group flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition',
+                    'flex shrink-0 items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors',
                     isActive
-                      ? 'bg-emerald-400/10 text-emerald-100 ring-1 ring-emerald-400/20'
-                      : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-100',
+                      ? 'bg-white/[0.06] text-slate-100'
+                      : 'text-slate-400 hover:bg-white/[0.03] hover:text-slate-200',
                   ].join(' ')
                 }
                 end={item.end}
@@ -63,7 +46,7 @@ export function AppShell() {
                 <NavGlyph name={item.glyph} />
                 <span className="whitespace-nowrap">{item.label}</span>
                 {item.badge ? (
-                  <span className="ml-1 hidden rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-slate-500 uppercase sm:inline lg:ml-auto">
+                  <span className="ml-auto hidden text-[10px] text-slate-600 sm:inline">
                     {item.badge}
                   </span>
                 ) : null}
@@ -71,21 +54,15 @@ export function AppShell() {
             ))}
           </nav>
 
-          <div className="mt-auto hidden pt-10 lg:block">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
-              <p className="text-[10px] font-semibold tracking-[0.2em] text-emerald-300 uppercase">
-                Workspace live
-              </p>
-              <p className="mt-2 text-xs leading-5 text-slate-500">
-                Phase 8 adds isolated SQL challenges with server-owned schemas, seeds, and a
-                built-in SQLite harness.
-              </p>
-            </div>
+          <div className="mt-auto hidden pt-8 lg:block">
+            <p className="text-[11px] leading-5 text-slate-600">
+              Local-first software engineering lab.
+            </p>
           </div>
         </aside>
 
         <main
-          className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-12"
+          className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-10"
           id="main-content"
         >
           <Outlet />

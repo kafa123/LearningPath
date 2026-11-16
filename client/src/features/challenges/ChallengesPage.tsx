@@ -6,10 +6,10 @@ import { ErrorPanel, LoadingPanel } from '@/shared/components/QueryState'
 
 const allValue = 'all'
 
-const difficultyStyles: Record<string, string> = {
-  Beginner: 'border-emerald-400/25 bg-emerald-400/10 text-emerald-200',
-  Intermediate: 'border-sky-400/25 bg-sky-400/10 text-sky-200',
-  Advanced: 'border-amber-400/25 bg-amber-400/10 text-amber-200',
+const difficultyDot: Record<string, string> = {
+  Beginner: 'bg-emerald-400',
+  Intermediate: 'bg-sky-400',
+  Advanced: 'bg-amber-400',
 }
 
 function humanizeSlug(slug: string) {
@@ -27,49 +27,39 @@ function uniqueSorted(values: string[]) {
 function ChallengeCard({ challenge }: { challenge: ChallengeSummary }) {
   return (
     <Link
-      className="group flex h-full flex-col rounded-2xl border border-white/10 bg-slate-900/55 p-5 transition hover:-translate-y-0.5 hover:border-emerald-400/30 hover:bg-slate-900/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+      className="group flex h-full flex-col rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 transition-colors hover:border-white/[0.16] hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
       to={`/challenges/${challenge.slug}`}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={[
-            'rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase',
-            difficultyStyles[challenge.difficulty] ??
-              'border-white/10 bg-white/[0.04] text-slate-300',
-          ].join(' ')}
-        >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+        <span className="inline-flex items-center gap-1.5 text-slate-400">
+          <span
+            aria-hidden="true"
+            className={[
+              'size-1.5 rounded-full',
+              difficultyDot[challenge.difficulty] ?? 'bg-slate-500',
+            ].join(' ')}
+          />
           {challenge.difficulty}
         </span>
-        <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-slate-400 uppercase">
-          {challenge.type}
-        </span>
-        <span className="ml-auto text-[11px] font-medium text-slate-500">
-          {challenge.estimatedMinutes} min
-        </span>
+        <span className="text-slate-500">{challenge.type}</span>
+        <span className="ml-auto text-slate-500">{challenge.estimatedMinutes} min</span>
       </div>
 
-      <h2 className="mt-5 text-lg font-semibold text-white transition group-hover:text-emerald-100">
+      <h2 className="mt-3 text-sm font-semibold text-white transition-colors group-hover:text-slate-200">
         {challenge.title}
       </h2>
-      <p className="mt-2 text-xs leading-5 text-slate-400">{challenge.summary}</p>
-      <p className="mt-3 text-[11px] text-slate-500">
+      <p className="mt-1.5 text-xs leading-5 text-slate-400">{challenge.summary}</p>
+      <p className="mt-2 text-[11px] text-slate-500">
         {humanizeSlug(challenge.domainSlug)} · {challenge.topic}
       </p>
 
-      <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-white/[0.07] pt-4">
+      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/[0.07] pt-3 text-[11px] text-slate-500">
         {challenge.languages.map((language) => (
-          <span
-            className="rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[10px] text-slate-400"
-            key={language.id}
-          >
-            {language.name}
-          </span>
+          <span key={language.id}>{language.name}</span>
         ))}
-        <span className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-emerald-300">
+        <span className="ml-auto inline-flex items-center gap-1 text-slate-400 group-hover:text-slate-200">
           Open workspace
-          <span aria-hidden="true" className="transition group-hover:translate-x-0.5">
-            →
-          </span>
+          <span aria-hidden="true">→</span>
         </span>
       </div>
     </Link>
@@ -137,30 +127,22 @@ export function ChallengesPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <header>
-        <p className="text-[10px] font-semibold tracking-[0.24em] text-emerald-300 uppercase">
-          Challenges
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Practice with a real workspace.
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-          Browse every validated challenge package. Open one to read its statement, inspect
-          public tests, and edit starter code in Monaco. Executable languages run in an
-          isolated container; read-only packages remain available for review.
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Challenges</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+          Browse every validated challenge package. Executable languages run in an isolated
+          container; read-only packages remain available for review.
         </p>
       </header>
 
       <section
         aria-label="Challenge filters"
-        className="rounded-2xl border border-white/10 bg-slate-900/45 p-4"
+        className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-4"
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
           <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
-              Search
-            </span>
+            <span className="mb-1 block text-xs text-slate-500">Search</span>
             <input
-              className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-emerald-400/40 focus:outline-none"
+              className="w-full rounded-md border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-white/25 focus:outline-none"
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Title, topic, or domain"
               type="search"
@@ -169,11 +151,9 @@ export function ChallengesPage() {
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
-              Domain
-            </span>
+            <span className="mb-1 block text-xs text-slate-500">Domain</span>
             <select
-              className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-emerald-400/40 focus:outline-none"
+              className="w-full rounded-md border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-white/25 focus:outline-none"
               onChange={(event) => setDomain(event.target.value)}
               value={domain}
             >
@@ -187,11 +167,9 @@ export function ChallengesPage() {
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
-              Difficulty
-            </span>
+            <span className="mb-1 block text-xs text-slate-500">Difficulty</span>
             <select
-              className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-emerald-400/40 focus:outline-none"
+              className="w-full rounded-md border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-white/25 focus:outline-none"
               onChange={(event) => setDifficulty(event.target.value)}
               value={difficulty}
             >
@@ -205,11 +183,9 @@ export function ChallengesPage() {
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase">
-              Type
-            </span>
+            <span className="mb-1 block text-xs text-slate-500">Type</span>
             <select
-              className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-emerald-400/40 focus:outline-none"
+              className="w-full rounded-md border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 focus:border-white/25 focus:outline-none"
               onChange={(event) => setType(event.target.value)}
               value={type}
             >
@@ -229,7 +205,7 @@ export function ChallengesPage() {
           </span>
           {hasFilters ? (
             <button
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-slate-300 transition hover:border-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+              className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-slate-300 transition-colors hover:border-white/[0.18] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
               onClick={clearFilters}
               type="button"
             >
@@ -260,10 +236,10 @@ export function ChallengesPage() {
       ) : null}
 
       {state.status === 'success' && filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
-          <p className="text-sm font-medium text-slate-300">No challenges match those filters.</p>
+        <div className="rounded-lg border border-dashed border-white/[0.1] bg-white/[0.01] p-10 text-center">
+          <p className="text-sm text-slate-300">No challenges match those filters.</p>
           <button
-            className="mt-4 rounded-lg border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition hover:bg-emerald-400/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+            className="mt-4 rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-white/[0.18] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
             onClick={clearFilters}
             type="button"
           >

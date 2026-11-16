@@ -16,7 +16,7 @@ describe('ChallengesPage', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Practice with a real workspace.',
+        name: 'Challenges',
       }),
     ).toBeInTheDocument()
 

@@ -29,7 +29,7 @@ describe('ProgressPage', () => {
     renderApp(['/progress'])
 
     expect(
-      await screen.findByRole('heading', { name: 'Evidence, not activity.' }),
+      await screen.findByRole('heading', { name: 'Progress' }),
     ).toBeInTheDocument()
 
     expect(await screen.findByText('Problem decomposition')).toBeInTheDocument()

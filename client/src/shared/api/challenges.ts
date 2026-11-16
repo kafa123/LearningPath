@@ -50,6 +50,18 @@ export interface ChallengeEvaluationSummary {
   memoryLimitMb?: number | null
 }
 
+export interface RubricCriterion {
+  id: string
+  title: string
+  description?: string | null
+  maxPoints: number
+  weight: number
+}
+
+export interface ChallengeRubric {
+  criteria: RubricCriterion[]
+}
+
 export interface ExaminationVariantSummary {
   id: string
   label: string
@@ -77,6 +89,7 @@ export interface ChallengeDetail {
   languages: ChallengeLanguage[]
   publicTests: PublicTestSummary[]
   evaluation: ChallengeEvaluationSummary
+  rubric?: ChallengeRubric | null
   examination: ChallengeExaminationSummary
   statementMarkdown: string
   hintsMarkdown?: string | null

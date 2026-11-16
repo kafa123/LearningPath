@@ -1,0 +1,28 @@
+{
+  "columns": [
+    "id",
+    "status",
+    "total_cents"
+  ],
+  "expected": [
+    [
+      3,
+      "paid",
+      2500
+    ],
+    [
+      1,
+      "paid",
+      1500
+    ]
+  ],
+  "ordered": true,
+  "plan": {
+    "mustContain": [
+      "USING INDEX idx_orders_status_date"
+    ],
+    "mustNotContain": [
+      "SCAN orders"
+    ]
+  }
+}

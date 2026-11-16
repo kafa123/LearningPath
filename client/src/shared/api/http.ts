@@ -38,7 +38,32 @@ export async function getJson<T>(
   }
 }
 
-export async function postJson<T>(
+export function postJson<T>(
+  path: string,
+  body: unknown,
+  options: { signal?: AbortSignal } = {},
+): Promise<T> {
+  return sendJson<T>('POST', path, body, options)
+}
+
+export function putJson<T>(
+  path: string,
+  body: unknown,
+  options: { signal?: AbortSignal } = {},
+): Promise<T> {
+  return sendJson<T>('PUT', path, body, options)
+}
+
+export function postForm<T>(
+  path: string,
+  form: FormData,
+  options: { signal?: AbortSignal } = {},
+): Promise<T> {
+  return sendForm<T>(path, form, options)
+}
+
+async function sendJson<T>(
+  method: 'POST' | 'PUT',
   path: string,
   body: unknown,
   options: { signal?: AbortSignal } = {},
@@ -47,7 +72,7 @@ export async function postJson<T>(
 
   try {
     response = await fetch(path, {
-      method: 'POST',
+      method,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -66,6 +91,43 @@ export async function postJson<T>(
   if (!response.ok) {
     throw new ApiError(
       await readProblemMessage(response) ?? `The PSEL API returned HTTP ${response.status}.`,
+      response.status,
+    )
+  }
+
+  try {
+    return (await response.json()) as T
+  } catch {
+    throw new ApiError('The PSEL API returned an invalid response.', response.status)
+  }
+}
+
+async function sendForm<T>(
+  path: string,
+  form: FormData,
+  options: { signal?: AbortSignal } = {},
+): Promise<T> {
+  let response: Response
+
+  try {
+    response = await fetch(path, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: form,
+      signal: options.signal,
+    })
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+
+    throw new ApiError('Unable to reach the PSEL API.')
+  }
+
+  if (!response.ok) {
+    throw new ApiError(
+      (await readProblemMessage(response)) ??
+        `The PSEL API returned HTTP ${response.status}.`,
       response.status,
     )
   }

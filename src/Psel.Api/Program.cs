@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Psel.Api.Endpoints;
 using Psel.Infrastructure;
 using Psel.Modules.Assessment;
@@ -24,10 +25,32 @@ builder.Services.AddSubmissionsModule();
 builder.Services.AddProgressModule();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 25 * 1024 * 1024;
+    options.ValueCountLimit = 64;
+});
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api/authoring"))
+    {
+        var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+
+        if (feature is { IsReadOnly: false })
+        {
+            feature.MaxRequestBodySize = context.Request.Path.StartsWithSegments(
+                "/api/authoring/challenge-packages")
+                ? 25 * 1024 * 1024
+                : 2 * 1024 * 1024;
+        }
+    }
+
+    await next(context);
+});
 
 if (app.Environment.IsDevelopment())
 {
@@ -36,7 +59,9 @@ if (app.Environment.IsDevelopment())
 
 app.MapHealthEndpoints();
 app.MapLearningEndpoints();
+app.MapLearningAuthoringEndpoints();
 app.MapChallengeEndpoints();
+app.MapChallengeAuthoringEndpoints();
 app.MapExecutionEndpoints();
 app.MapAssessmentEndpoints();
 app.MapSubmissionEndpoints();

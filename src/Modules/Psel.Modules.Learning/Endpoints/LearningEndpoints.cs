@@ -78,6 +78,10 @@ internal static class LearningEndpoints
                         module.Prerequisites
                             .Select(prerequisite => prerequisite.PrerequisiteModule!.Slug)
                             .OrderBy(slug => slug)
+                            .ToList(),
+                        module.Competencies
+                            .OrderBy(competency => competency.SortOrder)
+                            .Select(competency => competency.Slug)
                             .ToList()))
                     .ToList()))
             .ToListAsync(cancellationToken);
@@ -109,6 +113,10 @@ internal static class LearningEndpoints
                         module.Prerequisites
                             .Select(prerequisite => prerequisite.PrerequisiteModule!.Slug)
                             .OrderBy(prerequisiteSlug => prerequisiteSlug)
+                            .ToList(),
+                        module.Competencies
+                            .OrderBy(competency => competency.SortOrder)
+                            .Select(competency => competency.Slug)
                             .ToList()))
                     .ToList()))
             .SingleOrDefaultAsync(cancellationToken);

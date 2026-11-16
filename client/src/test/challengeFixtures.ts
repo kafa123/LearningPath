@@ -124,6 +124,93 @@ export const orderRevenueDetail: ChallengeDetail = {
   hintsMarkdown: '# Hints\n\nUse a LEFT JOIN.',
 }
 
+export const refactorDuplicationDetail: ChallengeDetail = {
+  slug: 'refactor-duplication',
+  title: 'Refactor Duplicated Discount Rules',
+  summary: 'Remove duplicated pricing rules without changing observable behavior.',
+  domainSlug: 'software-quality',
+  topic: 'Refactoring',
+  difficulty: 'Intermediate',
+  type: 'Refactoring',
+  estimatedMinutes: 40,
+  objectives: [
+    'Identify duplicated rules as a single source of truth.',
+    'Extract a helper while preserving the public behavior.',
+  ],
+  prerequisiteSlugs: ['testing-foundations'],
+  competencySlugs: ['test-design', 'responsibility-boundaries'],
+  constraints: [
+    'Behavior must not change for any tier or price.',
+    'Keep both public function signatures unchanged.',
+  ],
+  examples: [
+    {
+      input: 'ApplyDiscount(120, "standard")',
+      output: '108',
+      explanation: 'Standard prices at or above 100 receive a 10% discount.',
+    },
+  ],
+  languages: [
+    {
+      id: 'csharp',
+      name: 'C#',
+      editorLanguage: 'csharp',
+      canExecute: true,
+      starterFiles: [
+        {
+          path: 'Solution.cs',
+          content: 'namespace Challenge;\n\npublic static class Solution\n{\n}\n',
+        },
+      ],
+    },
+  ],
+  publicTests: [
+    { name: 'Standard discount', description: 'Standard tier receives its discount.' },
+  ],
+  evaluation: {
+    kind: 'Hybrid',
+    timeLimitSeconds: 5,
+    memoryLimitMb: 256,
+  },
+  rubric: {
+    criteria: [
+      {
+        id: 'behavior-preservation',
+        title: 'Behavior preservation',
+        description: 'Public behavior stays identical for every tier and price.',
+        maxPoints: 10,
+        weight: 3,
+      },
+      {
+        id: 'single-source-of-truth',
+        title: 'Single source of truth',
+        description: 'The duplicated discount rules collapse into one implementation.',
+        maxPoints: 10,
+        weight: 3,
+      },
+      {
+        id: 'clarity',
+        title: 'Clarity',
+        description: 'Names and structure make the rule easy to read.',
+        maxPoints: 10,
+        weight: 2,
+      },
+      {
+        id: 'test-confidence',
+        title: 'Test confidence',
+        description: 'The refactoring is backed by the existing tests.',
+        maxPoints: 10,
+        weight: 2,
+      },
+    ],
+  },
+  examination: {
+    variants: [{ id: 'standard', label: 'Standard examination', timeLimitSeconds: 600 }],
+  },
+  statementMarkdown: '# Refactor duplicated discount rules',
+  hintsMarkdown: '# Hints\n\nLook for the repeated condition.',
+}
+
 export const twoSumDetail: ChallengeDetail = {
   slug: 'two-sum',
   title: 'Two Sum',

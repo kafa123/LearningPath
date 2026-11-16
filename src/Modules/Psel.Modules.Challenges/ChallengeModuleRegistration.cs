@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Psel.Modules.Challenges.Endpoints;
 using Psel.Modules.Challenges.Packages;
-
 namespace Psel.Modules.Challenges;
 
 /// <summary>
@@ -34,6 +33,7 @@ public static class ChallengeModuleRegistration
             serviceProvider => serviceProvider.GetRequiredService<ChallengeCatalog>());
         services.AddSingleton<IChallengeExecutionSource>(
             serviceProvider => serviceProvider.GetRequiredService<ChallengeCatalog>());
+        services.AddScoped<ChallengePackageImporter>();
         services.AddHostedService<ChallengeCatalogInitializer>();
 
         return services;
@@ -43,6 +43,13 @@ public static class ChallengeModuleRegistration
         this IEndpointRouteBuilder endpoints)
     {
         ChallengeEndpoints.MapChallengeEndpoints(endpoints);
+        return endpoints;
+    }
+
+    public static IEndpointRouteBuilder MapChallengeAuthoringEndpoints(
+        this IEndpointRouteBuilder endpoints)
+    {
+        ChallengeAuthoringEndpoints.MapChallengeAuthoringEndpoints(endpoints);
         return endpoints;
     }
 }

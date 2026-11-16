@@ -2,7 +2,7 @@
 
 > **Train. Build. Test. Understand.**
 
-PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer plus post-MVP settings and runtime diagnostics on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, eight validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, read-only runtime diagnostics, automated tests, and the project documentation baseline.
+PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer plus post-MVP settings, runtime diagnostics, and rubric-based self-reviews on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, eight validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, advisory rubric reviews, read-only runtime diagnostics, automated tests, and the project documentation baseline.
 
 The canonical product and architecture specification is [PROJECT_SPEC.md](PROJECT_SPEC.md).
 
@@ -19,6 +19,8 @@ The canonical product and architecture specification is [PROJECT_SPEC.md](PROJEC
 | 7 | Progress and examination | Implemented |
 | 8 | Database engineering challenges | Implemented |
 | 9 (post-MVP) | Settings and read-only runtime diagnostics | Implemented |
+| 10 (post-MVP) | Rubric-based self-review for completed submissions | Implemented |
+| Post-MVP | Local authoring: JSON learning import and ZIP challenge upload | Implemented |
 
 Phase 4 adds submission persistence, a bounded in-memory execution queue, a background execution worker, a Docker-backed C# runner, server-side execution harnesses, resource limits, and cleanup. Submitted code is never compiled or run in the API process. When Docker is unavailable, the API still starts and submissions are recorded with an `ExecutionUnavailable` result rather than crashing.
 
@@ -30,11 +32,15 @@ Phase 7 adds the `Psel.Modules.Progress` module. It derives competency states on
 
 Phase 8 adds database engineering challenges without a second execution pipeline. A package gains an optional `sql` block that declares a schema file and an optional seed file, and the `sql` language is executable only when that block is valid. The server injects the schema and seed into each test's trusted data, supplies a built-in SQLite harness, and runs the learner's single `.sql` file in a disposable container against a fresh in-memory database. Assessment compares result rows, optional column names, ordering, and selected `EXPLAIN QUERY PLAN` constraints, so correctness and index-usage exercises share the same submission, worker, runner, and grading rules as C# and Python. The learner query runs with `PRAGMA query_only`, a read-only authorizer, and row, column, and time caps; the application's own SQLite database is never mounted or opened.
 
-The web application exposes learning paths, the full challenge catalog, a practice page, examinations, progress, and a read-only Settings page. Practice combines the catalog with derived competency states and recent assessments, recommends challenges whose mapped competencies need attention, and hides packages that have no trusted execution harness. Every practice card opens the same workspace used for assessment.
+The web application exposes learning paths, the full challenge catalog, a practice page, examinations, progress, a local Authoring page, and a read-only Settings page. Learning paths and modules surface the challenges that assess their competencies, so theory and practice stay connected in both directions of the catalog. Practice combines the catalog with derived competency states and recent assessments, recommends challenges whose mapped competencies need attention, and hides packages that have no trusted execution harness. Every practice card opens the same workspace used for assessment.
 
 The post-MVP Settings page reports API health plus the safe subset of execution configuration: whether execution is enabled, the image for each language, and the time, memory, CPU, process, output, and queue limits. `GET /api/runtime` never returns Docker executable paths, workspace roots, container users, or database locations, and there is no endpoint that mutates configuration. Server-owned settings still change through `appsettings` or environment variables followed by an API restart.
 
+Local authoring adds two unauthenticated endpoints for a trusted machine. `POST /api/authoring/learning-content` upserts a JSON content pack through the same synchronizer as the startup seed, validating the whole pack before writing. `POST /api/authoring/challenge-packages` validates an uploaded ZIP with the startup package loader in a temporary directory, then installs it under `challenges/<domainSlug>/<slug>` and reloads the in-memory catalog without a restart. Existing packages require `replace=true`, and the responses never include filesystem paths, hidden tests, reference solutions, or harnesses.
+
 The interface ships with dark and light themes. A toggle in the sidebar and an Appearance section in Settings switch the palette, and the choice is stored in the browser. The light theme remaps the same Tailwind color tokens, so every page, card, and status badge follows without a second component tree; Monaco uses a matching light editor theme.
+
+Phase 10 adds advisory rubric self-reviews without touching the deterministic pipeline. A trusted package may declare a `rubric` block when `evaluation.kind` is `Rubric` or `Hybrid`; the server validates the criteria and returns them with the challenge detail. After a submission reaches a terminal state, the workspace shows a self-review panel where the learner can assign points per criterion and add a note. The client sends only points and text; the server recomputes the weighted 0–100 score and a neutral band (`Beginning`, `Developing`, `Proficient`, `Exemplary`). Reviews are stored separately from assessments and never change an assessment result.
 
 ## Technology baseline
 
@@ -100,7 +106,7 @@ npm run dev
 
 Open `http://localhost:5173`. The Vite development server proxies `/api` requests to the backend, so the browser does not need CORS access.
 
-On first startup the API applies migrations and seeds five learning domains containing twelve modules, twelve Markdown lessons, twenty-four competencies, thirty-six objectives, and seven prerequisite links. The seeder is idempotent for the local single-user database.
+On startup the API applies migrations and synchronizes the learning catalog as an upsert: five domains containing twelve modules, twelve Markdown lessons, twenty-four competencies, thirty-six objectives, and seven prerequisite links. Rows are matched by slug (objectives by module and sort order), so adding or editing seed content only requires a restart. Submissions, assessments, progress evidence, and rubric reviews are preserved; rows removed from the seed are not deleted automatically.
 
 Startup also discovers every `challenge.json` under `challenges/`, validates each package strictly, and loads the catalog. An invalid package or an empty challenge directory fails startup with a field-level error. Challenge content changes require an API restart.
 
@@ -145,6 +151,25 @@ Invoke-RestMethod "http://localhost:5080/api/examinations/$($exam.id)/finish" -M
 ```
 
 `GET /api/progress` derives competency states on read. `GET /api/assessments` returns recent assessment evidence, newest first. `POST /api/examinations` starts a session and returns a server-selected variant with a hint-free challenge projection; `POST /api/examinations/{id}/finish` closes it. An examination attempt is a normal submission that carries `examinationId` and `purpose: "Submit"`; `Run` is rejected for an examination.
+
+Rubric reviews are attached to an existing terminal submission:
+
+```powershell
+Invoke-RestMethod "http://localhost:5080/api/submissions/$id/rubric"
+
+$body = @{
+  criteria = @(
+    @{ id = 'behavior-preservation'; points = 10 }
+    @{ id = 'single-source-of-truth'; points = 8 }
+  )
+  note = 'Extracted the shared rule.'
+} | ConvertTo-Json -Depth 5
+
+Invoke-RestMethod "http://localhost:5080/api/submissions/$id/rubric" `
+  -Method Put -ContentType 'application/json' -Body $body
+```
+
+`GET` returns `404` until a review exists. `PUT` upserts one review per submission, returns `409` while the submission is still running, and rejects missing, duplicated, unknown, or out-of-range criteria with `400`. The response includes the server-computed score, band, and criterion snapshots.
 
 Challenge packages live under `challenges/` and are documented in [challenges/README.md](challenges/README.md).
 
@@ -266,7 +291,7 @@ npm run test:run
 npm run build
 ```
 
-The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the Phase 8 and post-MVP Phase 9 baseline there are 154 backend tests and 51 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
+The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the current baseline there are 177 backend tests and 62 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
 
 ## Project structure
 
@@ -288,10 +313,11 @@ docs/                        Architecture, database, API, security, roadmap, ADR
 challenges/                  Validated challenge packages and authoring guide
 ```
 
-Backend modules are separate assemblies introduced in the phase that gives them real behavior. `Psel.Modules.Learning` owns the learning domain and its EF configurations; `Psel.Modules.Challenges` owns filesystem-backed challenge packages but has no database tables; `Psel.Modules.Execution` owns runner and Docker concerns, with one adapter per language behind `ILanguageRunner`; `Psel.Modules.Assessment` owns deterministic grading, assessment persistence, and the result projection; `Psel.Modules.Submissions` owns the submission entity, queue, worker, and HTTP contract; `Psel.Modules.Progress` owns read-side competency aggregation and examination sessions. Execution depends on neither challenges nor submissions, and challenges expose harness and test material only through a trusted server-side interface. Submissions depend on Progress through the narrow `IExaminationPolicy` contract rather than its persistence. The host registers the learning, submissions, assessment, and progress assemblies with infrastructure so module EF configurations join the shared model without infrastructure referencing the modules. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [ADR-0004](docs/decisions/ADR-0004-learning-module-and-model-registration.md), [ADR-0005](docs/decisions/ADR-0005-filesystem-challenge-packages.md), [ADR-0006](docs/decisions/ADR-0006-submission-queue-and-docker-runner.md), [ADR-0007](docs/decisions/ADR-0007-deterministic-assessment.md), [ADR-0008](docs/decisions/ADR-0008-python-runtime.md), [ADR-0009](docs/decisions/ADR-0009-evidence-based-progress-and-examinations.md), and [ADR-0010](docs/decisions/ADR-0010-sql-execution-and-sqlite-isolation.md).
+Backend modules are separate assemblies introduced in the phase that gives them real behavior. `Psel.Modules.Learning` owns the learning domain and its EF configurations; `Psel.Modules.Challenges` owns filesystem-backed challenge packages but has no database tables; `Psel.Modules.Execution` owns runner and Docker concerns, with one adapter per language behind `ILanguageRunner`; `Psel.Modules.Assessment` owns deterministic grading, assessment persistence, and the result projection; `Psel.Modules.Submissions` owns the submission entity, queue, worker, HTTP contract, and advisory rubric reviews; `Psel.Modules.Progress` owns read-side competency aggregation and examination sessions. Execution depends on neither challenges nor submissions, and challenges expose harness and test material only through a trusted server-side interface. Submissions depend on Progress through the narrow `IExaminationPolicy` contract rather than its persistence. The host registers the learning, submissions, assessment, and progress assemblies with infrastructure so module EF configurations join the shared model without infrastructure referencing the modules. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [ADR-0004](docs/decisions/ADR-0004-learning-module-and-model-registration.md), [ADR-0005](docs/decisions/ADR-0005-filesystem-challenge-packages.md), [ADR-0006](docs/decisions/ADR-0006-submission-queue-and-docker-runner.md), [ADR-0007](docs/decisions/ADR-0007-deterministic-assessment.md), [ADR-0008](docs/decisions/ADR-0008-python-runtime.md), [ADR-0009](docs/decisions/ADR-0009-evidence-based-progress-and-examinations.md), and [ADR-0010](docs/decisions/ADR-0010-sql-execution-and-sqlite-isolation.md).
 
 ## Documentation
 
+- [Adding content and data](docs/ADDING_CONTENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Database design](docs/DATABASE_DESIGN.md)
 - [API specification](docs/API_SPECIFICATION.md)
@@ -306,6 +332,7 @@ Backend modules are separate assemblies introduced in the phase that gives them 
 - Submitted code runs only in a short-lived, restricted Docker container, never in the API process. Docker remains a useful isolation layer but not an absolute security boundary.
 - The client cannot select images, commands, mounts, environment variables, limits, examination variants, or time limits. These are server configuration and server-selected metadata.
 - Challenge packages are trusted content validated at startup. Hidden tests, reference solutions, and execution harnesses are never read into client API responses; keep them in `tests/hidden/`, `solutions/`, and `harness/`.
+- The authoring endpoints are unauthenticated local tools. They are bound to the same loopback-only API, must not be exposed to a network, and treat uploaded challenge harnesses as trusted authoring input that later runs inside the Docker sandbox.
 - Examination responses remove hints (`HintsMarkdown = null`) and examination submissions cannot use the `Run` purpose or target a different challenge.
 - SQL submissions run against a fresh in-memory SQLite database built from server-owned schema and seed SQL inside the container. The application's own database file is never mounted. Learner queries are restricted to `SELECT`/`WITH`, `PRAGMA query_only` is enabled, and an authorizer denies writes, attachments, and pragmas.
 - Learning material, challenge statements, and execution output are rendered as text or trusted Markdown. `react-markdown` does not render raw HTML by default; keep that default when user-authored content is introduced. Execution output is displayed in a `<pre>` element, not rendered as HTML.
@@ -320,7 +347,7 @@ Backend modules are separate assemblies introduced in the phase that gives them 
 | Vite/Vitest engine error | Node 20 or older is active | Install Node 26 LTS and verify `node --version` |
 | `dotnet ef` not found | Local tools not restored | Run `dotnet tool restore` |
 | Health check reports database unhealthy | Database path not writable or migration failed | Check API logs and `Database:Path` |
-| Learning catalog is empty | Seeder failed or the database already contains partial data | Check API logs and delete the development database to reseed |
+| Learning catalog is empty | Synchronizer failed before writing rows | Check API logs; fix the reported seed error and restart the API |
 | API fails at startup with a challenge validation error | A package manifest or referenced file is invalid | Fix the reported package and field; see [challenges/README.md](challenges/README.md) |
 | Submission finishes with `ExecutionUnavailable` | Docker CLI/engine is not installed or running, or the configured image is missing | Install Docker Desktop with WSL2, start the engine, and pull the language image (`mcr.microsoft.com/dotnet/sdk:10.0`, `python:3.13-slim`, or the configured `Execution:SqlImage`) |
 | Assessment result returns `404` | The submission is still running, or assessment recording failed | Poll the submission until `isTerminal`, then retry; check API logs for assessment errors |

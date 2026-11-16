@@ -61,7 +61,7 @@ src/Modules/Psel.Modules.Learning/
   Domain/           LearningDomain, LearningModule, material, objective, competency, prerequisite
   Endpoints/        /api/domains, /api/learning-paths, /api/modules, /api/materials
   Persistence/      Module-owned EF Core configurations
-  Seed/             Initial catalog and idempotent hosted-service seeder
+  Seed/             Initial catalog and upsert hosted-service synchronizer
   LearningModuleRegistration.cs
 
 src/Modules/Psel.Modules.Challenges/
@@ -157,7 +157,8 @@ Creating the remaining module projects before they contain real behavior would a
 
 - Learning domain entities and invariants.
 - Module-owned EF Core configurations.
-- Seed catalog and idempotent startup seeder.
+- Seed catalog and upsert startup synchronizer.
+- JSON content-pack import that reuses the same upsert path, validates references and parent moves, and never deletes rows.
 - Read-only HTTP endpoints and client-facing contracts.
 - No dependency on the API host or on other modules.
 
@@ -170,7 +171,8 @@ Creating the remaining module projects before they contain real behavior would a
 - Optional `sql` block that points at a schema file and an optional seed file. The loader reads both into server-only test data, validates result-row and query-plan expectations, and validates that `sql` and the `sql` language are declared together.
 - SQL packages cannot supply their own harness; the loader assigns the built-in harness so an author cannot weaken the execution boundary.
 - Non-disclosure boundary: hidden test files are existence-checked, but hidden content and reference solutions are never read into API response models. Solutions are excluded structurally because the manifest has no solution reference. SQL schema and seed content are injected into the server test plan and never appear in `ChallengeDetail`.
-- In-memory catalog loaded once at startup; invalid packages fail startup.
+- In-memory catalog loaded at startup and swapped atomically after an authoring upload; invalid packages fail startup.
+- Local authoring endpoint that extracts an upload to a temporary directory, validates it with the startup loader, and only then installs it under `Challenges:Path` with backup and rollback.
 - Read-only HTTP endpoints and client-facing contracts.
 - No database access, no code execution, and no dependency on the API host.
 
@@ -195,6 +197,7 @@ Creating the remaining module projects before they contain real behavior would a
 - Server-side test selection: `Run` selects public tests, `Submit` selects public and hidden tests. Clients cannot select tests.
 - Restart recovery marks stale queued/running rows as `Interrupted`.
 - Submission HTTP endpoints and client-facing contracts. Submitted source and harness content are never returned in the result payload.
+- Advisory rubric reviews for terminal submissions. `RubricReview` and `RubricCriterionScore` are owned by this module; points and note come from the learner, while score, band, and criterion metadata come from the trusted package rubric. Reviews are separate from assessment evidence and never mutate it.
 
 ### `Psel.Modules.Assessment`
 
@@ -224,12 +227,13 @@ Each module owns its domain rules, application services, endpoint definitions, a
 - A single `PselDbContext` remains the transaction boundary. Module-specific entity configurations are contributed through `ModuleAssemblyRegistry` and applied during model creation.
 - The database path is configuration-driven, defaulting to `data/psel.db` under the API content root.
 - Migrations are applied at startup for the local single-user scenario. This is not a multi-instance deployment strategy and is documented as such.
-- Learning content is seeded once by an `IHostedService` registered after database migration. The seeder is idempotent by checking for existing domains.
-- Challenge packages are not stored in the database. A hosted service validates the filesystem catalog after startup; the catalog is held in memory and served read-only.
+- Learning content is synchronized by an `IHostedService` registered after database migration. The synchronizer matches domains, modules, materials, and competencies by slug and objectives by module plus sort order. It inserts missing rows, updates changed scalar values, and re-creates missing prerequisite links without deleting learner data or rows removed from the seed. The authoring import builds the same seed graph and calls the same synchronizer after validating the whole pack.
+- Challenge packages are not stored in the database. A hosted service validates the filesystem catalog after startup; the catalog is held in memory and served read-only. Uploads validate a temporary copy with the same loader, install it under `challenges/<domainSlug>/<slug>`, then swap the in-memory snapshot without restarting the process.
 - Challenge package content is trusted authoring input, not user input, but still passes strict schema, path, size, and uniqueness validation.
 - Submission history is append-only: a new attempt creates a new row, and previous attempts are never overwritten. Status and output fields are updated only within the lifecycle of that attempt.
 - The submission worker does not hold a database transaction open while code executes. It marks the row running, releases the transaction, runs the container, then persists the terminal outcome and its assessment together.
 - Assessment and per-test evidence are append-only and belong to exactly one submission.
+- Rubric reviews are advisory and separate from assessments: at most one review per terminal submission, with one criterion-score snapshot per rubric criterion. Criterion title, maximum points, and weight are copied at save time so historical scores stay explainable; a unique index on `(RubricReviewId, SortOrder)` preserves criterion order.
 - Examination sessions and their attempt links are append-only from the learner's perspective: a session transitions from `InProgress` to `Completed` or `Expired`, and attempts are never rewritten.
 - Progress itself is not stored. It is derived from assessments and examination attempts at read time.
 - Hidden tests, reference solutions, and execution harnesses are never exposed through client APIs.
@@ -253,6 +257,8 @@ See [DATABASE_DESIGN.md](DATABASE_DESIGN.md).
 - Phase 8 adds SQL challenges through the existing workspace. The SQL language supplies its own editor language and starter `query.sql`, and Run/Submit use the same request, polling, and assessment components. No SQL-specific UI or client-selected schema is introduced.
 - Phase 8 also completes the Practice route. It combines the challenge catalog, progress states, and recent assessments into a practice-ready list, recommends challenges whose mapped competencies need attention, and links each card to the existing workspace. Read-only packages stay in the full Challenges catalog instead of appearing as practice-ready.
 - The post-MVP Phase 9 Settings page is read-only. It reuses the health hook for API status and loads `GET /api/runtime` for execution languages, images, and limits. The endpoint projects only server-owned diagnostics; Docker executable paths, workspace roots, container users, and database locations are not part of the contract. Configuration changes still happen through `appsettings` or environment variables and require a restart.
+- Phase 10 adds a rubric self-review panel after a terminal submission when the challenge detail carries a rubric. The panel loads any existing review, submits one point value per criterion plus an optional note, and shows the server-computed weighted score and band only after saving. Criterion titles, maximum points, and weights are read from the challenge detail; the client never computes the final score.
+- Local authoring adds an Authoring page with two upload forms: a JSON content pack for learning upserts and a ZIP challenge package with an explicit replace option. It renders only server results and validation messages; no filesystem path or hidden material is displayed.
 - The client supports dark and light themes through a `ThemeProvider` that writes `data-theme` to the document root and persists the choice in `localStorage`. The light palette is implemented by remapping Tailwind color tokens under `html[data-theme='light']`, so the existing components do not need dark/light variants. Monaco registers a matching light editor theme, and an inline script in `index.html` applies the stored theme before first paint to avoid a flash.
 - The workspace lazy-loads Monaco Editor. Monaco, its workers, and its theme are bundled locally rather than fetched from a CDN; the initial catalog bundle does not include the editor.
 - Drafts live only in component state. Execution output and assessment results are rendered as text, never as HTML.
@@ -379,7 +385,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 
 ### Phase 2
 
-- Backend tests cover every learning endpoint, unknown-slug ProblemDetails responses, seed counts, idempotent seeding, and the applied migration set.
+- Backend tests cover every learning endpoint, unknown-slug ProblemDetails responses, seed counts, idempotent upsert behavior, restoration of edited rows, re-creation of deleted child rows and prerequisites, and the applied migration set.
 - Frontend tests cover path browsing, module details, Markdown rendering, loading states, error states, and retry behavior.
 - The seed catalog is verified through the HTTP contract rather than by reaching into internal entity builders.
 
@@ -437,6 +443,18 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - App shell tests cover switching between dark and light themes, persisting the choice, and updating the toggle label. Settings tests also cover the explicit appearance controls.
 - The suite still does not require a live Docker daemon. The harness itself is additionally validated directly with Python and SQLite for correctness, plan pass/fail, and compile-error behavior.
 
+### Phase 10
+
+- Loader tests verify rubric projection, default weights, and the absence of hidden material, and reject a rubric on `AutomatedTests`, a missing rubric on `Rubric`, out-of-range points or weights, and duplicate criterion ids.
+- Endpoint tests verify rubric detail projection and the `GET`/`PUT` review contract: weighted score, band, snapshotted criteria, upsert behavior, unknown submissions, non-terminal conflicts, challenges without rubrics, and invalid criteria.
+- Frontend tests cover the review panel appearing only after a terminal submission on a rubric challenge, loading an existing review, submitting points and a note, and rendering the server-computed score and band.
+
+### Authoring
+
+- Learning import tests cover a new domain and module, in-place updates without duplicates, multipart JSON upload, unknown-prerequisite rejection without writes, and cross-parent move rejection.
+- Challenge upload tests use a disposable challenge root: valid install and catalog reload, conflict without `replace`, replacement with `replace=true`, zip-slip rejection, multiple-package rejection, and non-disclosure of hidden tests, solutions, harnesses, and filesystem paths.
+- Frontend tests cover form state, learning import success and server rejection, challenge install and replace, conflict messages, and `postForm` error handling.
+
 ## 9. Key decisions
 
 | Decision | Record |
@@ -452,13 +470,12 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 | Evidence-based progress and server-controlled examinations | [ADR-0009](decisions/ADR-0009-evidence-based-progress-and-examinations.md) |
 | SQL execution with an in-memory SQLite database | [ADR-0010](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md) |
 
-## 10. Known limitations in Phase 8
+## 10. Known limitations (through Phase 10)
 
-- No authentication or authorization.
+- No authentication or authorization. Authoring endpoints inherit this limitation and are intended for a trusted local machine only.
 - API binds to loopback only; it is not designed for network exposure.
-- Learning content is read-only seed data and there is no in-app authoring.
-- Challenge content is read-only filesystem packages; there is no in-app authoring.
-- Challenge catalog and harness changes require an API restart.
+- Learning content can be imported from JSON, but imports never delete rows; removal still requires a manual cleanup or a database reset.
+- Challenge content can be uploaded as a ZIP and reloaded without restart, but there is no in-app package editor or delete action.
 - Workspace drafts are not persisted across reloads; only explicit Run and Submit attempts are stored.
 - The queue is in-memory and single-process. Queued attempts are lost on shutdown and recovered as `Interrupted` at the next startup. A durable queue is out of scope for the local single-user product.
 - Only C#, Python, and SQL execution are implemented. Challenges that declare a language without a harness remain browse-only, and `api-validation` is still C#-only because its executable scenario needs a host application rather than a single function harness.
@@ -471,6 +488,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - Run and Submit execute the server-selected tests and record an assessment. Progress is derived from that evidence on read; there is no mutable progress row, so progress can only change through new assessments.
 - Competency state requires a server-controlled examination: `Mastered` needs an accepted examination submission plus an accepted `Submit` on a second mapped challenge. A challenge without `competencySlugs` or without examination variants cannot contribute the corresponding evidence.
 - Examination variants and time limits come from the challenge manifest. The server chooses a variant at session creation; the client cannot request one.
+- Rubric reviews are learner-authored self-assessments with no reviewer role, moderation, or separate persisted reviewer identity. They attach to an existing terminal submission, so rubric-only review without an executable submission is not implemented.
 - Assessment and examination lists are ordered in memory because SQLite cannot `ORDER BY` a `DateTimeOffset` column. This is acceptable for the local dataset and is documented as a scaling limit.
 - Hidden test data and reference solutions are loaded from the filesystem package and are never persisted in the database or returned by an endpoint. Hidden test names and per-test statuses are stored as server-side assessment evidence but filtered out of every client projection.
 - Docker is required for live execution. Without it, submissions terminate with `ExecutionUnavailable` and the assessment scores zero.

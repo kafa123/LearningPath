@@ -14,6 +14,8 @@ This roadmap follows [PROJECT_SPEC.md](../PROJECT_SPEC.md). Build incrementally.
 | 6 | Python runtime | Implemented |
 | 7 | Progress and examination | Implemented |
 | 8 | Database engineering | Implemented |
+| 9 | Settings and runtime diagnostics (post-MVP) | Implemented |
+| 10 | Rubric-based self-review (post-MVP) | Implemented |
 
 ## Phase 1 — Foundation
 
@@ -260,7 +262,7 @@ This roadmap follows [PROJECT_SPEC.md](../PROJECT_SPEC.md). Build incrementally.
 - In-app challenge or examination authoring.
 - Background expiry jobs; sessions expire lazily on read or attempt.
 - Durable or distributed queues.
-- Rubric-based review mode.
+- Rubric-based review mode. (Implemented in post-MVP Phase 10 for existing submissions.)
 - Additional languages beyond C# and Python.
 
 ### Notes
@@ -337,6 +339,43 @@ This phase extends beyond the eight phases defined in [PROJECT_SPEC.md](../PROJE
 
 - Keeping diagnostics read-only preserves the server-controlled execution boundary: clients can observe limits but cannot lower or raise them.
 - A future authenticated settings phase could add validated editing without changing the current contract.
+
+## Phase 10 — Rubric-based self-review (post-MVP)
+
+This phase implements the rubric-based assessment path described in [PROJECT_SPEC.md](../PROJECT_SPEC.md) section 11.2. It attaches reviews to existing submissions, so no second execution path is introduced.
+
+### Delivered
+
+- An optional trusted-package `rubric` block with unique criteria (`id`, `title`, `description`, `maxPoints`, `weight`). The loader requires a rubric for `evaluation.kind` `Rubric`, allows it for `Hybrid`, forbids it for `AutomatedTests`, and rejects more than 12 criteria.
+- `GET /api/challenges/{slug}` projects the server-owned rubric with each criterion, so the workspace can render the review form. Hidden tests, solutions, and harness content remain absent.
+- `GET /api/submissions/{id}/rubric` and `PUT /api/submissions/{id}/rubric`. `PUT` is an upsert with one review per submission and accepts only per-criterion points and an optional note.
+- Server-side weighted scoring on a 0–100 scale and neutral bands: `Beginning` (<50), `Developing` (50–69), `Proficient` (70–84), and `Exemplary` (≥85).
+- `RubricReview` and `RubricCriterionScore` entities and the `RubricReview` migration. Criterion title, maximum points, and weight are snapshotted at save time.
+- Validation: unknown submission `404`, non-terminal submission `409`, and missing, duplicated, unknown, or out-of-range criteria `400`; challenges without a rubric are rejected with `400`.
+- A `RubricReviewPanel` in the workspace, shown only after a terminal submission on a challenge with a rubric. It loads an existing review, submits points and a note, and displays the server-computed score and band after saving.
+- A rubric on the `refactor-duplication` package as the demonstration challenge.
+- Backend loader, endpoint, and migration coverage; frontend panel and workspace coverage; README, architecture, API, and roadmap updates.
+
+### Exit criteria
+
+- A learner can review a completed submission against explicit criteria and see a consistent server-computed weighted score and band.
+- Reviews remain advisory: they never change the deterministic assessment, submission status, or progress evidence.
+- Existing assessment and examination behavior is unchanged, and the full automated suite passes without a live Docker daemon.
+
+### Out of scope
+
+- Instructor, peer, or multi-reviewer workflows; authentication and reviewer identity.
+- Learner-authored or editable rubrics; criteria remain trusted package content.
+- Rubric-only challenges with no executable submission path.
+- Automatic grading from rubric scores or rubric scores feeding competency progress.
+- Rubric analytics, moderation, or score history beyond one upserted review per submission.
+
+### Notes
+
+- Attaching reviews to an existing submission reuses validation, terminal-state polling, and client contracts instead of inventing a second assessment pipeline.
+- Because the server computes totals, a client cannot inflate a score by changing weights or maxima; it can only choose points within the trusted range.
+- Criterion snapshots keep older reviews explainable when a package rubric is revised later.
+- The review is deliberately separate from the deterministic assessment: automated tests remain the pass/fail source of truth, while the rubric supports reflective practice.
 
 ## MVP acceptance mapping
 

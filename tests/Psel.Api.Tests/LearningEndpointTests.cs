@@ -59,6 +59,9 @@ public sealed class LearningEndpointTests
             module => module.Slug == "complexity-analysis");
 
         Assert.Contains("algorithm-foundations", complexity.PrerequisiteSlugs);
+        Assert.Equal(
+            ["asymptotic-analysis", "performance-tradeoffs"],
+            complexity.CompetencySlugs);
     }
 
     [Fact]
@@ -182,7 +185,8 @@ public sealed class LearningEndpointTests
         string Summary,
         string Level,
         int EstimatedMinutes,
-        List<string> PrerequisiteSlugs);
+        List<string> PrerequisiteSlugs,
+        List<string> CompetencySlugs);
 
     private sealed record DomainReferenceDto(string Slug, string Name);
 

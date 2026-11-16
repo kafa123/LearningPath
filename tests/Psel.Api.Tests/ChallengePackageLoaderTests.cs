@@ -223,6 +223,119 @@ public sealed class ChallengePackageLoaderTests
     }
 
     [Fact]
+    public void Load_RubricPackage_ProjectsClientSafeCriteria()
+    {
+        using var root = new TemporaryDirectory();
+        var manifest = JsonNode.Parse(ChallengeTestContent.MinimalManifest)!.AsObject();
+        manifest["evaluation"]!["kind"] = "Hybrid";
+        manifest["rubric"] = JsonNode.Parse(
+            """
+            {
+              "criteria": [
+                {
+                  "id": "correctness",
+                  "title": "Correctness",
+                  "description": "Behavior is preserved.",
+                  "maxPoints": 10,
+                  "weight": 3
+                },
+                {
+                  "id": "clarity",
+                  "title": "Clarity",
+                  "maxPoints": 5
+                }
+              ]
+            }
+            """);
+        ChallengeTestContent.AddPackage(root.Path, manifest.ToJsonString());
+
+        var detail = Assert.Single(
+            new ChallengePackageLoader(new ChallengeLocation(root.Path)).Load());
+
+        Assert.NotNull(detail.Rubric);
+        Assert.Equal(2, detail.Rubric.Criteria.Count);
+        Assert.Equal("correctness", detail.Rubric.Criteria[0].Id);
+        Assert.Equal("Behavior is preserved.", detail.Rubric.Criteria[0].Description);
+        Assert.Equal(10, detail.Rubric.Criteria[0].MaxPoints);
+        Assert.Equal(3, detail.Rubric.Criteria[0].Weight);
+        Assert.Null(detail.Rubric.Criteria[1].Description);
+        Assert.Equal(1, detail.Rubric.Criteria[1].Weight);
+
+        var serialized = JsonSerializer.Serialize(
+            detail,
+            new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        Assert.Contains("\"rubric\"", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain(ChallengeTestContent.HiddenSentinel, serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain(ChallengeTestContent.SolutionSentinel, serialized, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Load_AutomatedEvaluationWithRubric_Throws()
+    {
+        using var root = new TemporaryDirectory();
+        var manifest = JsonNode.Parse(ChallengeTestContent.MinimalManifest)!.AsObject();
+        manifest["rubric"] = JsonNode.Parse(
+            """
+            {
+              "criteria": [
+                { "id": "clarity", "title": "Clarity", "maxPoints": 10 }
+              ]
+            }
+            """);
+        ChallengeTestContent.AddPackage(root.Path, manifest.ToJsonString());
+
+        var exception = Assert.Throws<ChallengePackageValidationException>(
+            () => new ChallengePackageLoader(new ChallengeLocation(root.Path)).Load());
+
+        Assert.Contains(
+            "rubric requires evaluation.kind Rubric or Hybrid",
+            exception.Message);
+    }
+
+    [Fact]
+    public void Load_RubricEvaluationWithoutRubric_Throws()
+    {
+        using var root = new TemporaryDirectory();
+        var manifest = JsonNode.Parse(ChallengeTestContent.MinimalManifest)!.AsObject();
+        manifest["evaluation"]!["kind"] = "Rubric";
+        ChallengeTestContent.AddPackage(root.Path, manifest.ToJsonString());
+
+        var exception = Assert.Throws<ChallengePackageValidationException>(
+            () => new ChallengePackageLoader(new ChallengeLocation(root.Path)).Load());
+
+        Assert.Contains(
+            "rubric is required when evaluation.kind is Rubric",
+            exception.Message);
+    }
+
+    [Fact]
+    public void Load_RubricCriterionOutOfRange_Throws()
+    {
+        using var root = new TemporaryDirectory();
+        var manifest = JsonNode.Parse(ChallengeTestContent.MinimalManifest)!.AsObject();
+        manifest["evaluation"]!["kind"] = "Hybrid";
+        manifest["rubric"] = JsonNode.Parse(
+            """
+            {
+              "criteria": [
+                { "id": "clarity", "title": "Clarity", "maxPoints": 0, "weight": 11 }
+              ]
+            }
+            """);
+        ChallengeTestContent.AddPackage(root.Path, manifest.ToJsonString());
+
+        var exception = Assert.Throws<ChallengePackageValidationException>(
+            () => new ChallengePackageLoader(new ChallengeLocation(root.Path)).Load());
+
+        Assert.Contains(
+            "rubric.criteria[0].maxPoints must be between 1 and 100",
+            exception.Message);
+        Assert.Contains(
+            "rubric.criteria[0].weight must be between 1 and 10",
+            exception.Message);
+    }
+
+    [Fact]
     public void Load_SqlPackage_UsesBuiltInHarnessAndInjectsSchema()
     {
         using var root = new TemporaryDirectory();

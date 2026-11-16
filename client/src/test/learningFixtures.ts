@@ -16,6 +16,7 @@ export const learningPathFixture: LearningPathSummary = {
       level: 'Beginner',
       estimatedMinutes: 45,
       prerequisiteSlugs: [],
+      competencySlugs: ['algorithm-decomposition', 'correctness-reasoning'],
     },
     {
       slug: 'complexity-analysis',
@@ -24,6 +25,7 @@ export const learningPathFixture: LearningPathSummary = {
       level: 'Intermediate',
       estimatedMinutes: 50,
       prerequisiteSlugs: ['algorithm-foundations'],
+      competencySlugs: ['asymptotic-analysis', 'performance-tradeoffs'],
     },
   ],
 }

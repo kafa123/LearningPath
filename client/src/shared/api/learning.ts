@@ -7,6 +7,7 @@ export interface ModuleSummary {
   level: string
   estimatedMinutes: number
   prerequisiteSlugs: string[]
+  competencySlugs: string[]
 }
 
 export interface LearningPathSummary {

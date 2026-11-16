@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderApp } from '@/test/renderApp'
-import { orderRevenueDetail, twoSumDetail } from '@/test/challengeFixtures'
+import { orderRevenueDetail, refactorDuplicationDetail, twoSumDetail } from '@/test/challengeFixtures'
 import { jsonResponse } from '@/test/learningFixtures'
 
 vi.mock('@/shared/components/CodeEditor', () => ({
@@ -435,6 +435,173 @@ describe('ChallengeWorkspacePage', () => {
       languageId: 'csharp',
       files: [{ path: 'Solution.cs', content: csharpStarter }],
       purpose: 'Submit',
+    })
+  })
+
+  it('shows the rubric self-review after a terminal submission and saves server-computed scores', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+
+        if (url === '/api/challenges/refactor-duplication') {
+          return jsonResponse(refactorDuplicationDetail)
+        }
+
+        if (url === '/api/submissions' && init?.method === 'POST') {
+          return jsonResponse(
+            {
+              id: 'sub-refactor',
+              status: 'Queued',
+              createdAtUtc: '2026-11-14T00:00:00Z',
+            },
+            202,
+          )
+        }
+
+        if (url === '/api/submissions/sub-refactor') {
+          return jsonResponse({
+            id: 'sub-refactor',
+            challengeSlug: 'refactor-duplication',
+            languageId: 'csharp',
+            status: 'Succeeded',
+            isTerminal: true,
+            createdAtUtc: '2026-11-14T00:00:00Z',
+            startedAtUtc: '2026-11-14T00:00:01Z',
+            completedAtUtc: '2026-11-14T00:00:02Z',
+            durationMs: 41,
+            exitCode: 0,
+            standardOutput: '',
+            standardError: '',
+            failureMessage: null,
+            outputTruncated: false,
+            purpose: 'Submit',
+          })
+        }
+
+        if (url === '/api/submissions/sub-refactor/results') {
+          return jsonResponse({
+            submissionId: 'sub-refactor',
+            challengeSlug: 'refactor-duplication',
+            languageId: 'csharp',
+            purpose: 'Submit',
+            outcome: 'Accepted',
+            isAccepted: true,
+            score: 100,
+            passedTests: 2,
+            totalTests: 2,
+            publicPassed: 1,
+            publicTotal: 1,
+            hiddenPassed: 1,
+            hiddenTotal: 1,
+            publicTests: [
+              {
+                name: 'Standard discount',
+                description: 'Standard tier receives its discount.',
+                status: 'Passed',
+              },
+            ],
+            createdAtUtc: '2026-11-14T00:00:02Z',
+          })
+        }
+
+        if (url === '/api/submissions/sub-refactor/rubric' && !init?.method) {
+          return jsonResponse(
+            {
+              title: 'Rubric review not found.',
+              detail: 'This submission has not been reviewed against its rubric yet.',
+            },
+            404,
+          )
+        }
+
+        if (url === '/api/submissions/sub-refactor/rubric' && init?.method === 'PUT') {
+          return jsonResponse({
+            submissionId: 'sub-refactor',
+            challengeSlug: 'refactor-duplication',
+            score: 100,
+            band: 'Exemplary',
+            note: 'Extracted the shared rule.',
+            criteria: [
+              {
+                id: 'behavior-preservation',
+                title: 'Behavior preservation',
+                description: 'Public behavior stays identical for every tier and price.',
+                maxPoints: 10,
+                weight: 3,
+                points: 10,
+              },
+              {
+                id: 'single-source-of-truth',
+                title: 'Single source of truth',
+                description: 'The duplicated discount rules collapse into one implementation.',
+                maxPoints: 10,
+                weight: 3,
+                points: 10,
+              },
+              {
+                id: 'clarity',
+                title: 'Clarity',
+                description: 'Names and structure make the rule easy to read.',
+                maxPoints: 10,
+                weight: 2,
+                points: 10,
+              },
+              {
+                id: 'test-confidence',
+                title: 'Test confidence',
+                description: 'The refactoring is backed by the existing tests.',
+                maxPoints: 10,
+                weight: 2,
+                points: 10,
+              },
+            ],
+            createdAtUtc: '2026-11-14T00:00:03Z',
+            updatedAtUtc: '2026-11-14T00:00:03Z',
+          })
+        }
+
+        throw new Error(`Unexpected request: ${url} ${init?.method ?? 'GET'}`)
+      },
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderApp(['/challenges/refactor-duplication'])
+
+    await screen.findByLabelText('Code editor for Solution.cs')
+    await user.click(screen.getByRole('button', { name: 'Submit' }))
+
+    const panel = await screen.findByRole('region', { name: 'Rubric self-review' })
+    await screen.findByLabelText('Behavior preservation')
+    expect(panel).toHaveTextContent('Weighted score appears after you save.')
+
+    await user.clear(screen.getByLabelText('Behavior preservation'))
+    await user.type(screen.getByLabelText('Behavior preservation'), '10')
+    await user.clear(screen.getByLabelText('Single source of truth'))
+    await user.type(screen.getByLabelText('Single source of truth'), '10')
+    await user.clear(screen.getByLabelText('Clarity'))
+    await user.type(screen.getByLabelText('Clarity'), '10')
+    await user.clear(screen.getByLabelText('Test confidence'))
+    await user.type(screen.getByLabelText('Test confidence'), '10')
+    await user.type(
+      screen.getByLabelText('Review note'),
+      'Extracted the shared rule.',
+    )
+    await user.click(screen.getByRole('button', { name: 'Save self-review' }))
+
+    expect(await screen.findByText('100/100')).toBeInTheDocument()
+    expect(screen.getByText('Exemplary')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Update self-review' })).toBeInTheDocument()
+
+    const putCall = fetchMock.mock.calls.find((call) => call[1]?.method === 'PUT')
+    expect(JSON.parse(String(putCall?.[1]?.body))).toEqual({
+      criteria: [
+        { id: 'behavior-preservation', points: 10 },
+        { id: 'single-source-of-truth', points: 10 },
+        { id: 'clarity', points: 10 },
+        { id: 'test-confidence', points: 10 },
+      ],
+      note: 'Extracted the shared rule.',
     })
   })
 

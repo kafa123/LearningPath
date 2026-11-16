@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "slug": "count-vowels",
+  "title": "Count Vowels",
+  "summary": "Count how many vowels appear in a string.",
+  "domainSlug": "programming-fundamentals",
+  "topic": "Strings",
+  "difficulty": "Beginner",
+  "type": "Coding",
+  "estimatedMinutes": 20,
+  "objectives": [
+    "Iterate over characters without losing edge cases.",
+    "Keep the counting logic independent from input parsing."
+  ],
+  "prerequisites": [
+    "algorithm-foundations"
+  ],
+  "competencySlugs": [
+    "algorithm-decomposition",
+    "correctness-reasoning"
+  ],
+  "constraints": [
+    "Treat uppercase and lowercase vowels as the same.",
+    "Return 0 for an empty string.",
+    "Only the letters a, e, i, o, and u count as vowels."
+  ],
+  "examples": [
+    {
+      "input": "text = \"Hello World\"",
+      "output": "3",
+      "explanation": "e, o, and o are vowels."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Example 1",
+        "description": "Mixed case text with spaces.",
+        "source": "tests/public/example-1.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Uppercase and punctuation",
+        "description": "Uppercase vowels and punctuation must be handled correctly.",
+        "source": "tests/hidden/uppercase-and-punctuation.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  }
+}

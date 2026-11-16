@@ -99,6 +99,38 @@
     "timeLimitSeconds": 5,
     "memoryLimitMb": 256
   },
+  "rubric": {
+    "criteria": [
+      {
+        "id": "behavior-preservation",
+        "title": "Behavior preservation",
+        "description": "Public behavior stays identical for every tier and price, including boundary values.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "single-source-of-truth",
+        "title": "Single source of truth",
+        "description": "The duplicated discount rules collapse into one authoritative implementation.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "clarity",
+        "title": "Clarity",
+        "description": "Names and structure make the rule easy to read without explanatory comments.",
+        "maxPoints": 10,
+        "weight": 2
+      },
+      {
+        "id": "test-confidence",
+        "title": "Test confidence",
+        "description": "The refactoring is backed by the existing tests instead of manual spot checks.",
+        "maxPoints": 10,
+        "weight": 2
+      }
+    ]
+  },
   "examination": {
     "variants": [
       {
