@@ -1,0 +1,78 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": "H-1",
+        "totalCents": 4200,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "repository",
+        "wrapped": true
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_repository",
+        "errorText": "load order H-1: database: storage offline"
+      }
+    },
+    {
+      "order": {
+        "id": "H-2",
+        "totalCents": 4200,
+        "email": "grace@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "notifier",
+        "wrapped": true
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [
+          "Order H-2 confirmed: 4200 cents"
+        ],
+        "error": "err_notifier",
+        "errorText": "send confirmation for H-2: transport: smtp rejected"
+      }
+    },
+    {
+      "order": {
+        "id": "H-3",
+        "totalCents": 4200,
+        "email": "linus@example.com"
+      },
+      "repository": {
+        "loadError": "not_found",
+        "wrapped": true
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_not_found",
+        "errorText": "load order H-3: database: order not found"
+      }
+    }
+  ]
+}

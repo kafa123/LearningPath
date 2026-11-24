@@ -80,6 +80,8 @@ export const materialFixture: MaterialDetail = {
     '',
     'Big-O describes how the work grows as the input grows.',
     '',
+    '![Growth classes compared as input size increases](/illustrations/lessons/complexity-analysis-lesson-diagram.svg)',
+    '',
     '| Class | Example |',
     '| --- | --- |',
     '| O(n) | one pass over a collection |',

@@ -30,6 +30,11 @@ internal sealed class SubmissionService(
     private const int MaxFileBytes = 128 * 1024;
     private const int MaxTotalBytes = 256 * 1024;
 
+    private static readonly JsonSerializerOptions SourceFileJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public async Task<SubmissionCreated> CreateAsync(
         CreateSubmissionRequest request,
         CancellationToken cancellationToken)
@@ -143,6 +148,50 @@ internal sealed class SubmissionService(
             .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
 
         return submission is null ? null : ToDetail(submission);
+    }
+
+    public async Task<LatestSubmission?> FindLatestAsync(
+        string challengeSlug,
+        string languageId,
+        CancellationToken cancellationToken)
+    {
+        var submissions = await dbContext
+            .Set<Submission>()
+            .AsNoTracking()
+            .Where(candidate =>
+                candidate.ChallengeSlug == challengeSlug
+                && candidate.LanguageId == languageId)
+            .ToListAsync(cancellationToken);
+
+        // SQLite cannot translate DateTimeOffset ordering, so order on the client.
+        var submission = submissions
+            .OrderByDescending(candidate => candidate.CreatedAtUtc)
+            .ThenByDescending(candidate => candidate.Id)
+            .FirstOrDefault();
+
+        return submission is null
+            ? null
+            : new LatestSubmission(ToDetail(submission), ReadSourceFiles(submission));
+    }
+
+    private static IReadOnlyList<SubmissionSourceFile> ReadSourceFiles(Submission submission)
+    {
+        try
+        {
+            var files = JsonSerializer.Deserialize<IReadOnlyList<ExecutionFile>>(
+                submission.SourceFilesJson,
+                SourceFileJsonOptions);
+
+            return files is null
+                ? []
+                : files
+                    .Select(file => new SubmissionSourceFile(file.Path, file.Content))
+                    .ToArray();
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
     }
 
     public static SubmissionDetail ToDetail(Submission submission)

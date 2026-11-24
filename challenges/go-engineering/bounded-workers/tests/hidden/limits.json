@@ -1,0 +1,62 @@
+{
+  "cases": [
+    {
+      "jobs": [
+        { "id": "k1", "payload": 1 },
+        { "id": "k2", "payload": 2 },
+        { "id": "k3", "payload": 3 }
+      ],
+      "workers": 0,
+      "values": { "k1": 100, "k2": 200, "k3": 300 },
+      "expected": {
+        "results": [
+          { "id": "k1", "value": 100 },
+          { "id": "k2", "value": 200 },
+          { "id": "k3", "value": 300 }
+        ],
+        "error": "",
+        "calls": 3,
+        "maxConcurrency": 1,
+        "canceledHandles": 0
+      }
+    },
+    {
+      "jobs": [
+        { "id": "w1", "payload": 8 },
+        { "id": "w2", "payload": 9 }
+      ],
+      "workers": 8,
+      "reverse": true,
+      "values": { "w1": 80, "w2": 90 },
+      "expected": {
+        "results": [
+          { "id": "w1", "value": 80 },
+          { "id": "w2", "value": 90 }
+        ],
+        "error": "",
+        "calls": 2,
+        "maxConcurrency": 2,
+        "canceledHandles": 0
+      }
+    },
+    {
+      "jobs": [
+        { "id": "dup", "payload": 2 },
+        { "id": "other", "payload": 3 },
+        { "id": "dup", "payload": 4 }
+      ],
+      "workers": 2,
+      "values": { "dup": 22, "other": 33 },
+      "expected": {
+        "results": [
+          { "id": "dup", "value": 22 },
+          { "id": "other", "value": 33 },
+          { "id": "dup", "value": 22 }
+        ],
+        "error": "",
+        "calls": 3,
+        "canceledHandles": 0
+      }
+    }
+  ]
+}

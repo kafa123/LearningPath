@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-labelledby="title desc">
+<title id="title">Software Quality lesson cover</title>
+<desc id="desc">Abstract illustration for lesson 12 in Software Quality.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0a101c"/>
+    <stop offset="0.55" stop-color="#0d1728"/>
+    <stop offset="1" stop-color="#111d31"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fb7185" stop-opacity="0.30"/>
+    <stop offset="0.55" stop-color="#fb7185" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#fb7185" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M40 0H0V40" fill="none" stroke="#94a3b8" stroke-opacity="0.07"/>
+  </pattern>
+  <clipPath id="frame"><rect width="1200" height="420" rx="0"/></clipPath>
+</defs>
+<rect width="1200" height="420" fill="url(#bg)"/>
+<rect width="1200" height="420" fill="url(#grid)"/>
+<ellipse cx="930" cy="210" rx="390" ry="285" fill="url(#glow)"/>
+<rect x="0" y="0" width="1200" height="3" fill="#fb7185" opacity="0.85"/>
+<g opacity="0.09">
+  <text x="52" y="322" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="172" font-weight="700" fill="#fb7185" text-anchor="start" letter-spacing="0" opacity="1">12</text>
+</g>
+<g>
+  <rect x="72" y="64" width="8" height="8" rx="2" fill="#fb7185"/>
+  <text x="90" y="73" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#94a3b8" text-anchor="start" letter-spacing="2.6" opacity="1">SOFTWARE QUALITY</text>
+  <text x="72" y="112" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#64748b" text-anchor="start" letter-spacing="3.2" opacity="1">LESSON 12</text>
+</g>
+<g><rect x="590" y="136" width="64" height="48" rx="10" fill="#111c2e" stroke="#fb7185" stroke-width="1" opacity="1"/><text x="622" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#fb7185" text-anchor="middle" letter-spacing="0" opacity="1">R</text><line x1="654" y1="160" x2="690" y2="160" stroke="#fb7185" stroke-width="2" opacity="1"/><rect x="690" y="136" width="64" height="48" rx="10" fill="#111c2e" stroke="#fb7185" stroke-width="1" opacity="1"/><text x="722" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#fb7185" text-anchor="middle" letter-spacing="0" opacity="1">I</text><line x1="754" y1="160" x2="790" y2="160" stroke="#fb7185" stroke-width="2" stroke-dasharray="6 7" opacity="1"/><rect x="790" y="136" width="64" height="48" rx="10" fill="#111c2e" stroke="#fb7185" stroke-width="1" opacity="1"/><text x="822" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#fb7185" text-anchor="middle" letter-spacing="0" opacity="1">F</text><line x1="854" y1="160" x2="890" y2="160" stroke="#fb7185" stroke-width="2" opacity="1"/><rect x="890" y="136" width="64" height="48" rx="10" fill="#111c2e" stroke="#fb7185" stroke-width="1" opacity="1"/><text x="922" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#fb7185" text-anchor="middle" letter-spacing="0" opacity="1">X</text><circle cx="822" cy="140" r="34" fill="none" stroke="#f8fafc" stroke-width="2" opacity="1"/><line x1="846" y1="164" x2="878" y2="196" stroke="#f8fafc" stroke-width="2" opacity="1"/><text x="590" y="248" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">minimal failing input</text><rect x="590" y="264" width="206" height="62" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="604" y="288" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#cbd5e1" text-anchor="start" letter-spacing="0" opacity="1">start=1 · end=3</text><text x="604" y="308" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#fb7185" text-anchor="start" letter-spacing="0" opacity="1">expected 9 · actual 5</text><text x="840" y="288" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#fb7185" text-anchor="start" letter-spacing="0" opacity="1">fix the cause</text><text x="840" y="310" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">keep the regression</text></g>
+</svg>

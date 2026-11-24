@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.075Z",
+      "status": 404,
+      "body": "{\"error\":\"not_found\"}",
+      "contextValue": "trace-404",
+      "expected": {
+        "status": 404,
+        "elapsedHeader": "75",
+        "body": "{\"error\":\"not_found\"}",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.900Z",
+      "status": 500,
+      "body": "{\"error\":\"internal_error\"}",
+      "contextValue": "trace-500",
+      "expected": {
+        "status": 500,
+        "elapsedHeader": "900",
+        "body": "{\"error\":\"internal_error\"}",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.003Z",
+      "status": 400,
+      "body": "{\"error\":\"invalid_request\"}",
+      "contextValue": "trace-400",
+      "expected": {
+        "status": 400,
+        "elapsedHeader": "3",
+        "body": "{\"error\":\"invalid_request\"}",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    }
+  ]
+}

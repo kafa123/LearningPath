@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-labelledby="title desc">
+<title id="title">Go Engineering lesson cover</title>
+<desc id="desc">Abstract illustration for lesson 18 in Go Engineering.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0a101c"/>
+    <stop offset="0.55" stop-color="#0d1728"/>
+    <stop offset="1" stop-color="#111d31"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#22d3ee" stop-opacity="0.30"/>
+    <stop offset="0.55" stop-color="#22d3ee" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M40 0H0V40" fill="none" stroke="#94a3b8" stroke-opacity="0.07"/>
+  </pattern>
+  <clipPath id="frame"><rect width="1200" height="420" rx="0"/></clipPath>
+</defs>
+<rect width="1200" height="420" fill="url(#bg)"/>
+<rect width="1200" height="420" fill="url(#grid)"/>
+<ellipse cx="930" cy="210" rx="390" ry="285" fill="url(#glow)"/>
+<rect x="0" y="0" width="1200" height="3" fill="#22d3ee" opacity="0.85"/>
+<g opacity="0.09">
+  <text x="52" y="322" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="172" font-weight="700" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">18</text>
+</g>
+<g>
+  <rect x="72" y="64" width="8" height="8" rx="2" fill="#22d3ee"/>
+  <text x="90" y="73" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#94a3b8" text-anchor="start" letter-spacing="2.6" opacity="1">GO ENGINEERING</text>
+  <text x="72" y="112" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#64748b" text-anchor="start" letter-spacing="3.2" opacity="1">LESSON 18</text>
+</g>
+<g><rect x="560" y="112" width="264" height="148" rx="12" fill="#111c2e" stroke="#22d3ee" stroke-width="1" opacity="1"/><text x="574" y="138" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">generic function</text><text x="574" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#cbd5e1" text-anchor="start" letter-spacing="0" opacity="1">func Batch[T any]</text><text x="574" y="188" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">items []T</text><text x="574" y="208" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">size int</text><text x="574" y="234" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">→ [][]T</text><rect x="856" y="112" width="254" height="148" rx="12" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="870" y="138" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">constraint</text><text x="870" y="164" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#cbd5e1" text-anchor="start" letter-spacing="0" opacity="1">type Number interface</text><text x="870" y="188" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">~int | ~int64</text><text x="870" y="208" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">| ~float64</text><text x="870" y="234" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">exact operations only</text><rect x="560" y="288" width="172" height="36" rx="9" fill="#0e1828" stroke="#243449" stroke-width="1" opacity="1"/><text x="646" y="311" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="0" opacity="1">Batch[Order]</text><rect x="748" y="288" width="172" height="36" rx="9" fill="#0e1828" stroke="#243449" stroke-width="1" opacity="1"/><text x="834" y="311" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="0" opacity="1">Sum[Cents]</text><text x="560" y="356" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">one algorithm · explicit operations</text><text x="560" y="378" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="start" letter-spacing="0" opacity="1">if the constraint grows, use an interface</text></g>
+</svg>

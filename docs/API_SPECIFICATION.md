@@ -552,6 +552,48 @@ Returns one execution attempt.
 - The harness result block is removed from `standardOutput` before it is persisted or returned.
 - `status` reports the execution lifecycle. Deterministic grading is reported separately by the result endpoint.
 
+### `GET /api/submissions/latest?challengeSlug=...&languageId=...`
+
+Returns the most recent attempt for one challenge language, including the learner's saved source files. The workspace uses it to restore saved code and the last recorded result when the learner returns to a challenge. Both query parameters are required.
+
+**Response: 200 OK**
+
+```json
+{
+  "submission": {
+    "id": "0f1d2b5e-6f5a-4a0e-9a4b-1c2d3e4f5a6b",
+    "challengeSlug": "two-sum",
+    "languageId": "csharp",
+    "status": "Succeeded",
+    "isTerminal": true,
+    "createdAtUtc": "2026-11-08T10:15:30.0000000Z",
+    "startedAtUtc": "2026-11-08T10:15:30.2500000Z",
+    "completedAtUtc": "2026-11-08T10:15:36.7500000Z",
+    "durationMs": 6500,
+    "exitCode": 0,
+    "standardOutput": "all tests ran\n",
+    "standardError": "",
+    "failureMessage": null,
+    "outputTruncated": false,
+    "purpose": "Submit"
+  },
+  "files": [
+    {
+      "path": "Solution.cs",
+      "content": "namespace Challenge;\n\npublic static class Solution\n{\n    ...\n}\n"
+    }
+  ]
+}
+```
+
+`files` contains only learner-supplied source text for that attempt. The response never includes harnesses, hidden tests, reference solutions, container details, or workspace paths. Source text is untrusted input and must be rendered as code, never as HTML.
+
+**Response: 400 Bad Request** when `challengeSlug` or `languageId` is missing.
+
+**Response: 404 Not Found** when no attempt exists for that challenge language yet.
+
+An attempt restored from this endpoint is not a new attempt: it keeps its original id, timestamps, output, and assessment. The client should restore `files` into the editor and, when `submission.isTerminal` is `true`, load `GET /api/submissions/{id}/results` to show the last assessment.
+
 ### `GET /api/submissions/{id}/results`
 
 Returns the deterministic assessment recorded for one submission attempt. Exactly one assessment exists per submission; the endpoint returns `404` until an assessment has been recorded.

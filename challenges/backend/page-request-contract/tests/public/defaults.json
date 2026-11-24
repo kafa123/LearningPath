@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "page": null,
+      "pageSize": null,
+      "expected": {
+        "isValid": true,
+        "page": 1,
+        "pageSize": 20,
+        "offset": 0,
+        "errorCode": null
+      }
+    },
+    {
+      "page": "",
+      "pageSize": "   ",
+      "expected": {
+        "isValid": true,
+        "page": 1,
+        "pageSize": 20,
+        "offset": 0,
+        "errorCode": null
+      }
+    }
+  ]
+}

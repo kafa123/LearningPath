@@ -24,6 +24,18 @@ describe('MaterialPage', () => {
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getByText('one pass over a collection')).toBeInTheDocument()
 
+    expect(
+      screen.getByRole('img', { name: 'Measuring growth with Big-O lesson illustration' }),
+    ).toHaveAttribute('src', '/illustrations/lessons/complexity-analysis-lesson-cover.svg')
+    expect(
+      screen.getByRole('img', {
+        name: 'Growth classes compared as input size increases',
+      }),
+    ).toHaveAttribute(
+      'src',
+      '/illustrations/lessons/complexity-analysis-lesson-diagram.svg',
+    )
+
     expect(screen.getByRole('link', { name: 'Programming Fundamentals' })).toHaveAttribute(
       'href',
       '/learning/programming-fundamentals',

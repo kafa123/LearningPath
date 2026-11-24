@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "input": [
+        { "SKU": "z", "Quantity": 1, "Tags": [] },
+        { "SKU": "a", "Quantity": 1, "Tags": ["same"] },
+        { "SKU": "m", "Quantity": 1, "Tags": null }
+      ],
+      "expected": [
+        { "SKU": "A", "Quantity": 1, "Tags": ["same"] },
+        { "SKU": "M", "Quantity": 1, "Tags": [] },
+        { "SKU": "Z", "Quantity": 1, "Tags": [] }
+      ],
+      "expectedError": ""
+    },
+    {
+      "input": [
+        { "SKU": "x", "Quantity": 0, "Tags": ["keep"] }
+      ],
+      "expected": [],
+      "expectedError": ""
+    },
+    {
+      "input": [
+        { "SKU": "   ", "Quantity": 0, "Tags": [] }
+      ],
+      "expected": null,
+      "expectedError": "ErrInvalidSKU"
+    },
+    {
+      "input": [
+        { "SKU": "a", "Quantity": 1, "Tags": [] },
+        { "SKU": "\t", "Quantity": 5, "Tags": [] }
+      ],
+      "expected": null,
+      "expectedError": "ErrInvalidSKU"
+    }
+  ]
+}

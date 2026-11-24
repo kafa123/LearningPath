@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "slug": "booking-constraint-audit",
+  "title": "Audit booking constraints",
+  "summary": "Report invalid booking intervals, missing rooms, capacity violations, and overlapping reservations.",
+  "domainSlug": "database-engineering",
+  "topic": "Relational and constraint design",
+  "difficulty": "Advanced",
+  "type": "SQL",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Translate booking rules into explicit constraint checks.",
+    "Detect relationships that are missing a foreign key.",
+    "Express an overlap rule that a simple UNIQUE constraint cannot enforce.",
+    "Combine independent constraint audits into one deterministic result."
+  ],
+  "prerequisites": [
+    "relational-modeling",
+    "sql-querying"
+  ],
+  "competencySlugs": [
+    "relational-design",
+    "constraint-design",
+    "sql-composition"
+  ],
+  "constraints": [
+    "Return exactly the columns issue, entity_id, and detail in that order.",
+    "Order rows by issue ascending, then entity_id ascending, then detail ascending.",
+    "An invalid interval has starts_at greater than or equal to ends_at, regardless of status.",
+    "Capacity violations ignore cancelled bookings and allow party_size equal to capacity.",
+    "Overlap checks only compare non-cancelled bookings that have a valid interval.",
+    "Report each overlapping pair once, using the lower booking id as entity_id.",
+    "Return no rows when the data is clean."
+  ],
+  "examples": [
+    {
+      "input": "Booking 4 has starts_at = '2026-04-07T10:00:00Z' and ends_at = '2026-04-07T09:00:00Z'",
+      "output": "invalid_interval | 4 | 2026-04-07T10:00:00Z..2026-04-07T09:00:00Z",
+      "explanation": "A booking must end after it starts, even when it is cancelled."
+    },
+    {
+      "input": "Bookings 1 and 2 are confirmed for the same room with overlapping ranges",
+      "output": "overlapping_booking | 1 | conflicts with 2",
+      "explanation": "Each pair is reported once, from the lower id."
+    },
+    {
+      "input": "Booking 5 references room_id 99, which does not exist",
+      "output": "orphan_booking | 5 | pia@example.com",
+      "explanation": "The anti-join finds the missing relationship without a constraint error."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Standard audit",
+        "description": "The seeded bookings report every constraint violation.",
+        "source": "tests/public/standard.json"
+      },
+      {
+        "name": "Clean bookings",
+        "description": "A consistent data set produces no audit rows.",
+        "source": "tests/public/clean.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Adjacent and cancelled",
+        "description": "Cancelled bookings and touching intervals do not count as overlaps.",
+        "source": "tests/hidden/adjacent-cancelled.json"
+      },
+      {
+        "name": "Overlap pairs",
+        "description": "Three mutually overlapping bookings produce three ordered pairs.",
+        "source": "tests/hidden/overlap-pairs.json"
+      },
+      {
+        "name": "Capacity and status",
+        "description": "Capacity equality is allowed and cancelled bookings are ignored.",
+        "source": "tests/hidden/capacity-status.json"
+      },
+      {
+        "name": "Orphans and invalid intervals",
+        "description": "Missing rooms and equal start and end timestamps are both reported.",
+        "source": "tests/hidden/orphans-invalid.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

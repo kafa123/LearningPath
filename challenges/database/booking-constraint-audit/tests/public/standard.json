@@ -1,0 +1,9 @@
+{
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["invalid_interval", 4, "2026-04-07T10:00:00Z..2026-04-07T09:00:00Z"],
+    ["orphan_booking", 5, "pia@example.com"],
+    ["over_capacity", 3, "A2"],
+    ["overlapping_booking", 1, "conflicts with 2"]
+  ]
+}

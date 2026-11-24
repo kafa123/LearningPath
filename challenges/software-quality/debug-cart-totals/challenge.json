@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-cart-totals",
+  "title": "Debug cart totals and coupons",
+  "summary": "Find the defects in a cart calculator that mishandles quantities, discount thresholds, and rounding.",
+  "domainSlug": "software-quality",
+  "topic": "Debugging and boundary analysis",
+  "difficulty": "Intermediate",
+  "type": "Debugging",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Reproduce a defect with a focused input instead of guessing.",
+    "Distinguish an off-by-one threshold from a rounding defect.",
+    "Keep fixes general so every coupon and quantity behaves correctly."
+  ],
+  "prerequisites": [
+    "testing-foundations"
+  ],
+  "competencySlugs": [
+    "test-design",
+    "boundary-analysis",
+    "systematic-debugging",
+    "regression-prevention"
+  ],
+  "constraints": [
+    "Work in integer cents; never use floating point.",
+    "Ignore lines whose quantity is zero or negative.",
+    "SAVE10 applies only when the subtotal is at least 5000 cents.",
+    "SAVE25 applies only when the subtotal is at least 10000 cents.",
+    "The discount is the integer floor of subtotal * percent / 100.",
+    "Trim and upper-case the coupon before matching.",
+    "An empty cart totals 0."
+  ],
+  "examples": [
+    {
+      "input": "lines = [{unitPriceCents: 1500, quantity: 4}], coupon = \"SAVE10\"",
+      "output": "5400",
+      "explanation": "The subtotal is 6000 and the discount is 600."
+    },
+    {
+      "input": "lines = [{unitPriceCents: 1000, quantity: 0}], coupon = null",
+      "output": "0",
+      "explanation": "A non-positive quantity contributes nothing."
+    },
+    {
+      "input": "lines = [{unitPriceCents: 1111, quantity: 5}], coupon = \"SAVE10\"",
+      "output": "5000",
+      "explanation": "The discount floors to 555 cents instead of rounding."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Line quantities",
+        "description": "Non-positive quantities must not change the subtotal.",
+        "source": "tests/public/standard.json"
+      },
+      {
+        "name": "Discount threshold",
+        "description": "A subtotal exactly at the threshold receives the discount.",
+        "source": "tests/public/save10.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Quantity guards",
+        "description": "Zero, negative, and empty carts are handled without special cases.",
+        "source": "tests/hidden/quantity-guards.json"
+      },
+      {
+        "name": "Threshold boundaries",
+        "description": "Both coupons switch on exactly at their threshold and no earlier.",
+        "source": "tests/hidden/thresholds.json"
+      },
+      {
+        "name": "Discount rounding",
+        "description": "Discounts floor instead of rounding up.",
+        "source": "tests/hidden/rounding.json"
+      },
+      {
+        "name": "Coupon normalization",
+        "description": "Case and surrounding whitespace do not change the coupon.",
+        "source": "tests/hidden/normalization.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

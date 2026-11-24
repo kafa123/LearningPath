@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "bounded-workers",
+  "title": "Process jobs with a bounded worker pool",
+  "summary": "Run jobs through a fixed-size pool, keep outcomes in input order, and abort the whole batch on the first failure or cancellation.",
+  "domainSlug": "go-engineering",
+  "topic": "Worker pools",
+  "difficulty": "Advanced",
+  "type": "Coding",
+  "estimatedMinutes": 50,
+  "objectives": [
+    "Bound concurrency with a fixed worker pool instead of one goroutine per job.",
+    "Preserve input order and duplicate entries in the returned outcomes.",
+    "Cancel outstanding work and wait for every started goroutine before returning."
+  ],
+  "prerequisites": [
+    "go-concurrency"
+  ],
+  "competencySlugs": [
+    "goroutine-lifecycle",
+    "channel-coordination",
+    "deterministic-behavior"
+  ],
+  "constraints": [
+    "Keep the Job and Outcome types and the Process signature.",
+    "Workers below 1 behave like 1; a worker count above len(jobs) is allowed.",
+    "Return outcomes in input order, including duplicate ids.",
+    "Never call handle for the same input entry twice.",
+    "On the first handler error, cancel remaining work, wait for started goroutines, and return a wrapped error.",
+    "Do not use time.Sleep for sequencing or leak goroutines after returning."
+  ],
+  "examples": [
+    {
+      "input": "jobs = [{id: \"a\", payload: 3}, {id: \"b\", payload: 4}], workers = 2",
+      "output": "[{id: \"a\", value: ...}, {id: \"b\", value: ...}], nil",
+      "explanation": "Outcomes follow input order regardless of completion order."
+    },
+    {
+      "input": "jobs = [{id: \"first\"}, {id: \"boom\"}, {id: \"later\"}], workers = 2, handle fails for boom",
+      "output": "nil, job boom: lookup boom: job failed",
+      "explanation": "The first failure stops the batch and is wrapped with the job id."
+    },
+    {
+      "input": "jobs = [], workers = 3",
+      "output": "[], nil",
+      "explanation": "An empty batch returns an empty slice and starts no goroutines."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Ordered outcomes",
+        "description": "Results follow input order even when handlers finish in reverse.",
+        "source": "tests/public/ordering.json"
+      },
+      {
+        "name": "Worker bound",
+        "description": "Two workers and one worker cap peak concurrency accordingly.",
+        "source": "tests/public/worker-bound.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Failure and abortion",
+        "description": "A handler error cancels blocked work and wraps the job id.",
+        "source": "tests/hidden/errors.json"
+      },
+      {
+        "name": "Cancellation",
+        "description": "Pre-canceled contexts, mid-flight cancellation, and empty input.",
+        "source": "tests/hidden/cancellation.json"
+      },
+      {
+        "name": "Clamping and duplicates",
+        "description": "Worker clamping, oversized pools, and duplicate ids.",
+        "source": "tests/hidden/limits.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

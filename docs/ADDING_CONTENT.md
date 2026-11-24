@@ -26,7 +26,7 @@ Katalog learning bawaan didefinisikan di:
 src/Modules/Psel.Modules.Learning/Seed/LearningSeedData.cs
 ```
 
-Untuk menambah konten tanpa mengubah kode, gunakan import JSON di bagian 1.6.
+Untuk menambah konten tanpa mengubah kode, gunakan import JSON di bagian 1.7.
 
 Struktur method yang tersedia:
 
@@ -120,7 +120,31 @@ Path baru otomatis muncul di `/learning`, progress, dan form examination setelah
 - `competencySlugs` di challenge harus memakai **slug competency** yang ada di seed learning. Inilah penghubung progress dan panel “Practice” di halaman learning.
 - `prerequisites` di `challenge.json` juga memakai slug module, bukan slug challenge.
 
-### 1.5 Cara seed bekerja (upsert)
+### 1.5 Ilustrasi lesson (opsional)
+
+Setiap lesson bisa punya dua aset SVG di `client/public/illustrations/lessons/`:
+
+| Aset | Nama file | Dipakai di |
+|---|---|---|
+| Cover | `<slug>-cover.svg` | Hero di atas judul lesson |
+| Diagram konsep | `<slug>-diagram.svg` | Disisipkan di body Markdown |
+
+Langkahnya:
+
+1. Buat SVG dengan rasio cover `1200 × 420` dan diagram `960 × 480`. Keduanya panel gelap mandiri, jadi tetap terbaca di dark dan light theme.
+2. Daftarkan slug lesson di `client/src/features/learning/lessonIllustrations.ts`. Lesson yang tidak terdaftar tetap tampil normal tanpa cover.
+3. Sisipkan diagram di `bodyMarkdown` pada posisi yang relevan:
+
+   ```markdown
+   ![Diagram konsep untuk lesson ini](/illustrations/lessons/<slug>-diagram.svg)
+   ```
+
+   Teks `alt` menjadi deskripsi untuk pembaca layar. Judul diagram sebaiknya juga ditulis di dalam SVG.
+4. Restart API agar body Markdown tersinkron, lalu buka halaman lesson di `http://localhost:5173`.
+
+Cover memakai path publik Vite, jadi tidak perlu import atau rebuild backend. Menghapus satu aset cukup dengan menghapus entri slug dari `lessonIllustrations.ts` dan baris gambar di Markdown.
+
+### 1.6 Cara seed bekerja (upsert)
 
 `LearningDataSeeder` berjalan setiap API start dan memanggil `LearningSeedSynchronizer`. Perilakunya:
 
@@ -136,7 +160,7 @@ Path baru otomatis muncul di `/learning`, progress, dan form examination setelah
 
 Karena itu, menambah atau mengedit konten learning cukup dengan salah satu jalur:
 
-1. Import content pack dari `/authoring` (bagian 1.6), atau
+1. Import content pack dari `/authoring` (bagian 1.7), atau
 2. Edit `LearningSeedData.cs`, hentikan API, lalu jalankan lagi (`dotnet run --project src\Psel.Api`).
 
 Untuk jalur seed code, cek log: `Synchronized 5 learning domains: N added, M updated.` Log hanya muncul bila ada perubahan.
@@ -166,7 +190,7 @@ dotnet run --project src\Psel.Api
 
 > **Peringatan:** reset database menghapus submission, assessment, examination session, progress evidence, dan rubric review. Backup dulu bila data itu masih kamu butuhkan.
 
-### 1.6 Import content pack dari halaman Authoring
+### 1.7 Import content pack dari halaman Authoring
 
 Cara tercepat menambah atau mengubah learning content tanpa rebuild:
 
@@ -202,13 +226,13 @@ Aturan import:
 - Slug adalah identitas. Module, material, dan competency boleh diedit, tetapi tidak boleh dipindah ke domain/module lain lewat import.
 - Objective memakai kunci `(module, sortOrder)`.
 - `prerequisites` harus menunjuk module yang sudah ada di database atau ada di pack yang sama.
-- Import tidak menghapus baris yang tidak ada di pack; gunakan reset database (bagian 1.5) untuk menghapus.
+- Import tidak menghapus baris yang tidak ada di pack; gunakan reset database (bagian 1.6) untuk menghapus.
 - Batas upload 2 MiB; `bodyMarkdown` maksimal 200.000 karakter per material.
 - Semua validasi berjalan sebelum penulisan. Jika ada satu error, tidak ada baris yang berubah.
 
 Validasi yang gagal mengembalikan `400` ProblemDetails berisi daftar error, `413` untuk file terlalu besar, dan `415` untuk content type yang tidak didukung.
 
-### 1.7 Tes yang perlu diperbarui
+### 1.8 Tes yang perlu diperbarui
 
 Beberapa tes mengunci jumlah katalog. Setelah menambah learning data, sesuaikan:
 
@@ -260,7 +284,7 @@ Discovery bersifat rekursif; nama folder tidak menentukan slug. `slug` di manife
 7. Restart API. Log startup harus menampilkan jumlah package yang berhasil dimuat:
 
 ```text
-Loaded 8 challenge packages from D:\Aku\proyek\challenges.
+Loaded 16 challenge packages from D:\Aku\proyek\challenges.
 ```
 
 Jika satu package tidak valid, API menolak start. Package yang gagal tidak pernah tampil sebagian.
@@ -439,7 +463,7 @@ Cek manual:
 | Gejala | Penyebab umum | Solusi |
 |---|---|---|
 | Learning content baru tidak muncul | Import belum dijalankan, slug/field salah, atau API belum di-restart setelah mengedit seed | Jalankan import dari `/authoring`, atau restart API dan baca log `Synchronized ...` |
-| Konten hasil rename/hapus masih muncul | Upsert tidak menghapus baris yang hilang dari seed atau pack | Hapus manual baris terkait, atau reset database (bagian 1.5) |
+| Konten hasil rename/hapus masih muncul | Upsert tidak menghapus baris yang hilang dari seed atau pack | Hapus manual baris terkait, atau reset database (bagian 1.6) |
 | Import learning ditolak `400` | Ada field/slug ganda, parent dipindah, atau prerequisite tidak dikenal | Baca daftar error di respons; perbaiki pack lalu ulangi |
 | API gagal start setelah menambah challenge | JSON tidak valid, field tidak dikenal, path keluar folder, atau test/harness tidak ada | Baca pesan validasi di log; perbaiki manifest |
 | Upload challenge ditolak `409` | Slug sudah ada dan replace belum dicentang | Centang opsi replace, atau ubah slug |

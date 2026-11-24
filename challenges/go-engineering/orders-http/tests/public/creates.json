@@ -1,0 +1,37 @@
+{
+  "store": {
+    "orders": [],
+    "failGetIds": [],
+    "failSaveIds": []
+  },
+  "cases": [
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"  C-3  \",\"totalCents\":4200}",
+      "contextValue": "create-public",
+      "expected": {
+        "status": 201,
+        "body": { "id": "C-3", "totalCents": 4200 },
+        "location": "/orders/C-3",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": " { \"id\" : \"D-4\" , \"totalCents\" : 1 } ",
+      "contextValue": "create-public",
+      "expected": {
+        "status": 201,
+        "body": { "id": "D-4", "totalCents": 1 },
+        "location": "/orders/D-4",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    }
+  ]
+}

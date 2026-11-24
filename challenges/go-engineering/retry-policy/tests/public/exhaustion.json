@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "policy": {
+        "maxAttempts": 2,
+        "baseDelayMs": 5,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "retryable"
+      ],
+      "expected": {
+        "attempts": 2,
+        "delays": [
+          5
+        ],
+        "error": "retryable",
+        "errorText": "giving up after 2 attempts: temporary failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 1,
+        "baseDelayMs": 5,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "retryable",
+        "errorText": "giving up after 1 attempts: temporary failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 3,
+        "baseDelayMs": 2,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "retryable",
+        "retryable"
+      ],
+      "expected": {
+        "attempts": 3,
+        "delays": [
+          2,
+          4
+        ],
+        "error": "retryable",
+        "errorText": "giving up after 3 attempts: temporary failure"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "cases": [
+    {
+      "input": [
+        { "SKU": " sku-2 ", "Quantity": 1, "Tags": [" red "] },
+        { "SKU": "SKU-1", "Quantity": 3, "Tags": ["blue"] },
+        { "SKU": "sku-2", "Quantity": 7, "Tags": ["green", "red"] },
+        { "SKU": "SKU-1", "Quantity": 2, "Tags": ["cyan"] }
+      ],
+      "expected": [
+        { "SKU": "SKU-1", "Quantity": 3, "Tags": ["blue", "cyan"] },
+        { "SKU": "SKU-2", "Quantity": 7, "Tags": ["green", "red"] }
+      ],
+      "expectedError": ""
+    }
+  ]
+}

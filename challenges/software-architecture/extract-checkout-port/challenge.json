@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "slug": "extract-checkout-port",
+  "title": "Extract a checkout notifier port",
+  "summary": "Route checkout confirmations through an injected notifier port and enforce the order rules at the boundary.",
+  "domainSlug": "software-architecture",
+  "topic": "Ports and dependency direction",
+  "difficulty": "Advanced",
+  "type": "Architecture",
+  "estimatedMinutes": 45,
+  "objectives": [
+    "Route a delivery detail through an explicit port instead of a concrete gateway.",
+    "Keep the checkout rule independent of the notification mechanism.",
+    "Enforce validation order at the boundary.",
+    "Make the send behavior observable without touching console output."
+  ],
+  "prerequisites": [
+    "separation-of-concerns"
+  ],
+  "competencySlugs": [
+    "responsibility-boundaries",
+    "module-boundaries",
+    "dependency-direction",
+    "architecture-tradeoffs"
+  ],
+  "constraints": [
+    "Keep the public types Order and INotifier, and the Checkout.Complete signature.",
+    "Never write to the console or call a static gateway from checkout.",
+    "Validate in this order: empty order, invalid recipient, below threshold.",
+    "Send exactly one message only when the order qualifies.",
+    "Use the message format Order {id} confirmed: {total} cents.",
+    "Return sent, empty_order, invalid_recipient, or below_threshold."
+  ],
+  "examples": [
+    {
+      "input": "Order(42, 5000, \"ada@example.com\")",
+      "output": "sent, then notifier receives \"Order 42 confirmed: 5000 cents\"",
+      "explanation": "The threshold is inclusive, so 5000 qualifies."
+    },
+    {
+      "input": "Order(7, 4999, \"ada@example.com\")",
+      "output": "below_threshold, and the notifier receives nothing",
+      "explanation": "The checkout rules run before any delivery side effect."
+    },
+    {
+      "input": "Order(8, 0, null)",
+      "output": "empty_order",
+      "explanation": "Empty-order validation happens first."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Qualifying orders",
+        "description": "A qualifying order sends exactly one confirmation through the port.",
+        "source": "tests/public/sends.json"
+      },
+      {
+        "name": "Rejected orders",
+        "description": "Below-threshold and empty orders never reach the notifier.",
+        "source": "tests/public/guards.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Validation precedence",
+        "description": "When several rules fail, the documented order decides the result.",
+        "source": "tests/hidden/precedence.json"
+      },
+      {
+        "name": "Recipient checks",
+        "description": "Null, empty, and whitespace-only recipients are rejected without a send.",
+        "source": "tests/hidden/recipients.json"
+      },
+      {
+        "name": "Threshold edges",
+        "description": "The send boundary is inclusive at 5000 cents.",
+        "source": "tests/hidden/threshold.json"
+      },
+      {
+        "name": "No duplicate sends",
+        "description": "Each qualifying order produces exactly one recorded message.",
+        "source": "tests/hidden/single-send.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "Hybrid",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "id": "port-boundary",
+        "title": "Port boundary",
+        "description": "Checkout depends on the INotifier port and never on a concrete delivery mechanism or console.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "rule-order",
+        "title": "Rule order",
+        "description": "Validation order and result codes follow the contract, including precedence when several rules fail.",
+        "maxPoints": 10,
+        "weight": 2
+      },
+      {
+        "id": "behavior-preservation",
+        "title": "Behavior preservation",
+        "description": "Qualifying orders send exactly one message with the exact required text.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "testability",
+        "title": "Testability",
+        "description": "Behavior is observable through the injected notifier rather than through global side effects.",
+        "maxPoints": 10,
+        "weight": 2
+      }
+    ]
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

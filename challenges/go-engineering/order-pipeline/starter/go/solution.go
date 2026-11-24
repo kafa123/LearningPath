@@ -1,0 +1,58 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+// Order is the purchase being fulfilled.
+type Order struct {
+	ID         string
+	TotalCents int
+	Email      string
+}
+
+// Repository loads orders by id.
+type Repository interface {
+	Load(id string) (Order, error)
+}
+
+// Notifier delivers a confirmation message.
+type Notifier interface {
+	Send(message string) error
+}
+
+// Result describes a successful fulfillment.
+type Result struct {
+	Sent    bool
+	Message string
+}
+
+var (
+	ErrNotFound         = errors.New("order not found")
+	ErrInvalidRecipient = errors.New("invalid recipient")
+	ErrBelowMinimum     = errors.New("order below minimum")
+)
+
+// Fulfill loads the order, applies the rules, and sends one confirmation.
+func Fulfill(repo Repository, notifier Notifier, id string) (Result, error) {
+	order, err := repo.Load(id)
+	if err != nil {
+		return Result{}, err
+	}
+
+	if order.Email == "" {
+		return Result{}, ErrInvalidRecipient
+	}
+
+	if order.TotalCents < 1000 {
+		return Result{}, ErrBelowMinimum
+	}
+
+	message := fmt.Sprintf("Order %s confirmed: %d cents", id, order.TotalCents)
+	if err := notifier.Send(message); err != nil {
+		return Result{}, err
+	}
+
+	return Result{Sent: true, Message: message}, nil
+}

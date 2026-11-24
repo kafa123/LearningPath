@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "slug": "order-pipeline",
+  "title": "Fulfill orders through ports",
+  "summary": "Fulfill an order through repository and notifier ports while wrapping every failure so callers can inspect it with errors.Is.",
+  "domainSlug": "go-engineering",
+  "topic": "Errors and interfaces",
+  "difficulty": "Intermediate",
+  "type": "Coding",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Wrap repository, validation, and delivery failures so callers can inspect them with errors.Is.",
+    "Depend on the Repository and Notifier interfaces instead of concrete implementations.",
+    "Enforce validation precedence before any notification side effect."
+  ],
+  "prerequisites": [
+    "go-errors-and-interfaces"
+  ],
+  "competencySlugs": [
+    "error-wrapping",
+    "interface-contracts",
+    "testable-seams"
+  ],
+  "constraints": [
+    "Keep the public Order, Repository, Notifier, Result, sentinel errors, and Fulfill signature unchanged.",
+    "Wrap every failure with fmt.Errorf and %w so errors.Is still matches the documented sentinel.",
+    "Evaluate load, recipient, minimum total, and send in that order.",
+    "Send exactly one confirmation only when the order qualifies.",
+    "Use the message format Order {id} confirmed: {total} cents."
+  ],
+  "examples": [
+    {
+      "input": "Repository returns Order{ID: \"A-100\", TotalCents: 2500, Email: \"ada@example.com\"}",
+      "output": "Result{Sent: true, Message: \"Order A-100 confirmed: 2500 cents\"}, nil",
+      "explanation": "A qualifying order sends exactly one confirmation."
+    },
+    {
+      "input": "Email = \"   \" and TotalCents = 500",
+      "output": "Result{}, error wrapping ErrInvalidRecipient",
+      "explanation": "The recipient check runs before the minimum-total check, so the invalid recipient wins."
+    },
+    {
+      "input": "Notifier returns an error wrapping a transport failure",
+      "output": "Result{}, error \"send confirmation for A-100: ...\" that still matches the transport sentinel with errors.Is",
+      "explanation": "The delivery failure is wrapped, not replaced."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Qualifying orders",
+        "description": "A qualifying order sends exactly one confirmation with the exact message.",
+        "source": "tests/public/success.json"
+      },
+      {
+        "name": "Rejected orders",
+        "description": "Invalid recipients, low totals, load failures, and delivery failures return wrapped errors.",
+        "source": "tests/public/rejections.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Wrap chains",
+        "description": "errors.Is finds repository and transport sentinels through nested wrapping.",
+        "source": "tests/hidden/wrap-chains.json"
+      },
+      {
+        "name": "Validation precedence",
+        "description": "When several rules fail, the documented check order decides the returned error.",
+        "source": "tests/hidden/precedence.json"
+      },
+      {
+        "name": "Recipient and threshold edges",
+        "description": "Whitespace recipients and the inclusive 1000-cent boundary behave as documented.",
+        "source": "tests/hidden/validation.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

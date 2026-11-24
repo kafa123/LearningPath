@@ -1,0 +1,10 @@
+{
+  "seed": "INSERT INTO teams (id, name, owner_email) VALUES\n  (1, 'Stable', 'owner@example.com');\n\nINSERT INTO members (id, team_id, email, display_name) VALUES\n  (1, 1, 'ok@example.com', 'Okay'),\n  (2, 50, 'm-a@example.com', 'Orphan A'),\n  (3, 7, 'm-b@example.com', 'Orphan B');\n\nINSERT INTO invitations (id, team_id, email, invited_at) VALUES\n  (1, 1, 'inv-ok@example.com', '2026-01-02'),\n  (2, 60, 'inv-a@example.com', '2026-01-03'),\n  (3, 6, 'inv-b@example.com', '2026-01-04');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["orphan_invitation", 2, "inv-a@example.com"],
+    ["orphan_invitation", 3, "inv-b@example.com"],
+    ["orphan_member", 2, "m-a@example.com"],
+    ["orphan_member", 3, "m-b@example.com"]
+  ]
+}

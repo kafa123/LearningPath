@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "lines": [
+        { "unitPriceCents": 2500, "quantity": 2 }
+      ],
+      "coupon": "SAVE10",
+      "expected": 4500
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 2499, "quantity": 2 }
+      ],
+      "coupon": "SAVE10",
+      "expected": 4998
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 2500, "quantity": 2 }
+      ],
+      "coupon": "SAVE25",
+      "expected": 5000
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 2000, "quantity": 5 }
+      ],
+      "coupon": "SAVE25",
+      "expected": 7500
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 1999, "quantity": 5 }
+      ],
+      "coupon": "SAVE25",
+      "expected": 9995
+    }
+  ]
+}

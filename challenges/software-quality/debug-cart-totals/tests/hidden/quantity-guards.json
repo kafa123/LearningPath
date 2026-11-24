@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "lines": [
+        { "unitPriceCents": 1000, "quantity": 0 },
+        { "unitPriceCents": 1000, "quantity": -3 },
+        { "unitPriceCents": 1000, "quantity": 2 }
+      ],
+      "coupon": null,
+      "expected": 2000
+    },
+    {
+      "lines": [],
+      "coupon": null,
+      "expected": 0
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 999, "quantity": 0 }
+      ],
+      "coupon": "SAVE10",
+      "expected": 0
+    }
+  ]
+}

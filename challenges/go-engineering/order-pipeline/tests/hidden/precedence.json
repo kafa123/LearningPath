@@ -1,0 +1,150 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": "P-1",
+        "totalCents": 500,
+        "email": ""
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_invalid_recipient",
+        "errorText": "order P-1: invalid recipient"
+      }
+    },
+    {
+      "order": {
+        "id": "P-2",
+        "totalCents": 500,
+        "email": "   "
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_invalid_recipient",
+        "errorText": "order P-2: invalid recipient"
+      }
+    },
+    {
+      "order": {
+        "id": "P-3",
+        "totalCents": 999,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_below_minimum",
+        "errorText": "order P-3: order below minimum"
+      }
+    },
+    {
+      "order": {
+        "id": "P-4",
+        "totalCents": 500,
+        "email": ""
+      },
+      "repository": {
+        "loadError": "not_found",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_not_found",
+        "errorText": "load order P-4: order not found"
+      }
+    },
+    {
+      "order": {
+        "id": "P-5",
+        "totalCents": 1000,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "notifier",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [
+          "Order P-5 confirmed: 1000 cents"
+        ],
+        "error": "err_notifier",
+        "errorText": "send confirmation for P-5: smtp rejected"
+      }
+    },
+    {
+      "order": {
+        "id": "P-6",
+        "totalCents": 999,
+        "email": "  \t"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_invalid_recipient",
+        "errorText": "order P-6: invalid recipient"
+      }
+    }
+  ]
+}

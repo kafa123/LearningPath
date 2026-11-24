@@ -25,12 +25,20 @@ public sealed class ChallengeEndpointTests
         Assert.Equal(
             [
                 "api-validation",
+                "booking-constraint-audit",
+                "data-integrity-audit",
                 "balanced-brackets",
+                "tenant-activity-feed",
                 "order-revenue",
                 "debug-off-by-one",
+                "debug-cart-totals",
+                "extract-checkout-port",
+                "inject-pricing-clock",
+                "error-response-mapping",
                 "refactor-duplication",
                 "two-sum",
                 "order-index-plan",
+                "page-request-contract",
                 "word-frequency"
             ],
             challenges.Select(challenge => challenge.Slug));
@@ -38,12 +46,20 @@ public sealed class ChallengeEndpointTests
         Assert.Equal(
             [
                 "Add Request Validation to an Endpoint",
+                "Audit booking constraints",
+                "Audit relational data integrity",
                 "Balanced Brackets",
+                "Build a tenant activity feed",
                 "Completed revenue per customer",
                 "Debug an Off-by-One Sum",
+                "Debug cart totals and coupons",
+                "Extract a checkout notifier port",
+                "Inject a clock into pricing",
+                "Map Domain Errors to HTTP Responses",
                 "Refactor Duplicated Discount Rules",
                 "Two Sum",
                 "Use the composite order index",
+                "Validate a Page Request Contract",
                 "Word Frequency"
             ],
             challenges.Select(challenge => challenge.Title));
@@ -156,12 +172,20 @@ public sealed class ChallengeEndpointTests
         string[] slugs =
         [
             "api-validation",
+            "booking-constraint-audit",
+            "data-integrity-audit",
             "balanced-brackets",
+            "tenant-activity-feed",
             "order-revenue",
             "debug-off-by-one",
+            "debug-cart-totals",
+            "extract-checkout-port",
+            "inject-pricing-clock",
+            "error-response-mapping",
             "refactor-duplication",
             "two-sum",
             "order-index-plan",
+            "page-request-contract",
             "word-frequency"
         ];
 

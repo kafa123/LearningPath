@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": 1,
+        "totalCents": 4999,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "below_threshold",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 2,
+        "totalCents": 0,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "empty_order",
+      "sentMessages": []
+    }
+  ]
+}

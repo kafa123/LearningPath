@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "input": [
+        { "SKU": " gamma ", "Quantity": 2, "Tags": [" z ", "a", "z"] },
+        { "SKU": "Beta", "Quantity": 5, "Tags": ["m"] },
+        { "SKU": "beta ", "Quantity": 9, "Tags": [" a ", ""] },
+        { "SKU": "alpha", "Quantity": -1, "Tags": ["dropped"] },
+        { "SKU": "delta", "Quantity": 1, "Tags": ["q"] }
+      ],
+      "expected": [
+        { "SKU": "BETA", "Quantity": 9, "Tags": ["a", "m"] },
+        { "SKU": "DELTA", "Quantity": 1, "Tags": ["q"] },
+        { "SKU": "GAMMA", "Quantity": 2, "Tags": ["a", "z"] }
+      ],
+      "expectedError": ""
+    }
+  ]
+}

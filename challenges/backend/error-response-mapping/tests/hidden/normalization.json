@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "errorCode": "  NOT_FOUND  ",
+      "internalDetail": null,
+      "expected": {
+        "status": 404,
+        "code": "not_found",
+        "title": "Resource not found",
+        "detail": "The requested resource does not exist.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": "Rate_Limited",
+      "internalDetail": null,
+      "expected": {
+        "status": 429,
+        "code": "rate_limited",
+        "title": "Too many requests",
+        "detail": "Retry after the indicated delay.",
+        "retryable": true
+      }
+    }
+  ]
+}

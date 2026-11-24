@@ -1,0 +1,184 @@
+{
+  "cases": [
+    {
+      "keys": [
+        "k1",
+        "k2",
+        "k3",
+        "k4",
+        "k5"
+      ],
+      "workers": 2,
+      "holdStarted": 2,
+      "values": {
+        "k1": "v1",
+        "k2": "v2",
+        "k3": "v3",
+        "k4": "v4",
+        "k5": "v5"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "k1",
+            "value": "v1"
+          },
+          {
+            "key": "k2",
+            "value": "v2"
+          },
+          {
+            "key": "k3",
+            "value": "v3"
+          },
+          {
+            "key": "k4",
+            "value": "v4"
+          },
+          {
+            "key": "k5",
+            "value": "v5"
+          }
+        ],
+        "error": "",
+        "calls": 5,
+        "maxConcurrency": 2,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "workers": 1,
+      "holdStarted": 1,
+      "values": {
+        "s1": "1",
+        "s2": "2",
+        "s3": "3",
+        "s4": "4"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "s1",
+            "value": "1"
+          },
+          {
+            "key": "s2",
+            "value": "2"
+          },
+          {
+            "key": "s3",
+            "value": "3"
+          },
+          {
+            "key": "s4",
+            "value": "4"
+          }
+        ],
+        "error": "",
+        "calls": 4,
+        "maxConcurrency": 1,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "workers": 0,
+      "values": {
+        "c1": "a",
+        "c2": "b",
+        "c3": "c"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "c1",
+            "value": "a"
+          },
+          {
+            "key": "c2",
+            "value": "b"
+          },
+          {
+            "key": "c3",
+            "value": "c"
+          }
+        ],
+        "error": "",
+        "calls": 3,
+        "maxConcurrency": 1,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "w1",
+        "w2",
+        "w3"
+      ],
+      "workers": 10,
+      "holdStarted": 3,
+      "values": {
+        "w1": "x",
+        "w2": "y",
+        "w3": "z"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "w1",
+            "value": "x"
+          },
+          {
+            "key": "w2",
+            "value": "y"
+          },
+          {
+            "key": "w3",
+            "value": "z"
+          }
+        ],
+        "error": "",
+        "calls": 3,
+        "maxConcurrency": 3,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "n1",
+        "n2"
+      ],
+      "workers": -7,
+      "values": {
+        "n1": "first",
+        "n2": "second"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "n1",
+            "value": "first"
+          },
+          {
+            "key": "n2",
+            "value": "second"
+          }
+        ],
+        "error": "",
+        "calls": 2,
+        "maxConcurrency": 1,
+        "canceledFetches": 0
+      }
+    }
+  ]
+}

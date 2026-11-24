@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "inventory-ledger",
+  "title": "Normalize an inventory ledger",
+  "summary": "Normalize SKU casing, merge duplicate rows, and return deterministic tags without changing the caller's data.",
+  "domainSlug": "go-engineering",
+  "topic": "Value semantics and collections",
+  "difficulty": "Beginner",
+  "type": "Coding",
+  "estimatedMinutes": 35,
+  "objectives": [
+    "Normalize SKUs with trimming and uppercasing while validating empty values.",
+    "Merge duplicate SKUs and union normalized tags without mutating the caller's data.",
+    "Return deterministic ordering with non-nil empty slices."
+  ],
+  "prerequisites": [
+    "go-foundations"
+  ],
+  "competencySlugs": [
+    "value-semantics",
+    "slices-and-maps",
+    "data-structure-costs"
+  ],
+  "constraints": [
+    "Keep the public Item type, ErrInvalidSKU sentinel, and NormalizeInventory signature.",
+    "Validate the trimmed SKU before discarding a non-positive quantity.",
+    "Never modify the input slice, its items, or any Tags backing array.",
+    "Return a non-nil empty slice for an item with no tags and for an empty result.",
+    "Sort the result by SKU and each item's tags ascending.",
+    "Deduplicate tags after trimming and discard empty tags."
+  ],
+  "examples": [
+    {
+      "input": "items = [{SKU: \" b \", Quantity: 2, Tags: [\" x \", \"x\"]}, {SKU: \"a\", Quantity: 1, Tags: []}]",
+      "output": "[{SKU: \"A\", Quantity: 1, Tags: []}, {SKU: \"B\", Quantity: 2, Tags: [\"x\"]}]",
+      "explanation": "SKUs are trimmed and uppercased, rows are ordered by SKU, and duplicate tags are removed."
+    },
+    {
+      "input": "items = [{SKU: \"a\", Quantity: 2, Tags: [\"z\"]}, {SKU: \" A \", Quantity: 5, Tags: [\"a\", \"z\"]}]",
+      "output": "[{SKU: \"A\", Quantity: 5, Tags: [\"a\", \"z\"]}]",
+      "explanation": "Duplicate SKUs keep the highest quantity and union their tags."
+    },
+    {
+      "input": "items = [{SKU: \"   \", Quantity: 3, Tags: []}]",
+      "output": "nil, ErrInvalidSKU",
+      "explanation": "A SKU that is empty after trimming rejects the whole call."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Normalize and order",
+        "description": "Trimmed SKUs are uppercased, non-positive rows are dropped, and the result is sorted.",
+        "source": "tests/public/normalization.json"
+      },
+      {
+        "name": "Merge duplicate SKUs",
+        "description": "Duplicate SKUs keep the highest quantity and union their tags.",
+        "source": "tests/public/merge-duplicates.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Input immutability",
+        "description": "The call must not change the caller's slice, its items, or any tag array.",
+        "source": "tests/hidden/immutability.json"
+      },
+      {
+        "name": "Tag normalization",
+        "description": "Tags are trimmed, deduplicated, sorted, and never null.",
+        "source": "tests/hidden/tag-normalization.json"
+      },
+      {
+        "name": "Ordering and invalid SKUs",
+        "description": "Results are ordered and an empty SKU fails even when the row would be dropped.",
+        "source": "tests/hidden/ordering-and-errors.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

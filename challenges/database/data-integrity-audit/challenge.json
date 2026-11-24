@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "slug": "data-integrity-audit",
+  "title": "Audit relational data integrity",
+  "summary": "Report duplicated member emails, teams without an owner, and orphaned rows in a single query.",
+  "domainSlug": "database-engineering",
+  "topic": "Constraints and referential integrity",
+  "difficulty": "Advanced",
+  "type": "SQL",
+  "estimatedMinutes": 35,
+  "objectives": [
+    "Translate integrity rules into explicit audit queries.",
+    "Detect duplicate values within a scope instead of across the whole table.",
+    "Find missing relationships without relying on enforced foreign keys.",
+    "Combine independent audit results into one deterministic result set."
+  ],
+  "prerequisites": [
+    "relational-modeling",
+    "sql-querying"
+  ],
+  "competencySlugs": [
+    "relational-design",
+    "constraint-design",
+    "sql-composition",
+    "null-semantics"
+  ],
+  "constraints": [
+    "Return exactly the columns issue, entity_id, and detail in that order.",
+    "Order rows by issue ascending, then entity_id ascending, then detail ascending.",
+    "Duplicate member emails are scoped to one team and compared case-insensitively.",
+    "A team owner that is NULL or blank counts as missing.",
+    "Report orphans even when the database does not enforce foreign keys.",
+    "Return no rows when the data is clean."
+  ],
+  "examples": [
+    {
+      "input": "Team 1 has members 'Ada@example.com' and 'ada@example.com'",
+      "output": "duplicate_member_email | 1 | ada@example.com",
+      "explanation": "Duplicate detection is per team and ignores letter case."
+    },
+    {
+      "input": "Team 4 has owner_email = '   '",
+      "output": "missing_owner | 4 | Team Four",
+      "explanation": "A blank owner is as missing as a NULL owner."
+    },
+    {
+      "input": "Invitation 9 references team_id 404, which does not exist",
+      "output": "orphan_invitation | 9 | stray@example.com",
+      "explanation": "Orphans are found with an anti-join, not with a constraint error."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Standard audit",
+        "description": "The seeded workspace reports every integrity issue once.",
+        "source": "tests/public/standard.json"
+      },
+      {
+        "name": "Clean workspace",
+        "description": "A consistent data set produces no audit rows.",
+        "source": "tests/public/clean.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Duplicate scope",
+        "description": "Duplicates are scoped to a team, compared case-insensitively, and reported once.",
+        "source": "tests/hidden/duplicate-scope.json"
+      },
+      {
+        "name": "Owner blanks",
+        "description": "NULL and whitespace-only owners are reported, while a valid owner is not.",
+        "source": "tests/hidden/owner-blanks.json"
+      },
+      {
+        "name": "Orphan ordering",
+        "description": "Orphaned members and invitations are reported with stable ordering.",
+        "source": "tests/hidden/orphans.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

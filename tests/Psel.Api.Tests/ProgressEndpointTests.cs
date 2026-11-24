@@ -32,7 +32,7 @@ public sealed class ProgressEndpointTests
         Assert.Equal(0, overview.Summary.AssessmentRequired);
         Assert.Equal(0, overview.Summary.Mastered);
 
-        Assert.Equal(5, overview.Domains.Count);
+        Assert.Equal(6, overview.Domains.Count);
         Assert.All(
             overview.Domains,
             domain => Assert.All(domain.Modules, module => Assert.NotEmpty(module.Competencies)));

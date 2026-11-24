@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "policy": {
+        "maxAttempts": 5,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "fatal"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "fatal",
+        "errorText": "permanent failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 5,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "fatal-wrapped"
+      ],
+      "expected": {
+        "attempts": 2,
+        "delays": [
+          10
+        ],
+        "error": "fatal",
+        "errorText": "decode: permanent failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 3,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable-wrapped",
+        "ok"
+      ],
+      "expected": {
+        "attempts": 2,
+        "delays": [
+          10
+        ],
+        "error": ""
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 2,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "fatal-wrapped"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "fatal",
+        "errorText": "decode: permanent failure"
+      }
+    }
+  ]
+}

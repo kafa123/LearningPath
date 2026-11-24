@@ -6,7 +6,8 @@ internal sealed class LanguageCatalog : ILanguageCatalog
     [
         new SupportedLanguage("csharp", "C#"),
         new SupportedLanguage("python", "Python"),
-        new SupportedLanguage("sql", "SQL")
+        new SupportedLanguage("sql", "SQL"),
+        new SupportedLanguage("go", "Go")
     ];
 
     public IReadOnlyList<SupportedLanguage> GetLanguages() => Languages;

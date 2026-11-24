@@ -1,0 +1,149 @@
+{
+  "store": {
+    "orders": [],
+    "failGetIds": [],
+    "failSaveIds": ["SAVE-FAIL"]
+  },
+  "cases": [
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-1\",\"totalCents\":250}",
+      "contextValue": "post-hidden-valid",
+      "expected": {
+        "status": 201,
+        "body": { "id": "P-1", "totalCents": 250 },
+        "location": "/orders/P-1",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-2\",\"totalCents\":",
+      "contextValue": "post-hidden-malformed",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-3\",\"totalCents\":10}{\"id\":\"P-4\",\"totalCents\":20}",
+      "contextValue": "post-hidden-extra",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-7\",\"totalCents\":5} trailing",
+      "contextValue": "post-hidden-trailing",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "",
+      "contextValue": "post-hidden-empty",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"totalCents\":10}",
+      "contextValue": "post-hidden-missing-id",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"   \",\"totalCents\":10}",
+      "contextValue": "post-hidden-blank-id",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-5\",\"totalCents\":0}",
+      "contextValue": "post-hidden-zero",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"P-6\",\"totalCents\":-5}",
+      "contextValue": "post-hidden-negative",
+      "expected": {
+        "status": 400,
+        "body": { "error": "invalid_request" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders",
+      "body": "{\"id\":\"SAVE-FAIL\",\"totalCents\":100}",
+      "contextValue": "post-hidden-save-error",
+      "expected": {
+        "status": 500,
+        "body": { "error": "internal_error" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    }
+  ]
+}

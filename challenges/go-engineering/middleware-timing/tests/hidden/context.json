@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.111Z",
+      "status": 201,
+      "body": "{\"id\":\"A-1\"}",
+      "contextValue": "ctx-alpha",
+      "expected": {
+        "status": 201,
+        "elapsedHeader": "111",
+        "body": "{\"id\":\"A-1\"}",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.020Z",
+      "status": 200,
+      "body": "ok",
+      "contextValue": "ctx-beta",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "20",
+        "body": "ok",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.100Z",
+      "status": 202,
+      "body": "accepted",
+      "contextValue": "ctx-gamma",
+      "expected": {
+        "status": 202,
+        "elapsedHeader": "100",
+        "body": "accepted",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    }
+  ]
+}

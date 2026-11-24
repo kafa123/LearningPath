@@ -1,0 +1,12 @@
+{
+  "seed": "INSERT INTO events (id, tenant_id, actor, kind, occurred_at) VALUES\n  (1, 7, 'ada', 'login', '2026-02-28T09:00:00Z'),\n  (2, 8, 'omar', 'login', '2026-02-28T10:00:00Z'),\n  (3, 8, 'omar', 'upload', '2026-02-28T11:00:00Z'),\n  (4, 9, 'pia', 'login', '2026-02-28T12:00:00Z'),\n  (5, 7, 'grace', 'upload', '2026-02-26T09:00:00Z');",
+  "columns": ["id", "actor", "kind", "occurred_at"],
+  "expected": [
+    [1, "ada", "login", "2026-02-28T09:00:00Z"],
+    [5, "grace", "upload", "2026-02-26T09:00:00Z"]
+  ],
+  "plan": {
+    "mustContain": ["USING INDEX idx_events_tenant_occurred"],
+    "mustNotContain": ["SCAN events"]
+  }
+}

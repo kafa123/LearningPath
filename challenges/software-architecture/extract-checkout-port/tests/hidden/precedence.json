@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": 3,
+        "totalCents": -100,
+        "recipient": null
+      },
+      "expectedCode": "empty_order",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 4,
+        "totalCents": 0,
+        "recipient": ""
+      },
+      "expectedCode": "empty_order",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 5,
+        "totalCents": 5000,
+        "recipient": "   "
+      },
+      "expectedCode": "invalid_recipient",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 6,
+        "totalCents": 4999,
+        "recipient": null
+      },
+      "expectedCode": "invalid_recipient",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 7,
+        "totalCents": 4999,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "below_threshold",
+      "sentMessages": []
+    }
+  ]
+}

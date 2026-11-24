@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "retry-policy",
+  "title": "Retry with a deterministic sleeper",
+  "summary": "Implement bounded retries with capped exponential delays through an injected sleeper and inspectable error wrapping.",
+  "domainSlug": "go-engineering",
+  "topic": "Deterministic seams",
+  "difficulty": "Intermediate",
+  "type": "Coding",
+  "estimatedMinutes": 45,
+  "objectives": [
+    "Retry only failures that carry the RetryableError marker.",
+    "Compute capped exponential delays and record them without reading the clock.",
+    "Preserve the original failure in the returned wrap so errors.Is still works."
+  ],
+  "prerequisites": [
+    "go-errors-and-interfaces"
+  ],
+  "competencySlugs": [
+    "error-wrapping",
+    "interface-contracts",
+    "deterministic-behavior",
+    "testable-seams"
+  ],
+  "constraints": [
+    "Keep the public Sleeper, Policy, Report, RetryableError, and Run signatures unchanged.",
+    "Never call time.Sleep, time.Now, or any other clock source inside Run.",
+    "Call the operation exactly once per attempt, with attempt numbers starting at 1.",
+    "Record every delay in Report.Delays as a non-nil slice and pass the same delay to Sleeper.Sleep.",
+    "Return a non-retryable error unchanged so errors.Is and errors.As still reach it.",
+    "When attempts are exhausted, wrap the last error as giving up after {attempts} attempts."
+  ],
+  "examples": [
+    {
+      "input": "MaxAttempts = 3, BaseDelay = 10ms, first attempt returns RetryableError",
+      "output": "Report{Attempts: 2, Delays: [10ms]} and nil when attempt 2 succeeds",
+      "explanation": "The delay before attempt 2 is BaseDelay doubled zero times."
+    },
+    {
+      "input": "MaxAttempts = 5, BaseDelay = 10ms, MaxDelay = 25ms, every attempt retryable",
+      "output": "Delays [10ms, 20ms, 25ms, 25ms], final error \"giving up after 5 attempts: ...\"",
+      "explanation": "Delays double until the cap, then stay at MaxDelay."
+    },
+    {
+      "input": "BaseDelay = 0, operation returns retryable twice then succeeds",
+      "output": "Attempts 3, Delays [], Sleeper.Sleep called zero times",
+      "explanation": "A non-positive base delay disables sleeping but not retrying."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Success paths",
+        "description": "First-attempt success and retry-then-success record the correct attempts and delays.",
+        "source": "tests/public/basic.json"
+      },
+      {
+        "name": "Exhaustion",
+        "description": "Running out of attempts wraps the last retryable error.",
+        "source": "tests/public/exhaustion.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Non-retryable failures",
+        "description": "Unmarked and wrapped fatal errors stop immediately and keep their identity.",
+        "source": "tests/hidden/non-retryable.json"
+      },
+      {
+        "name": "Delay growth and caps",
+        "description": "Delays double per attempt, respect MaxDelay, and disappear for a zero base delay.",
+        "source": "tests/hidden/delays.json"
+      },
+      {
+        "name": "Attempt clamping",
+        "description": "MaxAttempts below 1 behaves as a single attempt.",
+        "source": "tests/hidden/clamp.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "keys": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "workers": 4,
+      "errorKey": "b",
+      "errorAfterAllStarted": true,
+      "blockingKeys": [
+        "c",
+        "d"
+      ],
+      "values": {
+        "a": "A"
+      },
+      "expected": {
+        "results": null,
+        "error": "fetch",
+        "errorText": "fetch b: lookup b: upstream unavailable",
+        "calls": 4,
+        "canceledFetches": 2
+      }
+    },
+    {
+      "keys": [
+        "m",
+        "n"
+      ],
+      "workers": 2,
+      "canceled": true,
+      "expected": {
+        "results": null,
+        "error": "context canceled",
+        "calls": 0,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "boom",
+        "later"
+      ],
+      "workers": 1,
+      "errorKey": "boom",
+      "expected": {
+        "results": null,
+        "error": "fetch",
+        "errorText": "fetch boom: lookup boom: upstream unavailable",
+        "calls": 1,
+        "canceledFetches": 0
+      }
+    }
+  ]
+}

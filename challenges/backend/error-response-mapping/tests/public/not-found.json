@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "errorCode": "not_found",
+      "internalDetail": null,
+      "expected": {
+        "status": 404,
+        "code": "not_found",
+        "title": "Resource not found",
+        "detail": "The requested resource does not exist.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": "conflict",
+      "internalDetail": null,
+      "expected": {
+        "status": 409,
+        "code": "conflict",
+        "title": "State conflict",
+        "detail": "The request conflicts with the current state.",
+        "retryable": false
+      }
+    }
+  ]
+}

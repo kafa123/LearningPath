@@ -1,0 +1,7 @@
+{
+  "seed": "INSERT INTO properties (id, name) VALUES\n  (1, 'Harbor');\n\nINSERT INTO rooms (id, property_id, code, capacity) VALUES\n  (1, 1, 'A1', 3),\n  (2, 1, 'A2', 2);\n\nINSERT INTO bookings (id, room_id, guest_email, party_size, starts_at, ends_at, status) VALUES\n  (1, 1, 'a@example.com', 4, '2026-07-01T10:00:00Z', '2026-07-02T10:00:00Z', 'confirmed'),\n  (2, 1, 'b@example.com', 3, '2026-07-03T10:00:00Z', '2026-07-04T10:00:00Z', 'confirmed'),\n  (3, 2, 'c@example.com', 9, '2026-07-05T10:00:00Z', '2026-07-06T10:00:00Z', 'cancelled');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["over_capacity", 1, "A1"]
+  ]
+}

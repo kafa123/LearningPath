@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "jobs": [
+        { "id": "j1", "payload": 1 },
+        { "id": "j2", "payload": 2 },
+        { "id": "j3", "payload": 3 },
+        { "id": "j4", "payload": 4 }
+      ],
+      "workers": 2,
+      "holdStarted": 2,
+      "values": { "j1": 10, "j2": 20, "j3": 30, "j4": 40 },
+      "expected": {
+        "results": [
+          { "id": "j1", "value": 10 },
+          { "id": "j2", "value": 20 },
+          { "id": "j3", "value": 30 },
+          { "id": "j4", "value": 40 }
+        ],
+        "error": "",
+        "calls": 4,
+        "maxConcurrency": 2,
+        "canceledHandles": 0
+      }
+    },
+    {
+      "jobs": [
+        { "id": "s1", "payload": 7 },
+        { "id": "s2", "payload": 8 },
+        { "id": "s3", "payload": 9 }
+      ],
+      "workers": 1,
+      "values": { "s1": 70, "s2": 80, "s3": 90 },
+      "expected": {
+        "results": [
+          { "id": "s1", "value": 70 },
+          { "id": "s2", "value": 80 },
+          { "id": "s3", "value": 90 }
+        ],
+        "error": "",
+        "calls": 3,
+        "maxConcurrency": 1,
+        "canceledHandles": 0
+      }
+    }
+  ]
+}

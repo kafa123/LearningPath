@@ -17,6 +17,12 @@ public sealed class ExecutionOptions
     public string PythonImage { get; set; } = "python:3.13-slim";
 
     /// <summary>
+    /// Image used by the Go runner. The SDK image is required because the
+    /// submission is compiled inside the container before it runs.
+    /// </summary>
+    public string GoImage { get; set; } = "golang:1.27-alpine";
+
+    /// <summary>
     /// Image used by the SQL runner. SQLite ships with the Python standard
     /// library, so the trusted SQL harness runs in the same minimal image as
     /// Python submissions.

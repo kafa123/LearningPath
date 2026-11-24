@@ -1,0 +1,5 @@
+{
+  "seed": "INSERT INTO teams (id, name, owner_email) VALUES\n  (1, 'Platform', 'ada@example.com'),\n  (2, 'Growth', 'grace@example.com');\n\nINSERT INTO members (id, team_id, email, display_name) VALUES\n  (1, 1, 'ada@example.com', 'Ada'),\n  (2, 2, 'grace@example.com', 'Grace');\n\nINSERT INTO invitations (id, team_id, email, invited_at) VALUES\n  (1, 1, 'new@example.com', '2026-01-02');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": []
+}

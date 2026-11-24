@@ -1,0 +1,10 @@
+{
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["duplicate_member_email", 1, "ada@example.com"],
+    ["missing_owner", 2, "Growth"],
+    ["missing_owner", 3, "Infra"],
+    ["orphan_invitation", 2, "stray@example.com"],
+    ["orphan_member", 5, "orphan@example.com"]
+  ]
+}

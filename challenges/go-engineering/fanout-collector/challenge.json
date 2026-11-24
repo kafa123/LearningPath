@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "fanout-collector",
+  "title": "Fan out requests with bounded concurrency",
+  "summary": "Fetch many keys through a bounded worker pool, preserve input order, and cancel outstanding work on the first failure.",
+  "domainSlug": "go-engineering",
+  "topic": "Goroutines and cancellation",
+  "difficulty": "Advanced",
+  "type": "Coding",
+  "estimatedMinutes": 50,
+  "objectives": [
+    "Fan out independent fetches with a bounded worker pool that preserves input order.",
+    "Cancel outstanding work when the first fetch fails and wait for every started goroutine to exit.",
+    "Keep goroutine and allocation counts proportional to the worker limit, not the key count."
+  ],
+  "prerequisites": [
+    "go-concurrency"
+  ],
+  "competencySlugs": [
+    "goroutine-lifecycle",
+    "channel-coordination",
+    "allocation-discipline"
+  ],
+  "constraints": [
+    "Never start more than workers fetch calls concurrently.",
+    "Preserve input order; duplicate keys produce duplicate results.",
+    "Return the first fetch error wrapped as fetch {key}: {error} and cancel the rest.",
+    "Return nil, ctx.Err() without calling fetch when the context is already canceled.",
+    "Return an empty non-nil []Result and nil error for empty input.",
+    "Do not spawn one goroutine per key; respect the worker limit."
+  ],
+  "examples": [
+    {
+      "input": "keys = [\"a\", \"b\", \"c\"], workers = 2",
+      "output": "[{Key: \"a\", Value: ...}, {Key: \"b\", Value: ...}, {Key: \"c\", Value: ...}] in input order",
+      "explanation": "Completion order does not decide result order."
+    },
+    {
+      "input": "One fetch returns an error while others are still running",
+      "output": "nil, error \"fetch b: ...\"; every started fetch returns before FetchAll does",
+      "explanation": "The derived context cancels blocked fetches and the pool waits for them."
+    },
+    {
+      "input": "keys = [\"x\", \"y\", \"x\"], workers = 3",
+      "output": "Three results, with the x value repeated at the first and third positions",
+      "explanation": "Keys are tasks, so duplicates stay duplicated."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Ordered results",
+        "description": "Results follow input order, duplicates repeat, and empty input stays non-nil.",
+        "source": "tests/public/ordered.json"
+      },
+      {
+        "name": "Fetch failures",
+        "description": "Errors wrap the failing key, cancel blocked fetches, and an already-canceled context does no work.",
+        "source": "tests/public/errors.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Completion order",
+        "description": "Results stay in input order even when fetches finish in reverse order.",
+        "source": "tests/hidden/ordering.json"
+      },
+      {
+        "name": "Concurrency bound",
+        "description": "The pool never exceeds the worker limit and clamps invalid worker counts.",
+        "source": "tests/hidden/concurrency.json"
+      },
+      {
+        "name": "Cancellation",
+        "description": "Blocked fetches observe cancellation and all started work finishes before returning.",
+        "source": "tests/hidden/cancellation.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

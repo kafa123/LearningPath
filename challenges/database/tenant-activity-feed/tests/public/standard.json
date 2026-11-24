@@ -1,0 +1,14 @@
+{
+  "columns": ["id", "actor", "kind", "occurred_at"],
+  "expected": [
+    [5, "grace", "logout", "2026-02-28T12:00:00Z"],
+    [4, "ada", "share", "2026-02-28T11:00:00Z"],
+    [3, "linus", "comment", "2026-02-28T11:00:00Z"],
+    [2, "grace", "upload", "2026-02-27T10:00:00Z"],
+    [8, "ada", "edit", "2026-02-26T08:00:00Z"]
+  ],
+  "plan": {
+    "mustContain": ["USING INDEX idx_events_tenant_occurred"],
+    "mustNotContain": ["SCAN events"]
+  }
+}

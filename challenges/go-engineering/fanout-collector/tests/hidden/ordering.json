@@ -1,0 +1,121 @@
+{
+  "cases": [
+    {
+      "keys": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ],
+      "workers": 4,
+      "reverse": true,
+      "values": {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "one",
+            "value": "1"
+          },
+          {
+            "key": "two",
+            "value": "2"
+          },
+          {
+            "key": "three",
+            "value": "3"
+          },
+          {
+            "key": "four",
+            "value": "4"
+          }
+        ],
+        "error": "",
+        "calls": 4,
+        "maxConcurrency": 4,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "workers": 8,
+      "reverse": true,
+      "values": {
+        "a": "A",
+        "b": "B",
+        "c": "C",
+        "d": "D",
+        "e": "E"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "a",
+            "value": "A"
+          },
+          {
+            "key": "b",
+            "value": "B"
+          },
+          {
+            "key": "c",
+            "value": "C"
+          },
+          {
+            "key": "d",
+            "value": "D"
+          },
+          {
+            "key": "e",
+            "value": "E"
+          }
+        ],
+        "error": "",
+        "calls": 5,
+        "maxConcurrency": 5,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "dup",
+        "other",
+        "dup"
+      ],
+      "workers": 2,
+      "values": {
+        "dup": "D",
+        "other": "O"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "dup",
+            "value": "D"
+          },
+          {
+            "key": "other",
+            "value": "O"
+          },
+          {
+            "key": "dup",
+            "value": "D"
+          }
+        ],
+        "error": "",
+        "calls": 3,
+        "canceledFetches": 0
+      }
+    }
+  ]
+}

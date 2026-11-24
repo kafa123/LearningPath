@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "slug": "tenant-activity-feed",
+  "title": "Build a tenant activity feed",
+  "summary": "Return the latest activity for one tenant with a bounded, deterministic query that uses the feed index.",
+  "domainSlug": "database-engineering",
+  "topic": "Indexes and query plans",
+  "difficulty": "Advanced",
+  "type": "Performance",
+  "estimatedMinutes": 35,
+  "objectives": [
+    "Align a filtered, ordered, and limited query with an existing composite index.",
+    "Read an EXPLAIN QUERY PLAN result to confirm an index search.",
+    "Use a deterministic tie-breaker for rows with the same timestamp.",
+    "Keep a selective feed query from scanning the events table."
+  ],
+  "prerequisites": [
+    "indexes-and-query-plans"
+  ],
+  "competencySlugs": [
+    "index-design",
+    "plan-interpretation",
+    "sql-composition",
+    "performance-tradeoffs"
+  ],
+  "constraints": [
+    "Return exactly the columns id, actor, kind, and occurred_at in that order.",
+    "Return only events for tenant_id 7 with occurred_at strictly before 2026-03-01T00:00:00Z.",
+    "Order rows by occurred_at descending, then by id descending.",
+    "Return at most 5 rows.",
+    "The query plan must use the idx_events_tenant_occurred index and must not scan the events table."
+  ],
+  "examples": [
+    {
+      "input": "Tenant 7 has eight events before the cutoff",
+      "output": "The five newest rows, newest first",
+      "explanation": "The composite index covers the tenant, the time range, and the sort order."
+    },
+    {
+      "input": "Two events share occurred_at = '2026-02-28T11:00:00Z'",
+      "output": "The row with the larger id comes first",
+      "explanation": "The id tie-breaker makes the feed order deterministic."
+    }
+  ],
+  "languages": [
+    {
+      "id": "sql",
+      "name": "SQL",
+      "editorLanguage": "sql",
+      "starterFiles": [
+        {
+          "path": "query.sql",
+          "source": "starter/sql/query.sql"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "sql": {
+    "schema": "sql/schema.sql",
+    "seed": "sql/seed.sql"
+  },
+  "tests": {
+    "public": [
+      {
+        "name": "Latest tenant activity",
+        "description": "The seeded feed returns the five newest events for tenant 7.",
+        "source": "tests/public/standard.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Cutoff boundary",
+        "description": "Events exactly at the cutoff are excluded; events just before it are included.",
+        "source": "tests/hidden/cutoff-boundary.json"
+      },
+      {
+        "name": "Other tenants excluded",
+        "description": "A busy second tenant must not appear in the feed.",
+        "source": "tests/hidden/other-tenants.json"
+      },
+      {
+        "name": "Deterministic ties",
+        "description": "Events sharing a timestamp are ordered by id descending.",
+        "source": "tests/hidden/ties.json"
+      },
+      {
+        "name": "Empty feed keeps the plan",
+        "description": "The query still uses the index when the tenant has no matching events.",
+        "source": "tests/hidden/empty-feed.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 10,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

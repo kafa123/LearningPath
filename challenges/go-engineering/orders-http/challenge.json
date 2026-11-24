@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "orders-http",
+  "title": "Serve orders with net/http",
+  "summary": "Build a net/http handler that reads and creates orders through an injected store, with strict JSON validation and request-context propagation.",
+  "domainSlug": "go-engineering",
+  "topic": "HTTP handlers",
+  "difficulty": "Intermediate",
+  "type": "API",
+  "estimatedMinutes": 50,
+  "objectives": [
+    "Expose order reads and writes through a net/http handler backed by an injected Store.",
+    "Validate POST payloads strictly and map failures to stable JSON error bodies.",
+    "Propagate the request context to every store call."
+  ],
+  "prerequisites": [
+    "go-http-services"
+  ],
+  "competencySlugs": [
+    "http-handlers",
+    "request-context",
+    "interface-contracts"
+  ],
+  "constraints": [
+    "Keep the Order and Store types and the NewHandler(store Store) http.Handler signature.",
+    "Use http.ServeMux routing; unknown paths keep the mux default 404 and unsupported methods the mux default 405.",
+    "Trim the POST id before validation and storage.",
+    "Reject a POST body that is malformed or contains more than one JSON value.",
+    "Set Content-Type application/json on every JSON response.",
+    "Never substitute context.Background() for r.Context()."
+  ],
+  "examples": [
+    {
+      "input": "GET /orders/A-1 with store.Get returning Order{ID: \"A-1\", TotalCents: 1250}, true, nil",
+      "output": "200, body {\"id\":\"A-1\",\"totalCents\":1250}",
+      "explanation": "A found order is returned as JSON."
+    },
+    {
+      "input": "GET /orders/missing with store.Get returning false",
+      "output": "404, body {\"error\":\"not_found\"}",
+      "explanation": "A missing order is a client-visible 404."
+    },
+    {
+      "input": "POST /orders with body {\"id\":\"  C-3  \",\"totalCents\":4200}",
+      "output": "201, Location /orders/C-3, body {\"id\":\"C-3\",\"totalCents\":4200}",
+      "explanation": "The id is trimmed once, then validated and stored."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Read an order",
+        "description": "A stored order is returned as JSON; an unknown id is not found.",
+        "source": "tests/public/reads.json"
+      },
+      {
+        "name": "Create an order",
+        "description": "A valid POST trims the id, stores once, and reports the new location.",
+        "source": "tests/public/creates.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Reads and store failures",
+        "description": "Missing orders, store errors, and context propagation on reads.",
+        "source": "tests/hidden/reads.json"
+      },
+      {
+        "name": "Validation and writes",
+        "description": "Malformed, extra, and invalid payloads plus save failures.",
+        "source": "tests/hidden/posts.json"
+      },
+      {
+        "name": "Routing defaults",
+        "description": "Unknown paths and unsupported methods keep the mux defaults.",
+        "source": "tests/hidden/routes.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

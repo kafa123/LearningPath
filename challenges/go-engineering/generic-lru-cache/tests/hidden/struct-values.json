@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "point",
+      "ops": [
+        { "op": "put", "key": "origin", "value": { "X": 0, "Y": 0 } },
+        { "op": "put", "key": "unit", "value": { "X": 1, "Y": 1 } },
+        { "op": "get", "key": "origin" },
+        { "op": "put", "key": "scaled", "value": { "X": 5, "Y": 6 } },
+        { "op": "keys" },
+        { "op": "get", "key": "unit" },
+        { "op": "len" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "get", "found": true, "value": { "X": 0, "Y": 0 } },
+        { "op": "put" },
+        { "op": "keys", "keys": ["scaled", "origin"] },
+        { "op": "get", "found": false, "value": { "X": 0, "Y": 0 } },
+        { "op": "len", "len": 2 }
+      ]
+    },
+    {
+      "capacity": 1,
+      "keyType": "string",
+      "valueType": "point",
+      "ops": [
+        { "op": "put", "key": "a", "value": { "X": 1, "Y": 2 } },
+        { "op": "put", "key": "b", "value": { "X": 3, "Y": 4 } },
+        { "op": "keys" },
+        { "op": "get", "key": "a" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["b"] },
+        { "op": "get", "found": false, "value": { "X": 0, "Y": 0 } }
+      ]
+    }
+  ]
+}

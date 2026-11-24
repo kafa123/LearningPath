@@ -1,4 +1,4 @@
-import { getJson, postJson } from '@/shared/api/http'
+import { ApiError, getJson, postJson } from '@/shared/api/http'
 
 export type SubmissionPurpose = 'Run' | 'Submit'
 
@@ -63,6 +63,11 @@ export interface AssessmentResult {
   createdAtUtc: string
 }
 
+export interface LatestSubmission {
+  submission: SubmissionDetail
+  files: SubmissionFileInput[]
+}
+
 export function createSubmission(
   request: CreateSubmissionRequest,
   signal?: AbortSignal,
@@ -87,4 +92,24 @@ export function getAssessmentResult(
     `/api/submissions/${encodeURIComponent(id)}/results`,
     { signal },
   )
+}
+
+export async function getLatestSubmission(
+  challengeSlug: string,
+  languageId: string,
+  signal?: AbortSignal,
+): Promise<LatestSubmission | null> {
+  const query = new URLSearchParams({ challengeSlug, languageId })
+
+  try {
+    return await getJson<LatestSubmission>(`/api/submissions/latest?${query}`, {
+      signal,
+    })
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null
+    }
+
+    throw error
+  }
 }

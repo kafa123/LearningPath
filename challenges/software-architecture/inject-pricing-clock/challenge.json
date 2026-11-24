@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "slug": "inject-pricing-clock",
+  "title": "Inject a clock into pricing",
+  "summary": "Replace an ambient time read inside a pricing rule with an injected instant so time-based discounts stay deterministic.",
+  "domainSlug": "software-architecture",
+  "topic": "Time and testability at boundaries",
+  "difficulty": "Intermediate",
+  "type": "Architecture",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Move an ambient clock dependency to an explicit input.",
+    "Decide time-based rules from a supplied UTC instant.",
+    "Handle weekend and time-of-day boundaries without guessing.",
+    "Keep pricing deterministic and testable across dates."
+  ],
+  "prerequisites": [
+    "separation-of-concerns"
+  ],
+  "competencySlugs": [
+    "dependency-direction",
+    "architecture-tradeoffs",
+    "responsibility-boundaries"
+  ],
+  "constraints": [
+    "Use the supplied now value; never read the ambient clock.",
+    "Treat now as UTC for both the hour and the day of week.",
+    "WEEKEND10 applies on Saturday or Sunday when the base price is at least 3000 cents.",
+    "EARLYBIRD applies before 10:00 UTC and never makes the price negative.",
+    "Trim and upper-case the coupon before matching.",
+    "A base price of zero or less returns 0.",
+    "Unknown coupons return the base price unchanged."
+  ],
+  "examples": [
+    {
+      "input": "basePriceCents = 5000, coupon = \"WEEKEND10\", now = 2026-03-08T12:00:00Z (Sunday)",
+      "output": "4500",
+      "explanation": "The weekend discount is 10% of the base price."
+    },
+    {
+      "input": "basePriceCents = 5000, coupon = \"EARLYBIRD\", now = 2026-03-04T09:59:59Z",
+      "output": "4500",
+      "explanation": "The early-bird rule applies before 10:00 UTC."
+    },
+    {
+      "input": "basePriceCents = 5000, coupon = \"EARLYBIRD\", now = 2026-03-04T10:00:00Z",
+      "output": "5000",
+      "explanation": "Exactly 10:00 UTC is no longer early."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Weekend pricing",
+        "description": "The weekend rule uses the supplied Sunday instant.",
+        "source": "tests/public/weekend.json"
+      },
+      {
+        "name": "Early-bird pricing",
+        "description": "The early-bird rule uses the supplied morning instant.",
+        "source": "tests/public/earlybird.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Weekdays are not weekends",
+        "description": "The weekend rule does not fire on Monday through Friday.",
+        "source": "tests/hidden/weekday.json"
+      },
+      {
+        "name": "Weekend boundaries",
+        "description": "Saturday and Sunday edges, the 3000 threshold, and floor rounding are respected.",
+        "source": "tests/hidden/weekend-boundary.json"
+      },
+      {
+        "name": "Clock boundaries",
+        "description": "09:59:59 and 10:00:00 UTC behave differently.",
+        "source": "tests/hidden/clock-boundary.json"
+      },
+      {
+        "name": "Calendar boundaries",
+        "description": "Year changes and leap days use the supplied instant, not the machine clock.",
+        "source": "tests/hidden/calendar-boundary.json"
+      },
+      {
+        "name": "Coupon normalization",
+        "description": "Case, whitespace, unknown coupons, and non-positive prices are handled safely.",
+        "source": "tests/hidden/normalization.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "Hybrid",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "id": "clock-injection",
+        "title": "Clock injection",
+        "description": "Pricing reads the supplied instant and has no remaining ambient time dependency.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "determinism",
+        "title": "Determinism",
+        "description": "Weekend and hour decisions are derived from the supplied UTC instant at the exact boundaries.",
+        "maxPoints": 10,
+        "weight": 3
+      },
+      {
+        "id": "boundary-handling",
+        "title": "Boundary handling",
+        "description": "Thresholds, floor rounding, and non-positive prices are safe and explicit.",
+        "maxPoints": 10,
+        "weight": 2
+      },
+      {
+        "id": "clarity",
+        "title": "Clarity",
+        "description": "Each coupon rule stays easy to read and can be tested in isolation.",
+        "maxPoints": 10,
+        "weight": 1
+      }
+    ]
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

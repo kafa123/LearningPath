@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "keys": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "workers": 5,
+      "errorKey": "c",
+      "errorAfterAllStarted": true,
+      "blockingKeys": [
+        "d",
+        "e"
+      ],
+      "values": {
+        "a": "A",
+        "b": "B"
+      },
+      "expected": {
+        "results": null,
+        "error": "fetch",
+        "errorText": "fetch c: lookup c: upstream unavailable",
+        "calls": 5,
+        "canceledFetches": 2
+      }
+    },
+    {
+      "keys": [
+        "p",
+        "q",
+        "r"
+      ],
+      "workers": 3,
+      "canceled": true,
+      "expected": {
+        "results": null,
+        "error": "context canceled",
+        "calls": 0,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "first",
+        "second"
+      ],
+      "workers": 1,
+      "errorKey": "first",
+      "expected": {
+        "results": null,
+        "error": "fetch",
+        "errorText": "fetch first: lookup first: upstream unavailable",
+        "calls": 1,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [],
+      "workers": 4,
+      "expected": {
+        "results": [],
+        "error": "",
+        "calls": 0,
+        "canceledFetches": 0
+      }
+    }
+  ]
+}

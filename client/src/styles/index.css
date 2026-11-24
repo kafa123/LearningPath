@@ -183,6 +183,23 @@ button {
   border-top: 1px solid rgb(255 255 255 / 0.1);
 }
 
+/* Lesson artwork. Covers and diagrams are self-contained dark panels, so they
+   keep a hairline frame in both themes to read as deliberate figures. */
+.learning-prose img,
+.material-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.9rem;
+  background: rgb(2 6 23 / 0.5);
+}
+
+.material-cover {
+  margin-top: 1.5rem;
+  box-shadow: 0 24px 60px -40px rgb(2 6 23 / 0.9);
+}
+
 /* ------------------------------------------------------------------ */
 /* Light theme                                                         */
 /*                                                                     */
@@ -300,4 +317,10 @@ html[data-theme='light'] .learning-prose th {
 
 html[data-theme='light'] .learning-prose hr {
   border-top-color: rgb(15 23 42 / 0.12);
+}
+
+html[data-theme='light'] .learning-prose img,
+html[data-theme='light'] .material-cover {
+  border-color: rgb(15 23 42 / 0.12);
+  box-shadow: 0 24px 50px -38px rgb(15 23 42 / 0.5);
 }

@@ -1,0 +1,21 @@
+{
+  "cases": [
+    {
+      "input": [
+        { "SKU": " beta ", "Quantity": 4, "Tags": ["b"] },
+        { "SKU": "alpha", "Quantity": 0, "Tags": ["ignored"] },
+        { "SKU": "Alpha", "Quantity": 2, "Tags": [] }
+      ],
+      "expected": [
+        { "SKU": "ALPHA", "Quantity": 2, "Tags": [] },
+        { "SKU": "BETA", "Quantity": 4, "Tags": ["b"] }
+      ],
+      "expectedError": ""
+    },
+    {
+      "input": [],
+      "expected": [],
+      "expectedError": ""
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "cases": [
+    {
+      "jobs": [
+        { "id": "first", "payload": 1 },
+        { "id": "boom", "payload": 2 },
+        { "id": "later", "payload": 3 }
+      ],
+      "workers": 2,
+      "blockingIds": ["first"],
+      "errorJobId": "boom",
+      "values": { "first": 10, "boom": 20, "later": 30 },
+      "expected": {
+        "results": null,
+        "error": "job",
+        "errorText": "job boom: lookup boom: job failed",
+        "calls": 2,
+        "maxConcurrency": 2,
+        "canceledHandles": 1
+      }
+    },
+    {
+      "jobs": [
+        { "id": "x", "payload": 4 },
+        { "id": "y", "payload": 5 }
+      ],
+      "workers": 2,
+      "errorJobId": "x",
+      "errorAfterAllStarted": true,
+      "values": { "x": 40, "y": 50 },
+      "expected": {
+        "results": null,
+        "error": "job",
+        "errorText": "job x: lookup x: job failed",
+        "calls": 2,
+        "maxConcurrency": 2,
+        "canceledHandles": 0
+      }
+    }
+  ]
+}

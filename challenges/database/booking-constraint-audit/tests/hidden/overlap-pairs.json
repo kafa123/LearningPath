@@ -1,0 +1,9 @@
+{
+  "seed": "INSERT INTO properties (id, name) VALUES\n  (1, 'Harbor');\n\nINSERT INTO rooms (id, property_id, code, capacity) VALUES\n  (1, 1, 'A1', 4);\n\nINSERT INTO bookings (id, room_id, guest_email, party_size, starts_at, ends_at, status) VALUES\n  (1, 1, 'a@example.com', 2, '2026-06-01T10:00:00Z', '2026-06-05T10:00:00Z', 'confirmed'),\n  (2, 1, 'b@example.com', 2, '2026-06-02T10:00:00Z', '2026-06-04T10:00:00Z', 'confirmed'),\n  (3, 1, 'c@example.com', 2, '2026-06-03T10:00:00Z', '2026-06-06T10:00:00Z', 'confirmed');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["overlapping_booking", 1, "conflicts with 2"],
+    ["overlapping_booking", 1, "conflicts with 3"],
+    ["overlapping_booking", 2, "conflicts with 3"]
+  ]
+}

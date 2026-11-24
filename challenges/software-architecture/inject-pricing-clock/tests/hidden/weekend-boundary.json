@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "basePriceCents": 3000,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-07T00:00:00Z",
+      "expected": 2700
+    },
+    {
+      "basePriceCents": 3000,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-08T23:59:59Z",
+      "expected": 2700
+    },
+    {
+      "basePriceCents": 2999,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-07T12:00:00Z",
+      "expected": 2999
+    },
+    {
+      "basePriceCents": 5555,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-07T12:00:00Z",
+      "expected": 5000
+    },
+    {
+      "basePriceCents": 3000,
+      "coupon": "weekend10",
+      "now": "2026-03-07T12:00:00Z",
+      "expected": 2700
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "op": "batch",
+      "type": "row",
+      "items": [
+        { "Name": "a", "Score": 1 },
+        { "Name": "b", "Score": 2 },
+        { "Name": "c", "Score": 3 }
+      ],
+      "size": 2,
+      "expected": [
+        [
+          { "Name": "a", "Score": 1 },
+          { "Name": "b", "Score": 2 }
+        ],
+        [
+          { "Name": "c", "Score": 3 }
+        ]
+      ],
+      "expectedError": ""
+    },
+    {
+      "op": "sum",
+      "kind": "int",
+      "values": [1, 2, 3, 4],
+      "expected": 10
+    },
+    {
+      "op": "sum",
+      "kind": "int64",
+      "values": [4000000000, 1],
+      "expected": 4000000001
+    },
+    {
+      "op": "sum",
+      "kind": "float64",
+      "values": [1.5, 2.25, 0.25],
+      "expected": 4.0
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "page": "0",
+      "pageSize": "20",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page"
+      }
+    },
+    {
+      "page": "10001",
+      "pageSize": "20",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page"
+      }
+    },
+    {
+      "page": "1.5",
+      "pageSize": "20",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page"
+      }
+    },
+    {
+      "page": "-1",
+      "pageSize": "20",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page"
+      }
+    },
+    {
+      "page": "1",
+      "pageSize": "0",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page_size"
+      }
+    },
+    {
+      "page": "1",
+      "pageSize": "101",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page_size"
+      }
+    },
+    {
+      "page": "1",
+      "pageSize": "many",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page_size"
+      }
+    }
+  ]
+}

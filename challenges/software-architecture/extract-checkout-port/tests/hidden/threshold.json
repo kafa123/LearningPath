@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": 12,
+        "totalCents": 5001,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "sent",
+      "sentMessages": [
+        {
+          "recipient": "ada@example.com",
+          "message": "Order 12 confirmed: 5001 cents"
+        }
+      ]
+    },
+    {
+      "order": {
+        "id": 13,
+        "totalCents": 5000,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "sent",
+      "sentMessages": [
+        {
+          "recipient": "ada@example.com",
+          "message": "Order 13 confirmed: 5000 cents"
+        }
+      ]
+    },
+    {
+      "order": {
+        "id": 14,
+        "totalCents": 1,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "below_threshold",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 15,
+        "totalCents": -5,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "empty_order",
+      "sentMessages": []
+    }
+  ]
+}

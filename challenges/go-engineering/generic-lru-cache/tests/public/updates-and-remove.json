@@ -1,0 +1,52 @@
+{
+  "cases": [
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "put", "key": "a", "value": 10 },
+        { "op": "put", "key": "c", "value": 3 },
+        { "op": "keys" },
+        { "op": "get", "key": "a" },
+        { "op": "len" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["c", "a"] },
+        { "op": "get", "found": true, "value": 10 },
+        { "op": "len", "len": 2 }
+      ]
+    },
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "remove", "key": "a" },
+        { "op": "keys" },
+        { "op": "len" },
+        { "op": "remove", "key": "z" },
+        { "op": "len" },
+        { "op": "get", "key": "a" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "remove" },
+        { "op": "keys", "keys": ["b"] },
+        { "op": "len", "len": 1 },
+        { "op": "remove" },
+        { "op": "len", "len": 1 },
+        { "op": "get", "found": false, "value": 0 }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ using Psel.Modules.Learning.Domain;
 namespace Psel.Modules.Learning.Seed;
 
 /// <summary>
-/// Phase 2 seed content for the five learning domains. Keep this content
+/// Phase 2 seed content for the six learning domains. Keep this content
 /// independent of persistence and HTTP concerns.
 /// </summary>
 internal static class LearningSeedData
@@ -50,6 +50,8 @@ internal static class LearningSeedData
                     - **Output:** what must be produced.
                     - **Constraints:** size limits, allowed operations, and performance expectations.
                     - **Edge cases:** empty input, duplicates, negative values, and maximum sizes.
+
+                    ![From problem statement to a verified algorithm](/illustrations/lessons/algorithm-foundations-lesson-diagram.svg)
 
                     ### Start with pseudocode
 
@@ -106,6 +108,8 @@ internal static class LearningSeedData
                     ## Measuring growth, not seconds
 
                     Big-O describes how an algorithm's work grows as the input size grows. It ignores constant factors and machine speed, so it lets you compare algorithms independently of hardware.
+
+                    ![Growth classes compared as input size increases](/illustrations/lessons/complexity-analysis-lesson-diagram.svg)
 
                     ### Count the dominant operation
 
@@ -166,6 +170,8 @@ internal static class LearningSeedData
                     - **Queue** — first-in, first-out; useful for breadth-first traversal and job processing.
                     - **Heap** — fast access to the smallest or largest item.
 
+                    ![Choosing a structure by its dominant operations](/illustrations/lessons/data-structures-lesson-diagram.svg)
+
                     ### Map the operation to the cost
 
                     If the task is "count how often each word appears", a hash map gives average constant-time updates. If the task is "process tasks in arrival order", a queue expresses the intent directly.
@@ -210,6 +216,8 @@ internal static class LearningSeedData
                     ## Tables, keys, and relationships
 
                     A relational model stores facts in tables. Each row has a stable identity, each column has a type, and relationships are expressed with keys rather than object references.
+
+                    ![One fact, one place: keys, foreign keys, and normalization](/illustrations/lessons/relational-modeling-lesson-diagram.svg)
 
                     ### Keys and constraints
 
@@ -273,6 +281,8 @@ internal static class LearningSeedData
 
                     SQL is declarative: describe the result you want, then let the database choose the execution plan. Build complex queries in layers instead of writing one large statement.
 
+                    ![A query narrows rows stage by stage](/illustrations/lessons/sql-querying-lesson-diagram.svg)
+
                     ### Joins
 
                     - `INNER JOIN` keeps rows with matches on both sides.
@@ -334,6 +344,8 @@ internal static class LearningSeedData
 
                     An index is an auxiliary structure that lets the database find rows without scanning the whole table. The most common index is a B-tree, which supports equality and range lookups efficiently.
 
+                    ![Full table scan versus composite index search](/illustrations/lessons/indexes-and-query-plans-lesson-diagram.svg)
+
                     ### What to index
 
                     Index columns used by frequent filters, joins, and ordering. A composite index on `(customer_id, created_at)` supports queries that filter by customer and sort by time. Column order matters: the leftmost columns constrain the search.
@@ -394,6 +406,8 @@ internal static class LearningSeedData
                     - `POST /api/submissions` — create a submission.
                     - `PATCH /api/challenges/{id}` — partially update a challenge.
 
+                    ![Resources, methods, and status codes as one contract](/illustrations/lessons/http-api-design-lesson-diagram.svg)
+
                     ### Status codes are part of the contract
 
                     Return `200` for a successful read, `201` when a resource is created, `204` for a successful operation with no body, `400` for invalid input, `404` for an unknown resource, `409` for a state conflict, and `500` only for an unexpected server failure.
@@ -442,6 +456,8 @@ internal static class LearningSeedData
                     ## Validate at the boundary, fail safely
 
                     Incoming data is untrusted. Validate it before it reaches domain logic, and return a response that helps the client correct the request without revealing internals.
+
+                    ![Validate at the boundary and fail with a safe response](/illustrations/lessons/validation-and-error-handling-lesson-diagram.svg)
 
                     ### Validate structure and meaning
 
@@ -507,6 +523,8 @@ internal static class LearningSeedData
 
                     Separation of concerns means assigning a clear responsibility to each component. The goal is not more layers; it is fewer hidden coupling points.
 
+                    ![Dependencies point inward; each layer has one reason to change](/illustrations/lessons/separation-of-concerns-lesson-diagram.svg)
+
                     ### Ask three questions
 
                     1. **What does this code know?** HTTP details, persistence details, business rules, or presentation?
@@ -559,6 +577,8 @@ internal static class LearningSeedData
                     ## One deployable, explicit boundaries
 
                     A modular monolith runs as one process and one deployment unit, but internally it is divided into modules with explicit responsibilities. This keeps local operation simple while preventing the codebase from becoming an undifferentiated collection of classes.
+
+                    ![One deployable with explicit module contracts](/illustrations/lessons/modular-monoliths-lesson-diagram.svg)
 
                     ### Module contract
 
@@ -617,6 +637,8 @@ internal static class LearningSeedData
 
                     A good test describes a behavior, sets up only the state it needs, performs one action, and checks a meaningful outcome.
 
+                    ![Tests as executable expectations across the pyramid](/illustrations/lessons/testing-foundations-lesson-diagram.svg)
+
                     ### Arrange, act, assert
 
                     1. **Arrange** the inputs and collaborators.
@@ -674,6 +696,8 @@ internal static class LearningSeedData
 
                     Debugging is a controlled investigation, not random editing. Start by making the failure repeatable.
 
+                    ![Reproduce, isolate, falsify, fix](/illustrations/lessons/debugging-and-root-cause-lesson-diagram.svg)
+
                     ### A repeatable loop
 
                     1. **Reproduce** the defect with the smallest input that still fails.
@@ -695,6 +719,795 @@ internal static class LearningSeedData
                     """
                 )
             ]);
+
+        var goFoundations = CreateModule(
+            "go-foundations",
+            "Go Foundations",
+            "Write Go programs with clear value semantics, slices, maps, and small packages.",
+            "Beginner",
+            50,
+            1,
+            [
+                "Predict when Go copies a value and when two variables share backing storage.",
+                "Use slices and maps without accidental aliasing or surprise capacity growth.",
+                "Organize code into small packages with explicit, exported APIs."
+            ],
+            [
+                (
+                    "value-semantics",
+                    "Value semantics",
+                    "Explain how assignment, arguments, and receivers copy values, and where shared backing storage still leaks through."
+                ),
+                (
+                    "slices-and-maps",
+                    "Slices and maps",
+                    "Choose and manipulate slices, maps, and structs without aliasing bugs or hidden capacity surprises."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-foundations-lesson",
+                    "Values, slices, and maps",
+                    "Lesson",
+                    22,
+                    1,
+                    """
+                    ## Values, slices, and maps
+
+                    Go has no reference types in the Java sense. Every assignment, argument, and return copies the value. A slice or a map is itself a small value that points at shared backing storage, which is where most surprises come from.
+
+                    ### Zero values and copies
+
+                    Every type has a useful zero value: `0`, `""`, `false`, `nil`, and a struct whose fields are all zero. You rarely need constructors just to initialize memory.
+
+                    ```go
+                    type Account struct {
+                        ID      string
+                        Balance int64
+                    }
+
+                    func credit(a Account, amount int64) {
+                        a.Balance += amount // mutates the copy only
+                    }
+
+                    func creditPtr(a *Account, amount int64) {
+                        a.Balance += amount // mutates the caller's value
+                    }
+                    ```
+
+                    Choose value receivers when the method only reads fields or when the type is small and immutable. Choose pointer receivers when the method mutates the receiver or the struct is large enough that copying is wasteful. Be consistent across a type: mixing pointer and value receivers makes interface satisfaction confusing.
+
+                    A struct copy is shallow. Copying a struct that contains a slice copies the slice header, not the elements.
+
+                    ![Value copy versus shared backing storage](/illustrations/lessons/go-foundations-lesson-diagram.svg)
+
+                    ### Slices share an array
+
+                    A slice is three words: pointer, length, capacity. Two slices can point at the same array.
+
+                    ```go
+                    base := []int{1, 2, 3, 4}
+                    head := base[:2]
+                    tail := base[2:]
+
+                    head[0] = 99        // base[0] is now 99
+                    tail = append(tail, 5) // may write into base's spare capacity
+                    ```
+
+                    Use `append` only when you own the destination. When a function must not expose its backing array, return a copy:
+
+                    ```go
+                    func clone(in []int) []int {
+                        out := make([]int, len(in))
+                        copy(out, in)
+                        return out
+                    }
+                    ```
+
+                    Preallocate when the final size is known: `make([]T, 0, n)`. A full slice expression such as `base[:2:2]` caps capacity, forcing the next `append` to allocate instead of overwriting a neighbour's data.
+
+                    ### Maps are shared hash tables
+
+                    A map value points at a runtime hash table. Copying the map variable does not copy the entries.
+
+                    ```go
+                    counts := map[string]int{"go": 1}
+                    alias := counts
+                    alias["go"] = 2 // counts["go"] is 2
+                    ```
+
+                    Reading a missing key returns the zero value; use the comma-ok form when presence matters. Iteration order is deliberately randomized, so sort keys when output must be stable. A nil map is readable but panics on write; initialize with `make` or a literal before inserting.
+
+                    ```go
+                    value, ok := counts["rust"]
+                    if !ok {
+                        value = 0
+                    }
+                    ```
+
+                    ### Packages and exported names
+
+                    Keep packages small and named after what they provide, not where they sit. An identifier is exported only when it starts with a capital letter. Export the minimum surface, document it, and prefer returning concrete types while accepting interfaces. That keeps callers flexible without leaking implementation details.
+                    """
+                )
+            ]);
+
+        var goErrorsAndInterfaces = CreateModule(
+            "go-errors-and-interfaces",
+            "Errors and Interfaces",
+            "Model failures as values and depend on small interfaces at the consumer.",
+            "Intermediate",
+            55,
+            2,
+            [
+                "Wrap errors with enough context while keeping errors.Is and errors.As working.",
+                "Design minimal interfaces that describe what a consumer needs.",
+                "Use interfaces as test seams instead of hiding behavior behind globals."
+            ],
+            [
+                (
+                    "error-wrapping",
+                    "Error wrapping",
+                    "Add context to failures without destroying the error chain or leaking diagnostics."
+                ),
+                (
+                    "interface-contracts",
+                    "Interface contracts",
+                    "Define small, consumer-owned interfaces that are easy to implement and test."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-errors-and-interfaces-lesson",
+                    "Errors are values, interfaces are contracts",
+                    "Lesson",
+                    24,
+                    1,
+                    """
+                    ## Errors are values, interfaces are contracts
+
+                    Go treats failures as ordinary values and behavior as an implicit contract. Both choices push design decisions to the call site instead of a framework.
+
+                    ### Errors are values
+
+                    An error is any value with an `Error() string` method. Return `nil` for success and a non-nil value for failure.
+
+                    ```go
+                    var ErrNotFound = errors.New("not found")
+
+                    type ValidationError struct {
+                        Field string
+                    }
+
+                    func (e ValidationError) Error() string {
+                        return "invalid field: " + e.Field
+                    }
+                    ```
+
+                    Sentinels such as `ErrNotFound` identify a condition. Custom types carry structured detail. Callers should not compare strings; they should ask the chain.
+
+                    ```go
+                    order, err := repo.Load(id)
+                    if errors.Is(err, ErrNotFound) {
+                        return Result{}, ErrInvalidRecipient
+                    }
+
+                    var invalid ValidationError
+                    if errors.As(err, &invalid) {
+                        log.Printf("field %s failed validation", invalid.Field)
+                    }
+                    ```
+
+                    ### Wrap with context, not noise
+
+                    Use `fmt.Errorf` with `%w` to add a layer while preserving the chain.
+
+                    ```go
+                    if err := notifier.Send(message); err != nil {
+                        return Result{}, fmt.Errorf("send confirmation for %s: %w", order.ID, err)
+                    }
+                    ```
+
+                    The message should describe the operation that failed. Avoid repeating "error" or embedding secrets. A wrap chain answers two questions: what was attempted, and what was the underlying cause. `errors.Join` combines independent failures when one operation genuinely has several causes.
+
+                    Wrapping is not the same as logging. Log once at the boundary that owns the decision, not at every layer that passes the error along.
+
+                    ### Interfaces belong to the consumer
+
+                    An interface should describe the smallest set of methods a consumer calls. Go satisfies interfaces implicitly, so the producer does not need to know which interfaces exist.
+
+                    ```go
+                    type OrderStore interface {
+                        Load(ctx context.Context, id string) (Order, bool, error)
+                    }
+
+                    func Fulfill(ctx context.Context, store OrderStore, id string) error {
+                        order, found, err := store.Load(ctx, id)
+                        if err != nil {
+                            return fmt.Errorf("load order %s: %w", id, err)
+                        }
+                        if !found {
+                            return ErrNotFound
+                        }
+                        _ = order
+                        return nil
+                    }
+                    ```
+
+                    Accept interfaces, return concrete types. Keep interfaces near the code that consumes them, not next to the implementation. One-method interfaces such as `io.Reader` compose better than broad "service" interfaces that force every fake to implement unrelated methods.
+
+                    A nil interface is not a nil concrete value. If a function returns a typed nil pointer as an interface, the interface itself is non-nil and a nil check will fail. Return an explicit `nil` interface when there is no value.
+
+                    ### Interfaces as test seams
+
+                    The same small interface lets a test replace time, storage, or delivery with a deterministic fake. That is why the boundary matters: the consumer decides which dependency to inject, so the test can observe behavior without patching globals.
+
+                    ![Errors and interfaces at a boundary](/illustrations/lessons/go-errors-and-interfaces-lesson-diagram.svg)
+
+                    Prefer an explicit injected dependency over a package-level variable. It keeps tests parallel-safe and makes the production wiring visible in one place.
+                    """
+                )
+            ]);
+
+        var goConcurrency = CreateModule(
+            "go-concurrency",
+            "Concurrency",
+            "Coordinate goroutines with channels, contexts, and bounded worker pools.",
+            "Intermediate",
+            60,
+            3,
+            [
+                "Choose an owner for every goroutine and every channel it reads.",
+                "Stop work reliably when a context is canceled.",
+                "Bound concurrency and preserve output order under load."
+            ],
+            [
+                (
+                    "goroutine-lifecycle",
+                    "Goroutine lifecycle",
+                    "Start, cancel, and wait for goroutines so no work outlives its request."
+                ),
+                (
+                    "channel-coordination",
+                    "Channel coordination",
+                    "Use channels and select to hand off work, close cleanly, and collect results in order."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-concurrency-lesson",
+                    "Goroutines, channels, and cancellation",
+                    "Lesson",
+                    26,
+                    1,
+                    """
+                    ## Goroutines, channels, and cancellation
+
+                    A goroutine is cheap, but a goroutine that nobody waits for is a leak. Concurrency in Go is mostly about ownership: who starts the work, who stops it, and who closes the channel.
+
+                    ### Every goroutine needs an owner
+
+                    The function that starts a goroutine should also arrange for it to finish. `sync.WaitGroup` is the simplest tool when the number of goroutines is known.
+
+                    ```go
+                    var wg sync.WaitGroup
+                    for _, key := range keys {
+                        wg.Add(1)
+                        go func(key string) {
+                            defer wg.Done()
+                            results <- fetch(key)
+                        }(key)
+                    }
+                    wg.Wait()
+                    close(results)
+                    ```
+
+                    Capture loop variables explicitly on older toolchains, and prefer the per-iteration semantics of modern Go. Never close a channel from the receiving side: the sender closes, and only after it has stopped sending.
+
+                    A background goroutine that blocks forever on a channel keeps its stack, its references, and any locks it holds. Tests can detect the accumulation with the race detector and `runtime.NumGoroutine`, but the fix is ownership, not tuning.
+
+                    ### Channels coordinate, they do not store
+
+                    An unbuffered channel synchronizes sender and receiver. A buffered channel decouples them up to its capacity. Anything larger is usually a queue with its own lifetime and backpressure requirements.
+
+                    ```go
+                    select {
+                    case result := <-results:
+                        handle(result)
+                    case <-ctx.Done():
+                        return ctx.Err()
+                    }
+                    ```
+
+                    `select` is how a goroutine stays responsive while waiting. Use `range` over a channel to receive until it closes, and use the comma-ok form when a closed channel must be distinguished from a zero value.
+
+                    Closing a channel is a broadcast to every receiver. It does not flush pending work; the sender must finish first. Sending on a closed channel panics, so ownership must be exclusive.
+
+                    ![Bounded fan-out with cancellation](/illustrations/lessons/go-concurrency-lesson-diagram.svg)
+
+                    ### Context is the cancellation contract
+
+                    `context.Context` carries a deadline, a cancellation signal, and request-scoped values. Pass it as the first parameter and never store it in a struct.
+
+                    ```go
+                    ctx, cancel := context.WithCancel(ctx)
+                    defer cancel()
+                    ```
+
+                    Cancellation is cooperative. Every blocking operation must select on `ctx.Done()` or use an API that does. Check `ctx.Err()` after a failed operation to distinguish cancellation from a real failure.
+
+                    ### Bound the fan-out
+
+                    A worker pool limits how much work runs at once. A semaphore channel of size `n` is the smallest version:
+
+                    ```go
+                    slots := make(chan struct{}, workers)
+                    for _, key := range keys {
+                        slots <- struct{}{}
+                        go func(key string) {
+                            defer func() { <-slots }()
+                            fetch(key)
+                        }(key)
+                    }
+                    ```
+
+                    The caller still needs a `WaitGroup` and a policy for the first error. Bounded concurrency protects downstream services and keeps memory predictable. Unbounded goroutine-per-item designs look simple until the input grows.
+
+                    ### Race detector, not guesswork
+
+                    Run `go test -race` and `go run -race` around concurrent code. A data race is undefined behavior even when it appears to work. Prefer message passing for ownership transfer, and mutexes for short critical sections that guard state.
+                    """
+                )
+            ]);
+
+        var goHttpServices = CreateModule(
+            "go-http-services",
+            "HTTP Services",
+            "Serve JSON resources with net/http, propagate request context, and keep handlers testable.",
+            "Intermediate",
+            55,
+            4,
+            [
+                "Model resources with HTTP methods, status codes, and a stable JSON error shape.",
+                "Propagate request context and deadlines into every dependency.",
+                "Test handlers with httptest instead of a live network."
+            ],
+            [
+                (
+                    "http-handlers",
+                    "HTTP handlers",
+                    "Decode requests, validate input, and return the right status and representation."
+                ),
+                (
+                    "request-context",
+                    "Request context",
+                    "Carry cancellation, deadlines, and request-scoped values through the call chain."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-http-services-lesson",
+                    "HTTP services with net/http",
+                    "Lesson",
+                    25,
+                    1,
+                    """
+                    ## HTTP services with net/http
+
+                    The standard library is a complete HTTP toolkit. A service needs routing, decoding, validation, a consistent response shape, and context propagation. Frameworks add convenience, not different semantics.
+
+                    ### Route by method and path
+
+                    Modern Go patterns include the method, so a GET and a POST to the same path can have different handlers.
+
+                    ```go
+                    mux := http.NewServeMux()
+                    mux.HandleFunc("GET /orders/{id}", getOrder)
+                    mux.HandleFunc("POST /orders", createOrder)
+                    ```
+
+                    Use nouns for resources and let the method express the action. Return `405 Method Not Allowed` when the path exists but the method does not. Keep transport code thin: decode, validate, call the domain, encode.
+
+                    ### Decode at the boundary
+
+                    Decode exactly one JSON object into a typed request value. Reject unknown or trailing input when the contract is strict.
+
+                    ```go
+                    func decodeOrder(r *http.Request) (Order, error) {
+                        r.Body = http.MaxBytesReader(nil, r.Body, 64<<10)
+                        decoder := json.NewDecoder(r.Body)
+                        decoder.DisallowUnknownFields()
+
+                        var order Order
+                        if err := decoder.Decode(&order); err != nil {
+                            return Order{}, ErrInvalidRequest
+                        }
+
+                        if decoder.More() {
+                            return Order{}, ErrInvalidRequest
+                        }
+
+                        return order, nil
+                    }
+                    ```
+
+                    Validation is not the same as decoding. Check required fields, ranges, and cross-field rules before calling the store. Trim identifiers, reject empty strings, and keep numeric limits explicit.
+
+                    ### One error shape
+
+                    A stable error response lets clients react without parsing prose.
+
+                    ```go
+                    type ErrorResponse struct {
+                        Error string `json:"error"`
+                    }
+                    ```
+
+                    Return `400` for malformed or invalid input, `404` for a missing resource, `409` for a state conflict, and `500` for a server failure. Never put stack traces, SQL, or internal paths in the response; log them on the server and return an opaque code.
+
+                    ### Context belongs to the request
+
+                    `r.Context()` is canceled when the client disconnects or the server deadline expires. Pass it to every call that can block: database queries, outbound HTTP, queues.
+
+                    ```go
+                    func (h *Handler) getOrder(w http.ResponseWriter, r *http.Request) {
+                        order, found, err := h.store.Get(r.Context(), r.PathValue("id"))
+                        if err != nil {
+                            writeError(w, http.StatusInternalServerError, "internal_error")
+                            return
+                        }
+                        if !found {
+                            writeError(w, http.StatusNotFound, "not_found")
+                            return
+                        }
+                        writeJSON(w, http.StatusOK, order)
+                    }
+                    ```
+
+                    Do not replace it with `context.Background()` inside a handler: that severs cancellation and hides slow dependencies. Request-scoped values are for tracing and identity, not for passing required parameters.
+
+                    ![Request flow through a handler](/illustrations/lessons/go-http-services-lesson-diagram.svg)
+
+                    ### Test with httptest
+
+                    A handler is just an `http.Handler`. Call `ServeHTTP` with `httptest.NewRequest` and `httptest.NewRecorder` to assert status, headers, and body without opening a port. A fake store records the context it received, which proves propagation without a real database.
+
+                    Keep response writing in one helper so every handler emits the same content type and newline handling. Small helpers remove a whole class of inconsistent responses.
+                    """
+                )
+            ]);
+
+        var goTestingAndTooling = CreateModule(
+            "go-testing-and-tooling",
+            "Testing and Tooling",
+            "Write deterministic tests around explicit seams and use the Go toolchain with confidence.",
+            "Intermediate",
+            50,
+            5,
+            [
+                "Introduce seams for time, randomness, and I/O instead of patching globals.",
+                "Write table-driven tests that fail for one readable reason.",
+                "Use go test, the race detector, vet, and coverage as one loop."
+            ],
+            [
+                (
+                    "testable-seams",
+                    "Testable seams",
+                    "Replace hidden dependencies with small injected interfaces that tests can control."
+                ),
+                (
+                    "deterministic-behavior",
+                    "Deterministic behavior",
+                    "Remove wall-clock, randomness, and scheduling from logic so repeated runs agree."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-testing-and-tooling-lesson",
+                    "Testable seams and deterministic tests",
+                    "Lesson",
+                    23,
+                    1,
+                    """
+                    ## Testable seams and deterministic tests
+
+                    A flaky test usually means the code depends on something the test does not control: the clock, a random source, a network, or a scheduler. A seam is the place where that dependency can be replaced.
+
+                    ### Inject the dependency, do not patch it
+
+                    Package-level variables and `time.Now` are easy to call and hard to control. Move the dependency behind a small interface at the boundary that needs it.
+
+                    ```go
+                    type Clock interface {
+                        Now() time.Time
+                    }
+
+                    type Retryer struct {
+                        clock   Clock
+                        sleeper Sleeper
+                    }
+
+                    func (r *Retryer) Backoff(attempt int) {
+                        delay := time.Duration(1<<attempt) * 100 * time.Millisecond
+                        r.sleeper.Sleep(delay)
+                    }
+                    ```
+
+                    A test supplies a fake clock and a recording sleeper. Production wires the real implementations once in `main`. Do not mock everything: a pure function needs no interface, and a small value type can be used directly.
+
+                    ### Table-driven tests
+
+                    Table tests keep the cases together and the assertion in one place.
+
+                    ```go
+                    func TestNormalizeBatchSize(t *testing.T) {
+                        cases := []struct {
+                            name    string
+                            size    int
+                            wantErr bool
+                        }{
+                            {name: "valid", size: 3},
+                            {name: "zero", size: 0, wantErr: true},
+                            {name: "negative", size: -1, wantErr: true},
+                        }
+
+                        for _, tc := range cases {
+                            t.Run(tc.name, func(t *testing.T) {
+                                _, err := Batch([]int{1, 2, 3}, tc.size)
+                                if (err != nil) != tc.wantErr {
+                                    t.Fatalf("Batch() error = %v, wantErr %v", err, tc.wantErr)
+                                }
+                            })
+                        }
+                    }
+                    ```
+
+                    One case, one reason to fail. Use `t.Helper()` in shared assertions and `t.Cleanup()` for teardown. Run subtests in parallel only when they share no mutable state.
+
+                    ### Determinism rules
+
+                    Logic should not call `time.Now`, `time.Sleep`, `rand`, or `os.Getenv` directly. Receive the value or the dependency instead. Delays belong in a scheduler or a sleeper that tests replace.
+
+                    Concurrency tests should coordinate with channels and counters, not with sleeps. When a timeout is needed as a safety net, keep it generous and assert on state, not on elapsed time.
+
+                    ![A testable seam around time](/illustrations/lessons/go-testing-and-tooling-lesson-diagram.svg)
+
+                    ### One toolchain loop
+
+                    - `go test ./...` runs the suite.
+                    - `go test -race ./...` finds data races.
+                    - `go vet ./...` catches suspicious constructs the compiler accepts.
+                    - `gofmt -l .` (or `go fmt ./...`) keeps formatting mechanical.
+                    - `go test -cover ./...` shows untested branches, not correctness.
+                    - `go test -bench . -benchmem` measures allocations before optimizing.
+
+                    A test that depends on real time is a test that will eventually fail on a slow machine. Replace the dependency, keep the assertion sharp, and let the toolchain do the repetition.
+                    """
+                )
+            ]);
+
+        var goGenerics = CreateModule(
+            "go-generics",
+            "Generics",
+            "Use type parameters and constraints where they remove real duplication.",
+            "Advanced",
+            45,
+            6,
+            [
+                "Write generic functions that preserve type safety and readable call sites.",
+                "Choose constraints that describe the operations actually used.",
+                "Recognize when a generic abstraction costs more than the duplication it removes."
+            ],
+            [
+                (
+                    "type-parameters",
+                    "Type parameters",
+                    "Instantiate generic functions and data structures without losing inference or clarity."
+                ),
+                (
+                    "generic-constraints",
+                    "Generic constraints",
+                    "Express the exact operations a type argument must support."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-generics-lesson",
+                    "Type parameters without over-abstraction",
+                    "Lesson",
+                    21,
+                    1,
+                    """
+                    ## Type parameters without over-abstraction
+
+                    Generics remove duplication when the algorithm is identical and only the element type changes. They add cost when the behavior differs by type, because the constraint has to grow until it describes a whole protocol.
+
+                    ### Start from a real duplication
+
+                    A batch helper is a good candidate: the logic is the same for any element type.
+
+                    ```go
+                    func Batch[T any](items []T, size int) ([][]T, error) {
+                        if size <= 0 {
+                            return nil, ErrInvalidBatchSize
+                        }
+
+                        batches := make([][]T, 0, (len(items)+size-1)/size)
+                        for start := 0; start < len(items); start += size {
+                            end := min(start+size, len(items))
+                            batches = append(batches, items[start:end])
+                        }
+
+                        return batches, nil
+                    }
+                    ```
+
+                    `T any` means the function may store, move, and return values but cannot compare or add them. That is usually enough for containers and pipelines.
+
+                    ### Constraints describe operations
+
+                    A constraint is an interface that lists what the type argument must support.
+
+                    ```go
+                    type Number interface {
+                        ~int | ~int64 | ~float64
+                    }
+
+                    func Sum[T Number](values []T) T {
+                        var total T
+                        for _, value := range values {
+                            total += value
+                        }
+                        return total
+                    }
+                    ```
+
+                    The `~` token admits defined types whose underlying type matches, so `type Cents int64` works. Use `comparable` when a type must be a map key or support `==`. Compose constraints from smaller interfaces rather than repeating unions.
+
+                    ```go
+                    type Keyed[K comparable] interface {
+                        Key() K
+                    }
+                    ```
+
+                    A constraint with methods forces every type argument to implement them, which can be the right price for a generic index or cache. If the constraint keeps growing, the abstraction is probably describing behavior, not storage.
+
+                    ![Generic containers and constraints](/illustrations/lessons/go-generics-lesson-diagram.svg)
+
+                    ### Generic data structures
+
+                    A cache needs a comparable key and an arbitrary value. The implementation is identical for every pair, so generics fit.
+
+                    ```go
+                    type Cache[K comparable, V any] struct {
+                        entries map[K]*entry[K, V]
+                    }
+                    ```
+
+                    Keep the zero value useful when possible, or provide a constructor that documents the required invariants. Methods on generic types cannot introduce new type parameters, so put helpers on free functions when they need one.
+
+                    ### When not to use generics
+
+                    - The algorithm branches on type behavior: an interface or separate functions are clearer.
+                    - There is exactly one instantiation and no plan for a second.
+                    - The constraint becomes a page of unions that no reader can hold in their head.
+                    - Reflection is already required to inspect fields or tags.
+
+                    Type inference removes most explicit type arguments at call sites. If callers must write `Batch[Order, ...]` everywhere, the signature is probably too clever. Prefer the boring function until duplication is real and stable.
+                    """
+                )
+            ]);
+
+        var goPerformance = CreateModule(
+            "go-performance",
+            "Performance and Profiling",
+            "Reduce allocations and choose data structures by measured cost.",
+            "Advanced",
+            55,
+            7,
+            [
+                "Measure allocations and CPU before changing code.",
+                "Preallocate, reuse, and avoid accidental copies in hot paths.",
+                "Choose a container from the operations that dominate the workload."
+            ],
+            [
+                (
+                    "allocation-discipline",
+                    "Allocation discipline",
+                    "Reduce avoidable allocations and copies without obscuring the code."
+                ),
+                (
+                    "data-structure-costs",
+                    "Data structure costs",
+                    "Pick slices, maps, or linked structures from the operations and memory they actually cost."
+                )
+            ],
+            [
+                CreateMaterial(
+                    "go-performance-lesson",
+                    "Allocation discipline and data structure costs",
+                    "Lesson",
+                    24,
+                    1,
+                    """
+                    ## Allocation discipline and data structure costs
+
+                    Performance work starts with a measurement and ends with a simpler or smaller hot path. Optimizing by intuition usually moves cost instead of removing it.
+
+                    ### Measure before changing
+
+                    Benchmarks report time and allocations per operation.
+
+                    ```go
+                    func BenchmarkNormalize(b *testing.B) {
+                        items := loadItems()
+                        b.ReportAllocs()
+                        b.ResetTimer()
+
+                        for range b.N {
+                            _, _ = NormalizeInventory(items)
+                        }
+                    }
+                    ```
+
+                    `go test -bench . -benchmem` shows `ns/op` and `allocs/op`. Use a CPU profile (`go test -cpuprofile cpu.out -bench .`, then `go tool pprof`) to find the function that dominates, and an allocation profile to see what is allocated. A profile without a benchmark is a guess.
+
+                    ### Preallocate when the size is known
+
+                    `append` grows a slice geometrically. That is fine when the size is unknown; it is waste when the count is already available.
+
+                    ```go
+                    result := make([]Item, 0, len(items))
+                    for _, item := range items {
+                        if item.Quantity > 0 {
+                            result = append(result, item)
+                        }
+                    }
+                    ```
+
+                    The same idea applies to maps: `make(map[string]int, len(keys))` reserves buckets up front. Do not over-tune small inputs; readability wins below the hot path.
+
+                    ### Strings and copies
+
+                    String concatenation in a loop allocates a new string each time. `strings.Builder` grows one buffer.
+
+                    ```go
+                    var builder strings.Builder
+                    builder.Grow(estimatedSize)
+                    for _, part := range parts {
+                        builder.WriteString(part)
+                    }
+                    return builder.String()
+                    ```
+
+                    Converting `[]byte` to `string` copies unless the compiler can prove the result does not escape. Keep the bytes when the value is only compared or written. Watch for hidden copies in `fmt.Sprintf`, interface boxing, and closures that capture large values.
+
+                    ![Slice growth versus preallocation](/illustrations/lessons/go-performance-lesson-diagram.svg)
+
+                    ### Choose a container from its operations
+
+                    | Need | Container | Cost |
+                    |---|---|---|
+                    | Index by position | slice | O(1) access, O(n) insert/delete |
+                    | Lookup by key | map | average O(1), no order |
+                    | Move between neighbours | linked list | O(1) splice, poor cache locality |
+                    | Ordered keys | sorted slice or tree | O(log n) search, O(n) insert |
+
+                    An LRU cache combines a map for lookup with a linked list for recency, so eviction and refresh are O(1). A slice-only cache would scan on every hit.
+
+                    ### Close the loop
+
+                    Re-run the benchmark and the profile after each change. Keep the fastest version only if it stays readable and covered by tests. A performance budget makes regressions visible; an unmeasured micro-optimization is just a different bug.
+                    """
+                )
+            ]);
+
+        AddPrerequisite(goErrorsAndInterfaces, goFoundations);
+        AddPrerequisite(goConcurrency, goFoundations);
+        AddPrerequisite(goHttpServices, goErrorsAndInterfaces);
+        AddPrerequisite(goTestingAndTooling, goErrorsAndInterfaces);
+        AddPrerequisite(goGenerics, goFoundations);
+        AddPrerequisite(goPerformance, goConcurrency);
 
         AddPrerequisite(complexityAnalysis, algorithmFoundations);
         AddPrerequisite(dataStructures, algorithmFoundations);
@@ -742,7 +1555,19 @@ internal static class LearningSeedData
                 "Testing, debugging, refactoring, static analysis, and secure coding.",
                 5,
                 testingFoundations,
-                debuggingAndRootCause)
+                debuggingAndRootCause),
+            CreateDomain(
+                "go-engineering",
+                "Go Engineering",
+                "Idiomatic Go services: value semantics, errors, concurrency, HTTP, generics, and performance.",
+                6,
+                goFoundations,
+                goErrorsAndInterfaces,
+                goConcurrency,
+                goHttpServices,
+                goTestingAndTooling,
+                goGenerics,
+                goPerformance)
         ];
     }
 

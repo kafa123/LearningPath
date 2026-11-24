@@ -6,7 +6,7 @@ namespace Psel.Api.Tests;
 public sealed class LearningEndpointTests
 {
     [Fact]
-    public async Task GetDomains_ReturnsFiveOrderedDomainsWithModuleCounts()
+    public async Task GetDomains_ReturnsSixOrderedDomainsWithModuleCounts()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         using var factory = new CustomWebApplicationFactory();
@@ -17,14 +17,15 @@ public sealed class LearningEndpointTests
             cancellationToken);
 
         Assert.NotNull(domains);
-        Assert.Equal(5, domains.Count);
+        Assert.Equal(6, domains.Count);
         Assert.Equal(
             [
                 "programming-fundamentals",
                 "database-engineering",
                 "backend-engineering",
                 "software-architecture",
-                "software-quality"
+                "software-quality",
+                "go-engineering"
             ],
             domains.Select(domain => domain.Slug));
         Assert.Equal(3, domains[0].ModuleCount);
@@ -43,7 +44,7 @@ public sealed class LearningEndpointTests
             cancellationToken);
 
         Assert.NotNull(paths);
-        Assert.Equal(5, paths.Count);
+        Assert.Equal(6, paths.Count);
 
         var programming = Assert.Single(
             paths,

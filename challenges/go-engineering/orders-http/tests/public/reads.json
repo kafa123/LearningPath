@@ -1,0 +1,40 @@
+{
+  "store": {
+    "orders": [
+      { "id": "A-1", "totalCents": 1250 },
+      { "id": "B-2", "totalCents": 99 }
+    ],
+    "failGetIds": [],
+    "failSaveIds": []
+  },
+  "cases": [
+    {
+      "method": "GET",
+      "path": "/orders/A-1",
+      "body": "",
+      "contextValue": "read-public",
+      "expected": {
+        "status": 200,
+        "body": { "id": "A-1", "totalCents": 1250 },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/orders/missing",
+      "body": "",
+      "contextValue": "read-public",
+      "expected": {
+        "status": 404,
+        "body": { "error": "not_found" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    }
+  ]
+}

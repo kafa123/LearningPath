@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": 16,
+        "totalCents": 9999,
+        "recipient": "ada@example.com"
+      },
+      "expectedCode": "sent",
+      "sentMessages": [
+        {
+          "recipient": "ada@example.com",
+          "message": "Order 16 confirmed: 9999 cents"
+        }
+      ]
+    },
+    {
+      "order": {
+        "id": 17,
+        "totalCents": 100000,
+        "recipient": "grace@example.com"
+      },
+      "expectedCode": "sent",
+      "sentMessages": [
+        {
+          "recipient": "grace@example.com",
+          "message": "Order 17 confirmed: 100000 cents"
+        }
+      ]
+    }
+  ]
+}

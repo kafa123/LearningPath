@@ -94,13 +94,13 @@ public sealed class LearningAuthoringEndpointTests
         await using var scope = factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PselDbContext>();
 
-        Assert.Equal(6, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
-        Assert.Equal(13, await dbContext.Set<LearningModule>().CountAsync(cancellationToken));
-        Assert.Equal(13, await dbContext.Set<LearningMaterial>().CountAsync(cancellationToken));
-        Assert.Equal(25, await dbContext.Set<Competency>().CountAsync(cancellationToken));
-        Assert.Equal(37, await dbContext.Set<LearningObjective>().CountAsync(cancellationToken));
+        Assert.Equal(7, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
+        Assert.Equal(20, await dbContext.Set<LearningModule>().CountAsync(cancellationToken));
+        Assert.Equal(20, await dbContext.Set<LearningMaterial>().CountAsync(cancellationToken));
+        Assert.Equal(39, await dbContext.Set<Competency>().CountAsync(cancellationToken));
+        Assert.Equal(58, await dbContext.Set<LearningObjective>().CountAsync(cancellationToken));
         Assert.Equal(
-            8,
+            14,
             await dbContext.Set<LearningModulePrerequisite>().CountAsync(cancellationToken));
 
         using var moduleResponse = await client.GetAsync(
@@ -186,13 +186,13 @@ public sealed class LearningAuthoringEndpointTests
         await using var scope = factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PselDbContext>();
 
-        Assert.Equal(5, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
-        Assert.Equal(12, await dbContext.Set<LearningModule>().CountAsync(cancellationToken));
-        Assert.Equal(12, await dbContext.Set<LearningMaterial>().CountAsync(cancellationToken));
-        Assert.Equal(24, await dbContext.Set<Competency>().CountAsync(cancellationToken));
-        Assert.Equal(36, await dbContext.Set<LearningObjective>().CountAsync(cancellationToken));
+        Assert.Equal(6, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
+        Assert.Equal(19, await dbContext.Set<LearningModule>().CountAsync(cancellationToken));
+        Assert.Equal(19, await dbContext.Set<LearningMaterial>().CountAsync(cancellationToken));
+        Assert.Equal(38, await dbContext.Set<Competency>().CountAsync(cancellationToken));
+        Assert.Equal(57, await dbContext.Set<LearningObjective>().CountAsync(cancellationToken));
         Assert.Equal(
-            7,
+            13,
             await dbContext.Set<LearningModulePrerequisite>().CountAsync(cancellationToken));
 
         var module = await dbContext
@@ -338,7 +338,7 @@ public sealed class LearningAuthoringEndpointTests
         await using var scope = factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PselDbContext>();
 
-        Assert.Equal(5, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
+        Assert.Equal(6, await dbContext.Set<LearningDomain>().CountAsync(cancellationToken));
         Assert.False(await dbContext
             .Set<LearningDomain>()
             .AnyAsync(domain => domain.Slug == "security-engineering", cancellationToken));

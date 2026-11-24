@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "op": "group",
+      "items": ["bee", "ant", "bat", "ape", "cow"],
+      "keyMode": "first-letter",
+      "expected": {
+        "b": ["bee", "bat"],
+        "a": ["ant", "ape"],
+        "c": ["cow"]
+      },
+      "expectedKeyCalls": 5
+    },
+    {
+      "op": "group",
+      "items": ["aa", "ab", "ac"],
+      "keyMode": "first-letter",
+      "expected": {
+        "a": ["aa", "ab", "ac"]
+      },
+      "expectedKeyCalls": 3
+    },
+    {
+      "op": "group",
+      "items": [],
+      "keyMode": "first-letter",
+      "expected": {},
+      "expectedKeyCalls": 0
+    }
+  ]
+}

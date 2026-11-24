@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "put", "key": "c", "value": 3 },
+        { "op": "keys" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["c", "b"] }
+      ]
+    },
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "get", "key": "a" },
+        { "op": "put", "key": "c", "value": 3 },
+        { "op": "keys" },
+        { "op": "get", "key": "b" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "get", "found": true, "value": 1 },
+        { "op": "put" },
+        { "op": "keys", "keys": ["c", "a"] },
+        { "op": "get", "found": false, "value": 0 }
+      ]
+    }
+  ]
+}

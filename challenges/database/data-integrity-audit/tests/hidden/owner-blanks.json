@@ -1,0 +1,9 @@
+{
+  "seed": "INSERT INTO teams (id, name, owner_email) VALUES\n  (1, 'Alpha', NULL),\n  (2, 'Beta', ''),\n  (3, 'Gamma', '   '),\n  (4, 'Delta', 'owner@example.com');\n\nINSERT INTO members (id, team_id, email, display_name) VALUES\n  (1, 1, 'a@example.com', 'A'),\n  (2, 2, 'b@example.com', 'B'),\n  (3, 3, 'c@example.com', 'C'),\n  (4, 4, 'd@example.com', 'D');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["missing_owner", 1, "Alpha"],
+    ["missing_owner", 2, "Beta"],
+    ["missing_owner", 3, "Gamma"]
+  ]
+}

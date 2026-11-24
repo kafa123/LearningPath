@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "keys": [
+        "alpha",
+        "beta",
+        "gamma"
+      ],
+      "workers": 2,
+      "values": {
+        "alpha": "A",
+        "beta": "B",
+        "gamma": "C"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "alpha",
+            "value": "A"
+          },
+          {
+            "key": "beta",
+            "value": "B"
+          },
+          {
+            "key": "gamma",
+            "value": "C"
+          }
+        ],
+        "error": "",
+        "calls": 3,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [
+        "x",
+        "y",
+        "x"
+      ],
+      "workers": 3,
+      "values": {
+        "x": "ten",
+        "y": "twenty"
+      },
+      "expected": {
+        "results": [
+          {
+            "key": "x",
+            "value": "ten"
+          },
+          {
+            "key": "y",
+            "value": "twenty"
+          },
+          {
+            "key": "x",
+            "value": "ten"
+          }
+        ],
+        "error": "",
+        "calls": 3,
+        "canceledFetches": 0
+      }
+    },
+    {
+      "keys": [],
+      "workers": 2,
+      "expected": {
+        "results": [],
+        "error": "",
+        "calls": 0,
+        "canceledFetches": 0
+      }
+    }
+  ]
+}

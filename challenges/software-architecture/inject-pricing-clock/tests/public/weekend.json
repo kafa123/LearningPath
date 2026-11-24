@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "basePriceCents": 5000,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-08T12:00:00Z",
+      "expected": 4500
+    },
+    {
+      "basePriceCents": 3000,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-07T00:00:00Z",
+      "expected": 2700
+    }
+  ]
+}

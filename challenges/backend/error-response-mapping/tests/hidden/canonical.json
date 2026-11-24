@@ -1,0 +1,37 @@
+{
+  "cases": [
+    {
+      "errorCode": "invalid_request",
+      "internalDetail": null,
+      "expected": {
+        "status": 400,
+        "code": "invalid_request",
+        "title": "Invalid request",
+        "detail": "One or more fields are invalid.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": "not_found",
+      "internalDetail": "Customer 42 was not found.",
+      "expected": {
+        "status": 404,
+        "code": "not_found",
+        "title": "Resource not found",
+        "detail": "The requested resource does not exist.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": "rate_limited",
+      "internalDetail": "Redis bucket exhausted for tenant 7.",
+      "expected": {
+        "status": 429,
+        "code": "rate_limited",
+        "title": "Too many requests",
+        "detail": "Retry after the indicated delay.",
+        "retryable": true
+      }
+    }
+  ]
+}

@@ -253,7 +253,7 @@ See [DATABASE_DESIGN.md](DATABASE_DESIGN.md).
 - Phase 4 enables Run for languages marked `canExecute`, posts the active language's files to the submission API, polls the submission until it is terminal, and renders the structured status, output, diagnostics, duration, and exit code.
 - Phase 5 enables Submit. The workspace sends `purpose: "Run"` or `purpose: "Submit"`, then loads the assessment result after the submission becomes terminal and renders the outcome, score, public/hidden counts, and public per-test statuses. Hidden test names and data are never rendered because the API does not return them.
 - Phase 6 enables the same Run and Submit workflow for any challenge language marked `canExecute`, including Python. Language switching keeps per-language drafts, and the request carries the active language identifier and its own starter files. No client code selects an image, command, harness, or test set.
-- Phase 7 adds the progress dashboard, assessment history, and examination workspace. The workspace is reused in examination mode with hints removed, Run hidden, Submit labelled for assessment, and submissions disabled once the session is completed or expired. A countdown is rendered from the server-supplied expiry, but the server remains authoritative near submission time.
+- Phase 7 adds the progress dashboard, assessment history, and examination workspace. The dashboard summarizes mastery, pass rate, assessment readiness, and activity streak, recommends the next competency, shows per-domain progress, recent evidence, the module to continue, focus areas, an active-examination banner, and local lab health. The examination workspace is reused in examination mode with hints removed, Run hidden, Submit labelled for assessment, and submissions disabled once the session is completed or expired. A countdown is rendered from the server-supplied expiry, but the server remains authoritative near submission time.
 - Phase 8 adds SQL challenges through the existing workspace. The SQL language supplies its own editor language and starter `query.sql`, and Run/Submit use the same request, polling, and assessment components. No SQL-specific UI or client-selected schema is introduced.
 - Phase 8 also completes the Practice route. It combines the challenge catalog, progress states, and recent assessments into a practice-ready list, recommends challenges whose mapped competencies need attention, and links each card to the existing workspace. Read-only packages stay in the full Challenges catalog instead of appearing as practice-ready.
 - The post-MVP Phase 9 Settings page is read-only. It reuses the health hook for API status and loads `GET /api/runtime` for execution languages, images, and limits. The endpoint projects only server-owned diagnostics; Docker executable paths, workspace roots, container users, and database locations are not part of the contract. Configuration changes still happen through `appsettings` or environment variables and require a restart.
@@ -261,7 +261,7 @@ See [DATABASE_DESIGN.md](DATABASE_DESIGN.md).
 - Local authoring adds an Authoring page with two upload forms: a JSON content pack for learning upserts and a ZIP challenge package with an explicit replace option. It renders only server results and validation messages; no filesystem path or hidden material is displayed.
 - The client supports dark and light themes through a `ThemeProvider` that writes `data-theme` to the document root and persists the choice in `localStorage`. The light palette is implemented by remapping Tailwind color tokens under `html[data-theme='light']`, so the existing components do not need dark/light variants. Monaco registers a matching light editor theme, and an inline script in `index.html` applies the stored theme before first paint to avoid a flash.
 - The workspace lazy-loads Monaco Editor. Monaco, its workers, and its theme are bundled locally rather than fetched from a CDN; the initial catalog bundle does not include the editor.
-- Drafts live only in component state. Execution output and assessment results are rendered as text, never as HTML.
+- Per-file drafts live in component state and are mirrored to `localStorage` per challenge so unsent edits survive reloads and navigation. The workspace restores the most recent saved attempt for the active challenge language through `GET /api/submissions/latest`, including its source files and, when terminal, its last assessment. Examination workspaces do not restore practice drafts. Execution output and assessment results are rendered as text, never as HTML.
 - Production hosting is intentionally deferred; the Phase 8 exit criterion is that SQL challenges execute against isolated databases without the API ever exposing or opening its own database for learner queries.
 
 The frontend must never receive hidden tests, reference solutions, harness source, internal file paths, runner commands, or sensitive configuration.
@@ -395,11 +395,11 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - Startup tests verify that invalid packages and empty challenge roots fail fast.
 - Endpoint tests verify catalog ordering, detail contracts, unknown-slug ProblemDetails, and non-disclosure of hidden-test and solution content.
 - Loader and startup tests use disposable temporary package trees rather than the repository catalog.
-- Frontend tests cover challenge listing, filtering, empty and error states, workspace rendering, editing and resets, language switching with per-language drafts, and retry. Workspace tests mock the editor component so Monaco never loads in jsdom.
+- Frontend tests cover challenge listing, filtering, empty and error states, workspace rendering, editing and resets, language switching with per-language drafts, restoring the latest saved attempt and result, keeping unsent drafts across remounts, and retry. Workspace tests mock the editor component so Monaco never loads in jsdom.
 
 ### Phase 4
 
-- Submission endpoint tests cover accepted requests, polling to a terminal state, server-supplied harness injection, unknown challenges, non-executable languages, unsafe paths, unsupported extensions, unavailable execution, runtime failures, and non-disclosure of harness content.
+- Submission endpoint tests cover accepted requests, polling to a terminal state, server-supplied harness injection, unknown challenges, non-executable languages, unsafe paths, unsupported extensions, unavailable execution, runtime failures, latest-attempt restore with saved source files, missing history, and non-disclosure of harness content.
 - Runner contract tests use a recording fake Docker engine to verify workspace generation, harness injection, project/command construction, path rejection before Docker is invoked, workspace cleanup, and mapping of success, timeout, compilation failure, and unavailable execution.
 - Docker argument tests assert the exact isolation flags, read-only mount, non-root user, environment variables, and absence of privileged/socket access.
 - Challenge loader tests cover harness presence, missing/empty/out-of-package harness files, and verify harness content is absent from the serialized client projection.
@@ -428,7 +428,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - Assessment history tests verify newest-first ordering and examination linkage.
 - Examination tests verify server-selected variants and limits, unknown challenges, non-executable challenges, missing hidden tests, `Run` rejection, cross-challenge rejection, expiry via a controllable clock, finish behavior, and attempt counts.
 - A fake `TimeProvider` makes expiry deterministic; no test depends on the wall clock.
-- Frontend tests cover the progress dashboard, competency evidence, assessment history, empty and error states, examination start, the examination workspace, countdown display, hint removal, Submit-only mode, finish, and expiry.
+- Frontend tests cover the progress dashboard, including key metrics, next-step recommendation, recent activity, and the active-examination banner, as well as competency evidence, assessment history, empty and error states, examination start, the examination workspace, countdown display, hint removal, Submit-only mode, finish, and expiry.
 
 ### Phase 8
 
@@ -476,7 +476,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - API binds to loopback only; it is not designed for network exposure.
 - Learning content can be imported from JSON, but imports never delete rows; removal still requires a manual cleanup or a database reset.
 - Challenge content can be uploaded as a ZIP and reloaded without restart, but there is no in-app package editor or delete action.
-- Workspace drafts are not persisted across reloads; only explicit Run and Submit attempts are stored.
+- Workspace drafts are kept in browser `localStorage` and the last Run or Submit attempt is restored from the server. Clearing browser storage loses unsent drafts; server history is not deleted from the UI.
 - The queue is in-memory and single-process. Queued attempts are lost on shutdown and recovered as `Interrupted` at the next startup. A durable queue is out of scope for the local single-user product.
 - Only C#, Python, and SQL execution are implemented. Challenges that declare a language without a harness remain browse-only, and `api-validation` is still C#-only because its executable scenario needs a host application rather than a single function harness.
 - SQL challenges use SQLite and a fixed built-in harness. Packages cannot supply a custom harness, cannot use MySQL/PostgreSQL syntax, and cannot require extensions or third-party databases.

@@ -2,7 +2,7 @@
 
 > **Train. Build. Test. Understand.**
 
-PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer plus post-MVP settings, runtime diagnostics, and rubric-based self-reviews on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, eight validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, advisory rubric reviews, read-only runtime diagnostics, automated tests, and the project documentation baseline.
+PSEL is a local-first web application for learning, practicing, and objectively assessing software engineering skills. This repository currently contains the **Phase 8 database engineering** layer plus post-MVP settings, runtime diagnostics, and rubric-based self-reviews on top of the Phase 7 progress and examination features: a running ASP.NET Core API, a React application, SQLite/EF Core initialization, five seeded learning paths with modules and Markdown lessons, sixteen validated filesystem challenge packages, a Monaco-based workspace, Docker-backed C#, Python, and SQL execution, public/hidden test assessment, deterministic scoring, submission persistence, server-run examination sessions, evidence-based competency progress, advisory rubric reviews, read-only runtime diagnostics, automated tests, and the project documentation baseline.
 
 The canonical product and architecture specification is [PROJECT_SPEC.md](PROJECT_SPEC.md).
 
@@ -210,6 +210,8 @@ Invoke-RestMethod "http://localhost:5080/api/submissions/$($created.id)/results"
 
 The POST returns `202 Accepted`. Poll the submission endpoint until `isTerminal` is `true`; the status distinguishes success, compilation errors, runtime errors, time limits, memory limits, output limits, unavailable execution, and internal errors. The response includes captured output and diagnostics but never the server-side harness or hidden material. The result endpoint returns the deterministic outcome, score, public/hidden pass counts, and public per-test statuses. Scores use equal weight per selected test and integer arithmetic.
 
+The workspace restores the most recent attempt for the active challenge language through `GET /api/submissions/latest?challengeSlug=two-sum&languageId=csharp`. That response includes the learner's saved source files so the editor can reopen their previous code, and the terminal submission id can load the last assessment. Unsent edits are also kept in browser `localStorage` per challenge, so navigating away and back does not discard them. Examination workspaces start clean.
+
 The same workflow runs Python when the challenge provides a Python starter file and harness:
 
 ```powershell
@@ -291,7 +293,7 @@ npm run test:run
 npm run build
 ```
 
-The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the current baseline there are 177 backend tests and 62 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
+The backend integration tests use temporary SQLite files and temporary challenge package trees, and delete them after each run. Frontend tests mock HTTP calls; they do not require the API to be running. At the current baseline there are 180 backend tests and 65 frontend tests. Docker-backed execution is covered by runner contract tests with a fake Docker engine; the test suite never requires a live Docker daemon. Live Docker execution has also been verified manually: for C#, success, compilation error, runtime error, read-only workspace, disabled network, and cleanup; for Python, accepted, runtime-error, and compilation-error paths plus container and workspace cleanup; and for SQL, an accepted `order-revenue` submission at 5/5 tests, an accepted `order-index-plan` submission at 4/4, a wrong-query submission that failed only the plan constraints, and a `CompilationError` for a non-read-only statement. The SQL harness has also been validated directly against Python 3.12 and SQLite for result correctness, query-plan pass and failure, and compile-error reporting.
 
 ## Project structure
 

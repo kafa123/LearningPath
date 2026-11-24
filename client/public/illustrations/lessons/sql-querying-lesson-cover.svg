@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-labelledby="title desc">
+<title id="title">Database Engineering lesson cover</title>
+<desc id="desc">Abstract illustration for lesson 05 in Database Engineering.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0a101c"/>
+    <stop offset="0.55" stop-color="#0d1728"/>
+    <stop offset="1" stop-color="#111d31"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#38bdf8" stop-opacity="0.30"/>
+    <stop offset="0.55" stop-color="#38bdf8" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M40 0H0V40" fill="none" stroke="#94a3b8" stroke-opacity="0.07"/>
+  </pattern>
+  <clipPath id="frame"><rect width="1200" height="420" rx="0"/></clipPath>
+</defs>
+<rect width="1200" height="420" fill="url(#bg)"/>
+<rect width="1200" height="420" fill="url(#grid)"/>
+<ellipse cx="930" cy="210" rx="390" ry="285" fill="url(#glow)"/>
+<rect x="0" y="0" width="1200" height="3" fill="#38bdf8" opacity="0.85"/>
+<g opacity="0.09">
+  <text x="52" y="322" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="172" font-weight="700" fill="#38bdf8" text-anchor="start" letter-spacing="0" opacity="1">05</text>
+</g>
+<g>
+  <rect x="72" y="64" width="8" height="8" rx="2" fill="#38bdf8"/>
+  <text x="90" y="73" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#94a3b8" text-anchor="start" letter-spacing="2.6" opacity="1">DATABASE ENGINEERING</text>
+  <text x="72" y="112" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#64748b" text-anchor="start" letter-spacing="3.2" opacity="1">LESSON 05</text>
+</g>
+<g><rect x="570" y="132" width="96" height="52" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="618.0" y="163" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.8" opacity="1">FROM</text><line x1="670" y1="158" x2="679.0" y2="158.0" stroke="#38bdf8" stroke-width="1.6" opacity="1"/><polygon points="688.0,158.0 679.0,162.5 679.0,153.5" fill="#38bdf8"/><rect x="690" y="132" width="96" height="52" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="738.0" y="163" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.8" opacity="1">WHERE</text><line x1="790" y1="158" x2="799.0" y2="158.0" stroke="#38bdf8" stroke-width="1.6" opacity="1"/><polygon points="808.0,158.0 799.0,162.5 799.0,153.5" fill="#38bdf8"/><rect x="810" y="132" width="96" height="52" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="858.0" y="163" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.8" opacity="1">GROUP</text><line x1="910" y1="158" x2="919.0" y2="158.0" stroke="#38bdf8" stroke-width="1.6" opacity="1"/><polygon points="928.0,158.0 919.0,162.5 919.0,153.5" fill="#38bdf8"/><rect x="930" y="132" width="92" height="52" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="976.0" y="163" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.8" opacity="1">SELECT</text><line x1="1026" y1="158" x2="1035.0" y2="158.0" stroke="#38bdf8" stroke-width="1.6" opacity="1"/><polygon points="1044.0,158.0 1035.0,162.5 1035.0,153.5" fill="#38bdf8"/><rect x="1042" y="132" width="96" height="52" rx="10" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="1090.0" y="163" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.8" opacity="1">LIMIT</text><rect x="570" y="214" width="420" height="14" rx="7" fill="#38bdf8" stroke="#38bdf8" stroke-width="0" opacity="0.16"/><text x="1002" y="225" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">1000 rows</text><rect x="570" y="242" width="330" height="14" rx="7" fill="#38bdf8" stroke="#38bdf8" stroke-width="0" opacity="0.16"/><text x="912" y="253" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">400 rows</text><rect x="570" y="270" width="230" height="14" rx="7" fill="#38bdf8" stroke="#38bdf8" stroke-width="0" opacity="0.16"/><text x="812" y="281" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">40 rows</text><rect x="570" y="298" width="150" height="14" rx="7" fill="#38bdf8" stroke="#38bdf8" stroke-width="0" opacity="0.16"/><text x="732" y="309" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">12 rows</text><rect x="570" y="326" width="96" height="14" rx="7" fill="#38bdf8" stroke="#38bdf8" stroke-width="0" opacity="0.16"/><text x="678" y="337" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">5 rows</text><text x="570" y="380" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#64748b" text-anchor="start" letter-spacing="1.6" opacity="1">logical order</text></g>
+</svg>

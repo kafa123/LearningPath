@@ -1,0 +1,8 @@
+{
+  "seed": "INSERT INTO properties (id, name) VALUES\n  (1, 'Harbor');\n\nINSERT INTO rooms (id, property_id, code, capacity) VALUES\n  (1, 1, 'A1', 4);\n\nINSERT INTO bookings (id, room_id, guest_email, party_size, starts_at, ends_at, status) VALUES\n  (1, 1, 'x@example.com', 2, '2026-08-01T10:00:00Z', '2026-08-01T10:00:00Z', 'held'),\n  (2, 77, 'y@example.com', 2, '2026-08-02T10:00:00Z', '2026-08-03T10:00:00Z', 'confirmed'),\n  (3, 1, 'z@example.com', 2, '2026-08-04T10:00:00Z', '2026-08-05T10:00:00Z', 'confirmed');",
+  "columns": ["issue", "entity_id", "detail"],
+  "expected": [
+    ["invalid_interval", 1, "2026-08-01T10:00:00Z..2026-08-01T10:00:00Z"],
+    ["orphan_booking", 2, "y@example.com"]
+  ]
+}

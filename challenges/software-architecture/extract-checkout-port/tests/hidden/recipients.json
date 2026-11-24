@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": 8,
+        "totalCents": 8000,
+        "recipient": null
+      },
+      "expectedCode": "invalid_recipient",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 9,
+        "totalCents": 8000,
+        "recipient": ""
+      },
+      "expectedCode": "invalid_recipient",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 10,
+        "totalCents": 8000,
+        "recipient": "   "
+      },
+      "expectedCode": "invalid_recipient",
+      "sentMessages": []
+    },
+    {
+      "order": {
+        "id": 11,
+        "totalCents": 8000,
+        "recipient": " omar@example.com "
+      },
+      "expectedCode": "sent",
+      "sentMessages": [
+        {
+          "recipient": " omar@example.com ",
+          "message": "Order 11 confirmed: 8000 cents"
+        }
+      ]
+    }
+  ]
+}

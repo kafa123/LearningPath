@@ -1,0 +1,79 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": "A-100",
+        "totalCents": 2500,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": true,
+          "message": "Order A-100 confirmed: 2500 cents"
+        },
+        "sends": [
+          "Order A-100 confirmed: 2500 cents"
+        ],
+        "error": ""
+      }
+    },
+    {
+      "order": {
+        "id": "B-7",
+        "totalCents": 1000,
+        "email": "grace@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": true,
+          "message": "Order B-7 confirmed: 1000 cents"
+        },
+        "sends": [
+          "Order B-7 confirmed: 1000 cents"
+        ],
+        "error": ""
+      }
+    },
+    {
+      "order": {
+        "id": "C-42",
+        "totalCents": 125000,
+        "email": "linus@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": true,
+          "message": "Order C-42 confirmed: 125000 cents"
+        },
+        "sends": [
+          "Order C-42 confirmed: 125000 cents"
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

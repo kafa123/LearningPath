@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": "D-3",
+        "totalCents": 2500,
+        "email": ""
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_invalid_recipient",
+        "errorText": "order D-3: invalid recipient"
+      }
+    },
+    {
+      "order": {
+        "id": "E-4",
+        "totalCents": 999,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_below_minimum",
+        "errorText": "order E-4: order below minimum"
+      }
+    },
+    {
+      "order": {
+        "id": "F-5",
+        "totalCents": 2500,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "not_found",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_not_found",
+        "errorText": "load order F-5: order not found"
+      }
+    },
+    {
+      "order": {
+        "id": "G-6",
+        "totalCents": 2500,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "notifier",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [
+          "Order G-6 confirmed: 2500 cents"
+        ],
+        "error": "err_notifier",
+        "errorText": "send confirmation for G-6: smtp rejected"
+      }
+    }
+  ]
+}

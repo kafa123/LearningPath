@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "slug": "middleware-timing",
+  "title": "Observe requests with injected time",
+  "summary": "Wrap an http.Handler with timing middleware that buffered the response, reports whole milliseconds, and keeps request context and output intact.",
+  "domainSlug": "go-engineering",
+  "topic": "Middleware and context",
+  "difficulty": "Advanced",
+  "type": "API",
+  "estimatedMinutes": 45,
+  "objectives": [
+    "Wrap an http.Handler with middleware that measures elapsed time through an injected Clock.",
+    "Buffer the downstream response so a header can be set before the first byte is flushed.",
+    "Preserve downstream status, headers, body, and request context exactly."
+  ],
+  "prerequisites": [
+    "go-http-services",
+    "go-testing-and-tooling"
+  ],
+  "competencySlugs": [
+    "http-handlers",
+    "request-context",
+    "testable-seams",
+    "deterministic-behavior"
+  ],
+  "constraints": [
+    "Keep the Clock interface and the Observe(clock Clock, next http.Handler) http.Handler signature.",
+    "Call clock.Now() exactly twice per request, before and after the downstream handler.",
+    "Never call time.Now, time.Since, or time.Sleep.",
+    "Preserve the downstream status code, headers, and body exactly.",
+    "Set X-Elapsed-Ms before the response is flushed.",
+    "Pass the original request context to the downstream handler."
+  ],
+  "examples": [
+    {
+      "input": "before = 10:00:00.000, after = 10:00:00.250, downstream status 200, body {\"ok\":true}",
+      "output": "status 200, X-Elapsed-Ms: 250, body {\"ok\":true}",
+      "explanation": "Elapsed time is reported in whole milliseconds."
+    },
+    {
+      "input": "before = 10:00:00.000, after = 10:00:00.0004, downstream status 204, empty body",
+      "output": "status 204, X-Elapsed-Ms: 0, empty body",
+      "explanation": "Milliseconds() truncates, and an empty body stays empty."
+    },
+    {
+      "input": "before = 09:59:58.000, after = 10:00:00.500, downstream status 500",
+      "output": "status 500, X-Elapsed-Ms: 2500",
+      "explanation": "The middleware reports time honestly, including failures."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Timed responses",
+        "description": "200 and 201 responses report elapsed milliseconds.",
+        "source": "tests/public/statuses.json"
+      },
+      {
+        "name": "Bodies are preserved",
+        "description": "Empty and multi-line bodies survive the middleware unchanged.",
+        "source": "tests/public/bodies.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Timing edges",
+        "description": "Zero, sub-millisecond, and multi-second durations.",
+        "source": "tests/hidden/timing-edges.json"
+      },
+      {
+        "name": "Context and call count",
+        "description": "Request values reach the handler and the clock is called exactly twice.",
+        "source": "tests/hidden/context.json"
+      },
+      {
+        "name": "Error responses",
+        "description": "404, 400, and 500 statuses and bodies are preserved.",
+        "source": "tests/hidden/failures.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

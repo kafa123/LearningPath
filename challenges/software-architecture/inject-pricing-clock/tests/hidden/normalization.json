@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "basePriceCents": 5000,
+      "coupon": " earlybird ",
+      "now": "2026-03-04T09:00:00Z",
+      "expected": 4500
+    },
+    {
+      "basePriceCents": 5000,
+      "coupon": "SAVE10",
+      "now": "2026-03-04T09:00:00Z",
+      "expected": 5000
+    },
+    {
+      "basePriceCents": 5000,
+      "coupon": null,
+      "now": "2026-03-04T09:00:00Z",
+      "expected": 5000
+    },
+    {
+      "basePriceCents": 5000,
+      "coupon": "Weekend10",
+      "now": "2026-03-07T09:00:00Z",
+      "expected": 4500
+    },
+    {
+      "basePriceCents": 0,
+      "coupon": "WEEKEND10",
+      "now": "2026-03-07T09:00:00Z",
+      "expected": 0
+    },
+    {
+      "basePriceCents": -250,
+      "coupon": "EARLYBIRD",
+      "now": "2026-03-07T09:00:00Z",
+      "expected": 0
+    }
+  ]
+}

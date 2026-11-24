@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.250Z",
+      "status": 200,
+      "body": "{\"ok\":true}",
+      "contextValue": "req-200",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "250",
+        "body": "{\"ok\":true}",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.012Z",
+      "status": 201,
+      "body": "created",
+      "contextValue": "req-201",
+      "expected": {
+        "status": 201,
+        "elapsedHeader": "12",
+        "body": "created",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    }
+  ]
+}

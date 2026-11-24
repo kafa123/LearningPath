@@ -419,6 +419,82 @@ public sealed class SubmissionEndpointTests
         Assert.DoesNotContain("2025-12-31", body, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task GetLatestSubmission_ReturnsNewestAttemptWithSourceFiles()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var first = await PostValidSubmissionAsync(
+            client,
+            cancellationToken,
+            "// first attempt");
+        await WaitForTerminalAsync(client, first.Id, cancellationToken);
+
+        var second = await PostValidSubmissionAsync(
+            client,
+            cancellationToken,
+            "namespace Challenge; public static class Solution { }");
+        var secondDetail = await WaitForTerminalAsync(client, second.Id, cancellationToken);
+
+        using var response = await client.GetAsync(
+            $"/api/submissions/latest?challengeSlug=two-sum&languageId=csharp",
+            cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var latest = await response.Content.ReadFromJsonAsync<LatestSubmissionDto>(
+            JsonOptions,
+            cancellationToken);
+
+        Assert.NotNull(latest);
+        Assert.Equal(second.Id, latest.Submission.Id);
+        Assert.Equal(secondDetail.Status, latest.Submission.Status);
+        Assert.True(latest.Submission.IsTerminal);
+
+        var file = Assert.Single(latest.Files);
+        Assert.Equal("Solution.cs", file.Path);
+        Assert.Equal(
+            "namespace Challenge; public static class Solution { }",
+            file.Content);
+
+        Assert.DoesNotContain("PselHarness", body, StringComparison.Ordinal);
+        Assert.DoesNotContain("Server-side execution harness", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetLatestSubmission_NoHistory_ReturnsNotFound()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        using var response = await client.GetAsync(
+            "/api/submissions/latest?challengeSlug=two-sum&languageId=csharp",
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(
+            "application/problem+json",
+            response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task GetLatestSubmission_MissingLanguage_ReturnsBadRequest()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient();
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        using var response = await client.GetAsync(
+            "/api/submissions/latest?challengeSlug=two-sum",
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     private static Task<SubmissionCreatedDto> PostValidSubmissionAsync(
         HttpClient client,
         CancellationToken cancellationToken)
@@ -481,6 +557,12 @@ public sealed class SubmissionEndpointTests
         DateTimeOffset CreatedAtUtc);
 
     private sealed record LanguageDto(string Id, string Name);
+
+    private sealed record LatestSubmissionDto(
+        SubmissionDetailDto Submission,
+        IReadOnlyList<SubmissionFileDto> Files);
+
+    private sealed record SubmissionFileDto(string Path, string Content);
 
     private sealed record SubmissionDetailDto(
         Guid Id,

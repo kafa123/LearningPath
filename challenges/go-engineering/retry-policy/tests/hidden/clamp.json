@@ -1,0 +1,86 @@
+{
+  "cases": [
+    {
+      "policy": {
+        "maxAttempts": 0,
+        "baseDelayMs": 5,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "retryable",
+        "errorText": "giving up after 1 attempts: temporary failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": -4,
+        "baseDelayMs": 5,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "ok"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": ""
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 1,
+        "baseDelayMs": 5,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "fatal"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "fatal",
+        "errorText": "permanent failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 0,
+        "baseDelayMs": 0,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "ok"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": "retryable",
+        "errorText": "giving up after 1 attempts: temporary failure"
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 3,
+        "baseDelayMs": 0,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "retryable",
+        "retryable"
+      ],
+      "expected": {
+        "attempts": 3,
+        "delays": [],
+        "error": "retryable",
+        "errorText": "giving up after 3 attempts: temporary failure"
+      }
+    }
+  ]
+}

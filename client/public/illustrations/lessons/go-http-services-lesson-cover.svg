@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-labelledby="title desc">
+<title id="title">Go Engineering lesson cover</title>
+<desc id="desc">Abstract illustration for lesson 16 in Go Engineering.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0a101c"/>
+    <stop offset="0.55" stop-color="#0d1728"/>
+    <stop offset="1" stop-color="#111d31"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#22d3ee" stop-opacity="0.30"/>
+    <stop offset="0.55" stop-color="#22d3ee" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M40 0H0V40" fill="none" stroke="#94a3b8" stroke-opacity="0.07"/>
+  </pattern>
+  <clipPath id="frame"><rect width="1200" height="420" rx="0"/></clipPath>
+</defs>
+<rect width="1200" height="420" fill="url(#bg)"/>
+<rect width="1200" height="420" fill="url(#grid)"/>
+<ellipse cx="930" cy="210" rx="390" ry="285" fill="url(#glow)"/>
+<rect x="0" y="0" width="1200" height="3" fill="#22d3ee" opacity="0.85"/>
+<g opacity="0.09">
+  <text x="52" y="322" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="172" font-weight="700" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">16</text>
+</g>
+<g>
+  <rect x="72" y="64" width="8" height="8" rx="2" fill="#22d3ee"/>
+  <text x="90" y="73" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#94a3b8" text-anchor="start" letter-spacing="2.6" opacity="1">GO ENGINEERING</text>
+  <text x="72" y="112" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#64748b" text-anchor="start" letter-spacing="3.2" opacity="1">LESSON 16</text>
+</g>
+<g><rect x="560" y="176" width="132" height="86" rx="12" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="626" y="204" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#cbd5e1" text-anchor="middle" letter-spacing="0" opacity="1">client</text><text x="626" y="226" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="0" opacity="1">GET /orders/42</text><rect x="760" y="158" width="220" height="122" rx="12" fill="#111c2e" stroke="#22d3ee" stroke-width="1" opacity="1"/><text x="774" y="184" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#cbd5e1" text-anchor="start" letter-spacing="0" opacity="1">mux · handler</text><text x="774" y="206" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">decode · validate</text><text x="774" y="226" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">writeJSON</text><text x="774" y="250" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#22d3ee" text-anchor="start" letter-spacing="0" opacity="1">r.Context()</text><rect x="1042" y="176" width="98" height="86" rx="12" fill="#111c2e" stroke="#243449" stroke-width="1" opacity="1"/><text x="1091" y="204" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#cbd5e1" text-anchor="middle" letter-spacing="0" opacity="1">store</text><text x="1091" y="226" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="0" opacity="1">ctx-aware</text><line x1="694" y1="218" x2="747.0" y2="218.0" stroke="#22d3ee" stroke-width="1.8" opacity="1"/><polygon points="756.0,218.0 747.0,222.5 747.0,213.5" fill="#22d3ee"/><line x1="982" y1="218" x2="1029.0" y2="218.0" stroke="#22d3ee" stroke-width="1.8" opacity="1"/><polygon points="1038.0,218.0 1029.0,222.5 1029.0,213.5" fill="#22d3ee"/><rect x="560" y="314" width="172" height="32" rx="16.0" fill="#34d399" stroke="#34d399" stroke-width="1" opacity="0.14"/><text x="646.0" y="333.5" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#34d399" text-anchor="middle" letter-spacing="0" opacity="1">201 created</text><rect x="750" y="314" width="172" height="32" rx="16.0" fill="#fbbf24" stroke="#fbbf24" stroke-width="1" opacity="0.14"/><text x="836.0" y="333.5" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#fbbf24" text-anchor="middle" letter-spacing="0" opacity="1">400 invalid</text><rect x="940" y="314" width="172" height="32" rx="16.0" fill="#fb7185" stroke="#fb7185" stroke-width="1" opacity="0.14"/><text x="1026.0" y="333.5" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#fb7185" text-anchor="middle" letter-spacing="0" opacity="1">404 missing</text><text x="560" y="384" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#94a3b8" text-anchor="start" letter-spacing="0" opacity="1">the request context reaches every dependency</text></g>
+</svg>

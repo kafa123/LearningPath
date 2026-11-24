@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "generic-lru-cache",
+  "title": "Build an LRU cache with generics",
+  "summary": "Implement a typed least-recently-used cache with constant-time lookups, capacity clamping, recency refresh, and most-recent-first keys.",
+  "domainSlug": "go-engineering",
+  "topic": "Generic data structures",
+  "difficulty": "Advanced",
+  "type": "Coding",
+  "estimatedMinutes": 45,
+  "objectives": [
+    "Implement a generic cache keyed by any comparable type.",
+    "Maintain recency across Get, Put, and update operations.",
+    "Evict the least recently used entry at capacity and report keys most-recent-first."
+  ],
+  "prerequisites": [
+    "go-foundations"
+  ],
+  "competencySlugs": [
+    "type-parameters",
+    "generic-constraints",
+    "data-structure-costs",
+    "value-semantics"
+  ],
+  "constraints": [
+    "Keep the Cache type and the NewCache, Get, Put, Remove, Len, and Keys signatures.",
+    "Clamp a capacity below 1 to 1.",
+    "Get must refresh recency on a hit and return the zero value plus false on a miss.",
+    "Put on an existing key updates the value and refreshes recency without evicting.",
+    "Keys must return most recently used first and never return nil.",
+    "Remove is a no-op for an absent key, and Len reports the current entry count."
+  ],
+  "examples": [
+    {
+      "input": "capacity = 2; Put(\"a\", 1); Put(\"b\", 2); Get(\"a\"); Put(\"c\", 3)",
+      "output": "Keys() = [\"c\", \"a\"]",
+      "explanation": "Get refreshes \"a\", so \"b\" becomes the least recently used and is evicted."
+    },
+    {
+      "input": "cache := NewCache[string, int](2); value, ok := cache.Get(\"missing\")",
+      "output": "value = 0, ok = false",
+      "explanation": "A miss returns the value type's zero value and false."
+    },
+    {
+      "input": "cache := NewCache[string, int](0); cache.Put(\"a\", 1); cache.Put(\"b\", 2)",
+      "output": "Keys() = [\"b\"]",
+      "explanation": "Capacity below 1 is clamped to 1, so each new key evicts the previous one."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Basic eviction",
+        "description": "The least recently used key is evicted and Keys reports the newest first.",
+        "source": "tests/public/basic-eviction.json"
+      },
+      {
+        "name": "Updates and removal",
+        "description": "Updating a key refreshes it without eviction, and removal prunes recency state.",
+        "source": "tests/public/updates-and-remove.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Eviction order",
+        "description": "Longer sequences, a single-slot cache, and the capacity clamp keep the documented order.",
+        "source": "tests/hidden/eviction-order.json"
+      },
+      {
+        "name": "Remove and misses",
+        "description": "Removing present and absent keys leaves a consistent cache and zero values on misses.",
+        "source": "tests/hidden/remove-and-miss.json"
+      },
+      {
+        "name": "Struct values",
+        "description": "String keys with struct values update, evict, and report empty keys correctly.",
+        "source": "tests/hidden/struct-values.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

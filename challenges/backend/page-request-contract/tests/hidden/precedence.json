@@ -1,0 +1,37 @@
+{
+  "cases": [
+    {
+      "page": "0",
+      "pageSize": "0",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page"
+      }
+    },
+    {
+      "page": null,
+      "pageSize": "0",
+      "expected": {
+        "isValid": false,
+        "page": 0,
+        "pageSize": 0,
+        "offset": 0,
+        "errorCode": "invalid_page_size"
+      }
+    },
+    {
+      "page": " 2 ",
+      "pageSize": " 50 ",
+      "expected": {
+        "isValid": true,
+        "page": 2,
+        "pageSize": 50,
+        "offset": 50,
+        "errorCode": null
+      }
+    }
+  ]
+}

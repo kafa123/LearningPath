@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.400Z",
+      "status": 204,
+      "body": "",
+      "contextValue": "req-empty",
+      "expected": {
+        "status": 204,
+        "elapsedHeader": "400",
+        "body": "",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.001Z",
+      "status": 200,
+      "body": "line one\nline two\n",
+      "contextValue": "req-lines",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "1",
+        "body": "line one\nline two\n",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    }
+  ]
+}

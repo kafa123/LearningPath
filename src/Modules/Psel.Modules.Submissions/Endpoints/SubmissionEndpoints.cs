@@ -18,6 +18,10 @@ internal static class SubmissionEndpoints
             .WithName("CreateSubmission")
             .WithSummary("Queue one execution attempt for a challenge language.");
 
+        group.MapGet("/latest", GetLatestSubmission)
+            .WithName("GetLatestSubmission")
+            .WithSummary("Get the most recent attempt for one challenge language, with its saved source files.");
+
         group.MapGet("/{id:guid}", GetSubmission)
             .WithName("GetSubmission")
             .WithSummary("Get the status, diagnostics, and output of one execution attempt.");
@@ -73,6 +77,33 @@ internal static class SubmissionEndpoints
                 title: "Submission not found.",
                 detail: "No submission matches the requested identifier.")
             : TypedResults.Ok(submission);
+    }
+
+    private static async Task<Results<Ok<LatestSubmission>, ProblemHttpResult>> GetLatestSubmission(
+        string? challengeSlug,
+        string? languageId,
+        SubmissionService submissions,
+        CancellationToken cancellationToken)
+    {
+        var slug = challengeSlug?.Trim();
+        var language = languageId?.Trim();
+
+        if (string.IsNullOrWhiteSpace(slug) || string.IsNullOrWhiteSpace(language))
+        {
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Latest submission rejected.",
+                detail: "challengeSlug and languageId are required.");
+        }
+
+        var latest = await submissions.FindLatestAsync(slug, language, cancellationToken);
+
+        return latest is null
+            ? TypedResults.Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Submission history not found.",
+                detail: "No submission has been recorded for this challenge language yet.")
+            : TypedResults.Ok(latest);
     }
 
     private static async Task<Results<Ok<RubricReviewDetail>, ProblemHttpResult>> GetRubricReview(

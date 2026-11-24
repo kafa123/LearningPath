@@ -1,0 +1,36 @@
+{
+  "cases": [
+    {
+      "op": "batch",
+      "type": "string",
+      "items": ["a", "b", "c", "d", "e"],
+      "size": 2,
+      "expected": [["a", "b"], ["c", "d"], ["e"]],
+      "expectedError": ""
+    },
+    {
+      "op": "batch",
+      "type": "string",
+      "items": ["a", "b", "c"],
+      "size": 5,
+      "expected": [["a", "b", "c"]],
+      "expectedError": ""
+    },
+    {
+      "op": "batch",
+      "type": "string",
+      "items": [],
+      "size": 3,
+      "expected": [],
+      "expectedError": ""
+    },
+    {
+      "op": "batch",
+      "type": "string",
+      "items": ["a", "b"],
+      "size": 0,
+      "expected": null,
+      "expectedError": "ErrInvalidBatchSize"
+    }
+  ]
+}

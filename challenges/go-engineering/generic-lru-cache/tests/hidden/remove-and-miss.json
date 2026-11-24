@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "remove", "key": "a" },
+        { "op": "put", "key": "c", "value": 3 },
+        { "op": "keys" },
+        { "op": "get", "key": "a" },
+        { "op": "len" },
+        { "op": "remove", "key": "b" },
+        { "op": "remove", "key": "b" },
+        { "op": "keys" },
+        { "op": "get", "key": "b" },
+        { "op": "len" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "remove" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["c", "b"] },
+        { "op": "get", "found": false, "value": 0 },
+        { "op": "len", "len": 2 },
+        { "op": "remove" },
+        { "op": "remove" },
+        { "op": "keys", "keys": ["c"] },
+        { "op": "get", "found": false, "value": 0 },
+        { "op": "len", "len": 1 }
+      ]
+    },
+    {
+      "capacity": 2,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "keys" },
+        { "op": "len" },
+        { "op": "get", "key": "missing" },
+        { "op": "remove", "key": "missing" },
+        { "op": "keys" }
+      ],
+      "expected": [
+        { "op": "keys", "keys": [] },
+        { "op": "len", "len": 0 },
+        { "op": "get", "found": false, "value": 0 },
+        { "op": "remove" },
+        { "op": "keys", "keys": [] }
+      ]
+    },
+    {
+      "capacity": 2,
+      "keyType": "int",
+      "valueType": "string",
+      "ops": [
+        { "op": "put", "key": 1, "value": "one" },
+        { "op": "put", "key": 2, "value": "two" },
+        { "op": "get", "key": 1 },
+        { "op": "put", "key": 3, "value": "three" },
+        { "op": "keys" },
+        { "op": "get", "key": 2 }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "get", "found": true, "value": "one" },
+        { "op": "put" },
+        { "op": "keys", "keys": [3, 1] },
+        { "op": "get", "found": false, "value": "" }
+      ]
+    }
+  ]
+}

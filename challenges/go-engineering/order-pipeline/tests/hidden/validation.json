@@ -1,0 +1,127 @@
+{
+  "cases": [
+    {
+      "order": {
+        "id": "V-1",
+        "totalCents": 5000,
+        "email": "\t\n "
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_invalid_recipient",
+        "errorText": "order V-1: invalid recipient"
+      }
+    },
+    {
+      "order": {
+        "id": "V-2",
+        "totalCents": 1000,
+        "email": " ada@example.com "
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": true,
+          "message": "Order V-2 confirmed: 1000 cents"
+        },
+        "sends": [
+          "Order V-2 confirmed: 1000 cents"
+        ],
+        "error": ""
+      }
+    },
+    {
+      "order": {
+        "id": "V-3",
+        "totalCents": 0,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_below_minimum",
+        "errorText": "order V-3: order below minimum"
+      }
+    },
+    {
+      "order": {
+        "id": "V-4",
+        "totalCents": 5000,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "not_found",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "notifier",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [],
+        "error": "err_not_found",
+        "errorText": "load order V-4: order not found"
+      }
+    },
+    {
+      "order": {
+        "id": "V-5",
+        "totalCents": 5000,
+        "email": "ada@example.com"
+      },
+      "repository": {
+        "loadError": "",
+        "wrapped": false
+      },
+      "notifier": {
+        "sendError": "notifier",
+        "wrapped": false
+      },
+      "expected": {
+        "result": {
+          "sent": false,
+          "message": ""
+        },
+        "sends": [
+          "Order V-5 confirmed: 5000 cents"
+        ],
+        "error": "err_notifier",
+        "errorText": "send confirmation for V-5: smtp rejected"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderApp } from '@/test/renderApp'
 import { orderRevenueDetail, refactorDuplicationDetail, twoSumDetail } from '@/test/challengeFixtures'
 import { jsonResponse } from '@/test/learningFixtures'
@@ -30,6 +30,10 @@ const csharpStarter = twoSumDetail.languages[0].starterFiles[0].content
 const pythonStarter = twoSumDetail.languages[1].starterFiles[0].content
 
 describe('ChallengeWorkspacePage', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
   it('renders the statement, hints, public tests, and starter code', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(twoSumDetail)))
 
@@ -741,6 +745,115 @@ describe('ChallengeWorkspacePage', () => {
     })
   })
 
+  it('restores the latest saved code and result when the workspace opens', async () => {
+    const savedDetail = {
+      id: 'sub-saved',
+      challengeSlug: 'two-sum',
+      languageId: 'csharp',
+      status: 'Succeeded',
+      isTerminal: true,
+      createdAtUtc: '2026-11-08T00:00:00Z',
+      startedAtUtc: '2026-11-08T00:00:01Z',
+      completedAtUtc: '2026-11-08T00:00:02Z',
+      durationMs: 51,
+      exitCode: 0,
+      standardOutput: 'saved output\n',
+      standardError: '',
+      failureMessage: null,
+      outputTruncated: false,
+      purpose: 'Submit',
+    }
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL) => {
+        const url = String(input)
+
+        if (url === '/api/challenges/two-sum') {
+          return jsonResponse(twoSumDetail)
+        }
+
+        if (url.startsWith('/api/submissions/latest?')) {
+          return jsonResponse({
+            submission: savedDetail,
+            files: [{ path: 'Solution.cs', content: 'saved code' }],
+          })
+        }
+
+        if (url === '/api/submissions/sub-saved') {
+          return jsonResponse(savedDetail)
+        }
+
+        if (url === '/api/submissions/sub-saved/results') {
+          return jsonResponse({
+            submissionId: 'sub-saved',
+            challengeSlug: 'two-sum',
+            languageId: 'csharp',
+            purpose: 'Submit',
+            outcome: 'Accepted',
+            isAccepted: true,
+            score: 100,
+            passedTests: 4,
+            totalTests: 4,
+            publicPassed: 2,
+            publicTotal: 2,
+            hiddenPassed: 2,
+            hiddenTotal: 2,
+            publicTests: [],
+            createdAtUtc: '2026-11-08T00:00:02Z',
+          })
+        }
+
+        throw new Error(`Unexpected request: ${url}`)
+      },
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderApp(['/challenges/two-sum'])
+
+    const editor = await screen.findByLabelText('Code editor for Solution.cs')
+    await waitFor(() => expect(editor).toHaveValue('saved code'))
+
+    expect(screen.getByText('1 file modified')).toBeInTheDocument()
+    expect(await screen.findByText('Succeeded')).toBeInTheDocument()
+    expect(screen.getByText(/saved output/)).toBeInTheDocument()
+    expect(
+      await screen.findByRole('region', { name: 'Assessment result' }),
+    ).toHaveTextContent('Accepted')
+  })
+
+  it('keeps unsent drafts after the workspace is reopened', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL) => {
+        const url = String(input)
+
+        if (url === '/api/challenges/two-sum') {
+          return jsonResponse(twoSumDetail)
+        }
+
+        if (url.startsWith('/api/submissions/latest?')) {
+          return jsonResponse({ title: 'Submission history not found.' }, 404)
+        }
+
+        throw new Error(`Unexpected request: ${url}`)
+      },
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const first = renderApp(['/challenges/two-sum'])
+    const editor = await screen.findByLabelText('Code editor for Solution.cs')
+    await user.clear(editor)
+    await user.type(editor, 'unsent draft')
+    expect(editor).toHaveValue('unsent draft')
+
+    first.unmount()
+
+    renderApp(['/challenges/two-sum'])
+
+    const reopened = await screen.findByLabelText('Code editor for Solution.cs')
+    await waitFor(() => expect(reopened).toHaveValue('unsent draft'))
+    expect(screen.getByText('1 file modified')).toBeInTheDocument()
+  })
+
   it('shows an error state and can retry loading the challenge', async () => {
     const user = userEvent.setup()
     const fetchMock = vi
@@ -760,6 +873,10 @@ describe('ChallengeWorkspacePage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Two Sum', level: 1 }),
     ).toBeInTheDocument()
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(
+      fetchMock.mock.calls.filter(
+        ([input]) => String(input) === '/api/challenges/two-sum',
+      ),
+    ).toHaveLength(2)
   })
 })

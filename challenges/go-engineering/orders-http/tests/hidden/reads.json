@@ -1,0 +1,53 @@
+{
+  "store": {
+    "orders": [
+      { "id": "R-1", "totalCents": 700 }
+    ],
+    "failGetIds": ["E-5"],
+    "failSaveIds": []
+  },
+  "cases": [
+    {
+      "method": "GET",
+      "path": "/orders/R-1",
+      "body": "",
+      "contextValue": "read-hidden-1",
+      "expected": {
+        "status": 200,
+        "body": { "id": "R-1", "totalCents": 700 },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/orders/unknown",
+      "body": "",
+      "contextValue": "read-hidden-2",
+      "expected": {
+        "status": 404,
+        "body": { "error": "not_found" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/orders/E-5",
+      "body": "",
+      "contextValue": "read-hidden-3",
+      "expected": {
+        "status": 500,
+        "body": { "error": "internal_error" },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    }
+  ]
+}

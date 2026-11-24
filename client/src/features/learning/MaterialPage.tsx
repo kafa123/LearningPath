@@ -4,6 +4,7 @@ import { useParams } from 'react-router'
 import { useApiQuery } from '@/shared/hooks/useApiQuery'
 import type { MaterialDetail } from '@/shared/api/learning'
 import { Breadcrumbs, ErrorPanel, LoadingPanel } from '@/shared/components/QueryState'
+import { lessonCoverUrl } from './lessonIllustrations'
 
 function humanizeSlug(slug: string) {
   return slug
@@ -22,6 +23,7 @@ export function MaterialPage() {
   const { state, refresh } = useApiQuery<MaterialDetail>(
     `/api/materials/${encodeURIComponent(materialSlug)}`,
   )
+  const coverUrl = state.status === 'success' ? lessonCoverUrl(state.data.slug) : null
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -58,6 +60,17 @@ export function MaterialPage() {
               {state.data.module.title} · {state.data.estimatedMinutes} min
             </p>
           </header>
+
+          {coverUrl ? (
+            <img
+              alt={`${state.data.title} lesson illustration`}
+              className="material-cover"
+              decoding="async"
+              height={420}
+              src={coverUrl}
+              width={1200}
+            />
+          ) : null}
 
           <div className="learning-prose mt-6">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>

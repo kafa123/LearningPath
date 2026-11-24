@@ -7,6 +7,7 @@ import type { ChallengeDetail } from '@/shared/api/challenges'
 import {
   createSubmission,
   getAssessmentResult,
+  getLatestSubmission,
   getSubmission,
   type AssessmentResult,
   type SubmissionDetail,
@@ -18,6 +19,54 @@ import { RubricReviewPanel } from '@/features/challenges/RubricReviewPanel'
 
 function draftKey(languageId: string, filePath: string) {
   return `${languageId}:${filePath}`
+}
+
+function draftStorageKey(challengeSlug: string) {
+  return `psel.workspace.drafts.${challengeSlug}`
+}
+
+function readStoredDrafts(storageKey: string | null): Record<string, string> {
+  if (!storageKey || typeof window === 'undefined') {
+    return {}
+  }
+
+  try {
+    const raw = window.localStorage.getItem(storageKey)
+
+    if (!raw) {
+      return {}
+    }
+
+    const parsed: unknown = JSON.parse(raw)
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {}
+    }
+
+    const drafts: Record<string, string> = {}
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === 'string') {
+        drafts[key] = value
+      }
+    }
+
+    return drafts
+  } catch {
+    return {}
+  }
+}
+
+function writeStoredDrafts(storageKey: string, drafts: Record<string, string>) {
+  try {
+    if (Object.keys(drafts).length === 0) {
+      window.localStorage.removeItem(storageKey)
+    } else {
+      window.localStorage.setItem(storageKey, JSON.stringify(drafts))
+    }
+  } catch {
+    // Storage can be unavailable or full; drafts then live only in memory.
+  }
 }
 
 function statusTone(status: string) {
@@ -59,11 +108,14 @@ export function ChallengeWorkspace({
 }) {
   const isExamination = mode === 'examination'
   const firstLanguage = challenge.languages[0]
+  const storageKey = isExamination ? null : draftStorageKey(challenge.slug)
   const [activeLanguageId, setActiveLanguageId] = useState(firstLanguage?.id ?? '')
   const [activeFilePath, setActiveFilePath] = useState(
     firstLanguage?.starterFiles[0]?.path ?? '',
   )
-  const [overrides, setOverrides] = useState<Record<string, string>>({})
+  const [overrides, setOverrides] = useState<Record<string, string>>(() =>
+    readStoredDrafts(storageKey),
+  )
   const [submissionId, setSubmissionId] = useState<string | null>(null)
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null)
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null)
@@ -73,6 +125,99 @@ export function ChallengeWorkspace({
   )
   const [runError, setRunError] = useState<string | null>(null)
   const createController = useRef<AbortController | null>(null)
+  const restoredLanguages = useRef(new Set<string>())
+  const hasStartedSubmission = useRef(false)
+
+  useEffect(() => {
+    if (storageKey) {
+      writeStoredDrafts(storageKey, overrides)
+    }
+  }, [overrides, storageKey])
+
+  useEffect(() => {
+    if (isExamination || !activeLanguageId) {
+      return
+    }
+
+    if (restoredLanguages.current.has(activeLanguageId)) {
+      return
+    }
+
+    const language = challenge.languages.find(
+      (candidate) => candidate.id === activeLanguageId,
+    )
+
+    if (!language) {
+      return
+    }
+
+    const controller = new AbortController()
+
+    void (async () => {
+      try {
+        const latest = await getLatestSubmission(
+          challenge.slug,
+          language.id,
+          controller.signal,
+        )
+
+        if (controller.signal.aborted) {
+          return
+        }
+
+        restoredLanguages.current.add(activeLanguageId)
+
+        if (!latest || hasStartedSubmission.current) {
+          return
+        }
+
+        const files = Array.isArray(latest.files) ? latest.files : []
+
+        setOverrides((current) => {
+          const next = { ...current }
+
+          for (const file of files) {
+            if (typeof file?.path !== 'string' || typeof file.content !== 'string') {
+              continue
+            }
+
+            const starter = language.starterFiles.find(
+              (candidate) => candidate.path === file.path,
+            )
+
+            if (!starter) {
+              continue
+            }
+
+            const key = draftKey(language.id, starter.path)
+
+            if (key in next || file.content === starter.content) {
+              continue
+            }
+
+            next[key] = file.content
+          }
+
+          return next
+        })
+
+        if (latest.submission?.isTerminal) {
+          setSubmission(latest.submission)
+          setSubmissionId(latest.submission.id)
+          setRunStatus('idle')
+          setRunError(null)
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          restoredLanguages.current.add(activeLanguageId)
+        }
+      }
+    })()
+
+    return () => {
+      controller.abort()
+    }
+  }, [activeLanguageId, challenge, isExamination])
 
   useEffect(() => {
     return () => {
@@ -233,6 +378,7 @@ export function ChallengeWorkspace({
     const controller = new AbortController()
     createController.current = controller
 
+    hasStartedSubmission.current = true
     setRunStatus('starting')
     setRunError(null)
     setSubmission(null)

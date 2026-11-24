@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "slug": "error-response-mapping",
+  "title": "Map Domain Errors to HTTP Responses",
+  "summary": "Translate domain failure codes into safe HTTP statuses, stable problem details, and retry guidance.",
+  "domainSlug": "backend-engineering",
+  "topic": "HTTP error contracts",
+  "difficulty": "Intermediate",
+  "type": "API",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Map a small domain error vocabulary to HTTP semantics.",
+    "Keep internal failure detail out of the client response.",
+    "Mark only transient failures as retryable."
+  ],
+  "prerequisites": [
+    "http-api-design"
+  ],
+  "competencySlugs": [
+    "safe-error-responses",
+    "http-semantics",
+    "resource-modeling",
+    "input-validation"
+  ],
+  "constraints": [
+    "Match error codes after trimming and lowering them.",
+    "Return internal_error with status 500 for an unknown or missing code.",
+    "Never place internalDetail in the response detail.",
+    "Use the canonical title and detail for each known code.",
+    "Set retryable only for rate_limited, unavailable, and timeout."
+  ],
+  "examples": [
+    {
+      "input": "errorCode = \"not_found\"",
+      "output": "status = 404, code = \"not_found\", retryable = false",
+      "explanation": "A missing resource is a client-visible 404."
+    },
+    {
+      "input": "errorCode = \"internal\", internalDetail = \"SqliteException: database is locked\"",
+      "output": "status = 500, code = \"internal_error\", detail = \"An unexpected error occurred.\"",
+      "explanation": "Internal diagnostics never reach the caller."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Not found and conflict",
+        "description": "Missing resources and state conflicts are not retryable.",
+        "source": "tests/public/not-found.json"
+      },
+      {
+        "name": "Transient failures",
+        "description": "Rate limits, unavailable services, and timeouts are retryable.",
+        "source": "tests/public/retryable.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Unknown failure",
+        "description": "Unknown or missing codes become a safe internal error.",
+        "source": "tests/hidden/unknown.json"
+      },
+      {
+        "name": "Canonical mapping",
+        "description": "Every known code uses the documented status, title, and detail.",
+        "source": "tests/hidden/canonical.json"
+      },
+      {
+        "name": "Code normalization",
+        "description": "Surrounding whitespace and letter case do not change the mapping.",
+        "source": "tests/hidden/normalization.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "capacity": 3,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "put", "key": "c", "value": 3 },
+        { "op": "get", "key": "a" },
+        { "op": "put", "key": "d", "value": 4 },
+        { "op": "keys" },
+        { "op": "len" },
+        { "op": "put", "key": "e", "value": 5 },
+        { "op": "keys" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "get", "found": true, "value": 1 },
+        { "op": "put" },
+        { "op": "keys", "keys": ["d", "a", "c"] },
+        { "op": "len", "len": 3 },
+        { "op": "put" },
+        { "op": "keys", "keys": ["e", "d", "a"] }
+      ]
+    },
+    {
+      "capacity": 1,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "a", "value": 1 },
+        { "op": "put", "key": "b", "value": 2 },
+        { "op": "keys" },
+        { "op": "get", "key": "a" },
+        { "op": "len" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["b"] },
+        { "op": "get", "found": false, "value": 0 },
+        { "op": "len", "len": 1 }
+      ]
+    },
+    {
+      "capacity": 0,
+      "keyType": "string",
+      "valueType": "int",
+      "ops": [
+        { "op": "put", "key": "x", "value": 1 },
+        { "op": "put", "key": "y", "value": 2 },
+        { "op": "keys" },
+        { "op": "len" }
+      ],
+      "expected": [
+        { "op": "put" },
+        { "op": "put" },
+        { "op": "keys", "keys": ["y"] },
+        { "op": "len", "len": 1 }
+      ]
+    }
+  ]
+}

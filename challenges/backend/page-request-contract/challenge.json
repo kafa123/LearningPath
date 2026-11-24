@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "slug": "page-request-contract",
+  "title": "Validate a Page Request Contract",
+  "summary": "Parse page and pageSize query values into a safe paging window with actionable validation errors.",
+  "domainSlug": "backend-engineering",
+  "topic": "HTTP query contracts",
+  "difficulty": "Intermediate",
+  "type": "API",
+  "estimatedMinutes": 30,
+  "objectives": [
+    "Apply defaults for omitted query values.",
+    "Reject malformed numbers and out-of-range paging values.",
+    "Derive a safe offset without throwing from a request parser."
+  ],
+  "prerequisites": [
+    "http-api-design"
+  ],
+  "competencySlugs": [
+    "input-validation",
+    "safe-error-responses",
+    "http-semantics",
+    "resource-modeling"
+  ],
+  "constraints": [
+    "Accept page from 1 to 10000 inclusive.",
+    "Accept pageSize from 1 to 100 inclusive.",
+    "Use page 1 and pageSize 20 when a value is null, empty, or whitespace.",
+    "Return invalid_page before invalid_page_size when both are invalid.",
+    "Never throw for invalid input; return a result with IsValid false and an error code."
+  ],
+  "examples": [
+    {
+      "input": "page = null, pageSize = null",
+      "output": "page = 1, pageSize = 20, offset = 0",
+      "explanation": "Missing values fall back to the default window."
+    },
+    {
+      "input": "page = \"3\", pageSize = \"25\"",
+      "output": "page = 3, pageSize = 25, offset = 50",
+      "explanation": "The offset is (page - 1) * pageSize."
+    },
+    {
+      "input": "page = \"0\", pageSize = \"10\"",
+      "output": "IsValid = false, errorCode = \"invalid_page\"",
+      "explanation": "Pages start at 1."
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C#",
+      "editorLanguage": "csharp",
+      "harness": "harness/csharp/PselHarness.cs",
+      "starterFiles": [
+        {
+          "path": "Solution.cs",
+          "source": "starter/csharp/Solution.cs"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "editorLanguage": "python",
+      "harness": "harness/python/PselHarness.py",
+      "starterFiles": [
+        {
+          "path": "solution.py",
+          "source": "starter/python/solution.py"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "Default window",
+        "description": "Omitted values become page 1 and pageSize 20.",
+        "source": "tests/public/defaults.json"
+      },
+      {
+        "name": "Custom window",
+        "description": "A valid page and pageSize produce the expected offset.",
+        "source": "tests/public/custom.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Allowed boundaries",
+        "description": "The minimum and maximum page and pageSize values are accepted.",
+        "source": "tests/hidden/boundaries.json"
+      },
+      {
+        "name": "Invalid values",
+        "description": "Malformed and out-of-range values return an error code instead of throwing.",
+        "source": "tests/hidden/invalid.json"
+      },
+      {
+        "name": "Validation precedence",
+        "description": "Page errors take precedence, and whitespace around valid numbers is tolerated.",
+        "source": "tests/hidden/precedence.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 600
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 900
+      }
+    ]
+  }
+}

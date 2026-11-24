@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "jobs": [
+        { "id": "never", "payload": 1 },
+        { "id": "started", "payload": 2 }
+      ],
+      "workers": 2,
+      "canceled": true,
+      "values": { "never": 10, "started": 20 },
+      "expected": {
+        "results": null,
+        "error": "context canceled",
+        "calls": 0,
+        "canceledHandles": 0
+      }
+    },
+    {
+      "jobs": [
+        { "id": "blocked", "payload": 6 },
+        { "id": "queued", "payload": 7 }
+      ],
+      "workers": 1,
+      "blockingIds": ["blocked"],
+      "cancelAfterStarted": 1,
+      "values": { "blocked": 60, "queued": 70 },
+      "expected": {
+        "results": null,
+        "error": "context canceled",
+        "calls": 1,
+        "canceledHandles": 1
+      }
+    },
+    {
+      "jobs": [],
+      "workers": 3,
+      "expected": {
+        "results": [],
+        "error": "",
+        "calls": 0,
+        "canceledHandles": 0
+      }
+    }
+  ]
+}

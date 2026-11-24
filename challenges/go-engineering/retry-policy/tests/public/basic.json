@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "policy": {
+        "maxAttempts": 3,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "ok"
+      ],
+      "expected": {
+        "attempts": 1,
+        "delays": [],
+        "error": ""
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 3,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "ok"
+      ],
+      "expected": {
+        "attempts": 2,
+        "delays": [
+          10
+        ],
+        "error": ""
+      }
+    },
+    {
+      "policy": {
+        "maxAttempts": 4,
+        "baseDelayMs": 10,
+        "maxDelayMs": 0
+      },
+      "outcomes": [
+        "retryable",
+        "retryable",
+        "ok"
+      ],
+      "expected": {
+        "attempts": 3,
+        "delays": [
+          10,
+          20
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

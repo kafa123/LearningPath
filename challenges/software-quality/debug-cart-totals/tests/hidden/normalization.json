@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "lines": [
+        { "unitPriceCents": 1500, "quantity": 4 }
+      ],
+      "coupon": " save10 ",
+      "expected": 5400
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 2500, "quantity": 4 }
+      ],
+      "coupon": "Save25",
+      "expected": 7500
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 1500, "quantity": 4 }
+      ],
+      "coupon": "DISCARD",
+      "expected": 6000
+    },
+    {
+      "lines": [
+        { "unitPriceCents": 1500, "quantity": 4 }
+      ],
+      "coupon": "",
+      "expected": 6000
+    }
+  ]
+}

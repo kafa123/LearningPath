@@ -1,0 +1,41 @@
+{
+  "cases": [
+    {
+      "jobs": [
+        { "id": "a", "payload": 3 },
+        { "id": "b", "payload": 4 },
+        { "id": "c", "payload": 5 }
+      ],
+      "workers": 3,
+      "reverse": true,
+      "values": { "a": 30, "b": 40, "c": 50 },
+      "expected": {
+        "results": [
+          { "id": "a", "value": 30 },
+          { "id": "b", "value": 40 },
+          { "id": "c", "value": 50 }
+        ],
+        "error": "",
+        "calls": 3,
+        "maxConcurrency": 3,
+        "canceledHandles": 0
+      }
+    },
+    {
+      "jobs": [
+        { "id": "only", "payload": 1 }
+      ],
+      "workers": 2,
+      "values": { "only": 11 },
+      "expected": {
+        "results": [
+          { "id": "only", "value": 11 }
+        ],
+        "error": "",
+        "calls": 1,
+        "maxConcurrency": 1,
+        "canceledHandles": 0
+      }
+    }
+  ]
+}

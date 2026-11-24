@@ -1,0 +1,77 @@
+{
+  "store": {
+    "orders": [
+      { "id": "T-1", "totalCents": 330 }
+    ],
+    "failGetIds": [],
+    "failSaveIds": []
+  },
+  "cases": [
+    {
+      "method": "GET",
+      "path": "/does-not-exist",
+      "body": "",
+      "contextValue": "route-hidden-unknown",
+      "expected": {
+        "status": 404,
+        "body": null,
+        "location": "",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/orders/T-1",
+      "body": "",
+      "contextValue": "route-hidden-method",
+      "expected": {
+        "status": 405,
+        "body": null,
+        "location": "",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/orders",
+      "body": "",
+      "contextValue": "route-hidden-list",
+      "expected": {
+        "status": 405,
+        "body": null,
+        "location": "",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/orders/T-1",
+      "body": "{\"id\":\"T-1\",\"totalCents\":1}",
+      "contextValue": "route-hidden-post-item",
+      "expected": {
+        "status": 405,
+        "body": null,
+        "location": "",
+        "storeCalls": 0,
+        "contextSeen": false
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/orders/T-1",
+      "body": "",
+      "contextValue": "route-hidden-found",
+      "expected": {
+        "status": 200,
+        "body": { "id": "T-1", "totalCents": 330 },
+        "location": "",
+        "contentType": "application/json",
+        "storeCalls": 1,
+        "contextSeen": true
+      }
+    }
+  ]
+}

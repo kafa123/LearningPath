@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "report-batcher",
+  "title": "Batch and group report rows",
+  "summary": "Split report rows into fixed-size batches, group rows with exactly one key call per item, and sum numeric slices using generics.",
+  "domainSlug": "go-engineering",
+  "topic": "Generics and slices",
+  "difficulty": "Intermediate",
+  "type": "Coding",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Write generic slice helpers bounded by type parameters.",
+    "Validate batch sizes and preserve input order inside batches and groups.",
+    "Sum int, int64, and float64 values through a single numeric constraint."
+  ],
+  "prerequisites": [
+    "go-foundations"
+  ],
+  "competencySlugs": [
+    "slices-and-maps",
+    "type-parameters",
+    "generic-constraints",
+    "allocation-discipline"
+  ],
+  "constraints": [
+    "Keep the ErrInvalidBatchSize sentinel, Number constraint, and all three function signatures.",
+    "Batch rejects a size below 1 with ErrInvalidBatchSize and a nil result.",
+    "Return a non-nil empty slice or map for empty input.",
+    "GroupBy must call the key function exactly once per item.",
+    "Batch and GroupBy must preserve the input order inside each batch or group.",
+    "Sum accepts int, int64, and float64 through the ~ constraint and returns the zero value for empty input."
+  ],
+  "examples": [
+    {
+      "input": "Batch([]string{\"a\", \"b\", \"c\", \"d\", \"e\"}, 2)",
+      "output": "[[\"a\", \"b\"], [\"c\", \"d\"], [\"e\"]]",
+      "explanation": "Full batches come first and the final batch may be shorter."
+    },
+    {
+      "input": "GroupBy([]string{\"bee\", \"ant\", \"bat\", \"ape\"}, firstLetter)",
+      "output": "map[string][]string{\"b\": {\"bee\", \"bat\"}, \"a\": {\"ant\", \"ape\"}}",
+      "explanation": "Each group keeps the original input order and key runs once per item."
+    },
+    {
+      "input": "Sum([]float64{1.5, 2.25, 0.25})",
+      "output": "4",
+      "explanation": "The numeric constraint covers floating-point values as well as integers."
+    }
+  ],
+  "languages": [
+    {
+      "id": "go",
+      "name": "Go",
+      "editorLanguage": "go",
+      "harness": "harness/go/PselHarness.go",
+      "starterFiles": [
+        {
+          "path": "solution.go",
+          "source": "starter/go/solution.go"
+        }
+      ]
+    }
+  ],
+  "statement": "statement.md",
+  "hints": "hints.md",
+  "tests": {
+    "public": [
+      {
+        "name": "String batches",
+        "description": "Batches preserve order, allow a shorter final batch, and reject a non-positive size.",
+        "source": "tests/public/batch-strings.json"
+      },
+      {
+        "name": "Struct batches and sums",
+        "description": "Batching works for any element type and Sum handles int, int64, and float64.",
+        "source": "tests/public/batch-rows-and-sum.json"
+      }
+    ],
+    "hidden": [
+      {
+        "name": "Batch boundaries",
+        "description": "Exact multiples, short final batches, oversized sizes, empty input, and invalid sizes.",
+        "source": "tests/hidden/batch-boundaries.json"
+      },
+      {
+        "name": "Grouping order and key calls",
+        "description": "Each group preserves input order and the key function runs exactly once per item.",
+        "source": "tests/hidden/group-order-and-counts.json"
+      },
+      {
+        "name": "Sums and empty inputs",
+        "description": "All three numeric types sum correctly and every empty input returns a zero or empty result.",
+        "source": "tests/hidden/sums-and-empty-inputs.json"
+      }
+    ]
+  },
+  "evaluation": {
+    "kind": "AutomatedTests",
+    "timeLimitSeconds": 5,
+    "memoryLimitMb": 256
+  },
+  "examination": {
+    "variants": [
+      {
+        "id": "standard",
+        "label": "Standard examination",
+        "timeLimitSeconds": 900
+      },
+      {
+        "id": "extended",
+        "label": "Extended examination",
+        "timeLimitSeconds": 1200
+      }
+    ]
+  }
+}

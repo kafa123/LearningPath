@@ -1,0 +1,37 @@
+{
+  "cases": [
+    {
+      "errorCode": "internal",
+      "internalDetail": "SqliteException: database is locked at /app/data/psel.db",
+      "expected": {
+        "status": 500,
+        "code": "internal_error",
+        "title": "Unexpected error",
+        "detail": "An unexpected error occurred.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": null,
+      "internalDetail": "Object reference not set to an instance of an object.",
+      "expected": {
+        "status": 500,
+        "code": "internal_error",
+        "title": "Unexpected error",
+        "detail": "An unexpected error occurred.",
+        "retryable": false
+      }
+    },
+    {
+      "errorCode": "",
+      "internalDetail": null,
+      "expected": {
+        "status": 500,
+        "code": "internal_error",
+        "title": "Unexpected error",
+        "detail": "An unexpected error occurred.",
+        "retryable": false
+      }
+    }
+  ]
+}

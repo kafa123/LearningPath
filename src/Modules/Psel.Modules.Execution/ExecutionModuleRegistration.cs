@@ -30,6 +30,7 @@ public static class ExecutionModuleRegistration
         services.AddSingleton<ILanguageRunner, CSharpDockerRunner>();
         services.AddSingleton<ILanguageRunner, PythonDockerRunner>();
         services.AddSingleton<ILanguageRunner, SqlDockerRunner>();
+        services.AddSingleton<ILanguageRunner, GoDockerRunner>();
         services.AddSingleton<ILanguageCatalog, LanguageCatalog>();
         services.AddHostedService<StaleContainerCleanupService>();
 
@@ -69,7 +70,8 @@ public static class ExecutionModuleRegistration
         {
             ["csharp"] = settings.CSharpImage,
             ["python"] = settings.PythonImage,
-            ["sql"] = settings.SqlImage
+            ["sql"] = settings.SqlImage,
+            ["go"] = settings.GoImage
         };
         var languages = catalog.GetLanguages()
             .Select(language => new RuntimeLanguage(

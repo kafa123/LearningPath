@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "op": "sum",
+      "kind": "int",
+      "values": [],
+      "expected": 0
+    },
+    {
+      "op": "sum",
+      "kind": "int64",
+      "values": [],
+      "expected": 0
+    },
+    {
+      "op": "sum",
+      "kind": "float64",
+      "values": [],
+      "expected": 0
+    },
+    {
+      "op": "sum",
+      "kind": "int",
+      "values": [-3, 7, -2],
+      "expected": 2
+    },
+    {
+      "op": "sum",
+      "kind": "int64",
+      "values": [-4000000000, 4000000001],
+      "expected": 1
+    },
+    {
+      "op": "sum",
+      "kind": "float64",
+      "values": [-1.5, -2.25, 4.75],
+      "expected": 1.0
+    },
+    {
+      "op": "batch",
+      "type": "string",
+      "items": [],
+      "size": 1,
+      "expected": [],
+      "expectedError": ""
+    }
+  ]
+}

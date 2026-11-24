@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00Z",
+      "status": 200,
+      "body": "instant",
+      "contextValue": "req-zero",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "0",
+        "body": "instant",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T10:00:00Z",
+      "after": "2024-05-01T10:00:00.0004Z",
+      "status": 200,
+      "body": "sub-millisecond",
+      "contextValue": "req-sub",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "0",
+        "body": "sub-millisecond",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    },
+    {
+      "before": "2024-05-01T09:59:58Z",
+      "after": "2024-05-01T10:00:00.500Z",
+      "status": 200,
+      "body": "slow",
+      "contextValue": "req-slow",
+      "expected": {
+        "status": 200,
+        "elapsedHeader": "2500",
+        "body": "slow",
+        "clockCalls": 2,
+        "contextSeen": true
+      }
+    }
+  ]
+}

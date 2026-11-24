@@ -31,6 +31,20 @@ public sealed record SubmissionDetail(
     bool OutputTruncated,
     string Purpose);
 
+/// <summary>
+/// One source file restored into the workspace. It contains only learner
+/// input; harnesses, hidden tests, and reference solutions are never included.
+/// </summary>
+public sealed record SubmissionSourceFile(string Path, string Content);
+
+/// <summary>
+/// The most recent attempt for one challenge language. The workspace uses it to
+/// restore the learner's saved code and last recorded result.
+/// </summary>
+public sealed record LatestSubmission(
+    SubmissionDetail Submission,
+    IReadOnlyList<SubmissionSourceFile> Files);
+
 public sealed record RubricCriterionInput(string? Id, int? Points);
 
 /// <summary>

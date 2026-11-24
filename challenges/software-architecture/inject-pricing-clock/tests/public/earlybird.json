@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "basePriceCents": 5000,
+      "coupon": "EARLYBIRD",
+      "now": "2026-03-04T09:59:59Z",
+      "expected": 4500
+    },
+    {
+      "basePriceCents": 300,
+      "coupon": "EARLYBIRD",
+      "now": "2026-03-04T00:00:00Z",
+      "expected": 0
+    }
+  ]
+}
