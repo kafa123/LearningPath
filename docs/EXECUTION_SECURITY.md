@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-Phase 8 executes the same untrusted submitted C#, Python, and SQL content against server-selected public and hidden tests, including during examinations. This document describes the implemented boundary, the server-controlled controls, the fail-closed behavior, and the limits of container isolation so the project does not make false security claims.
+The execution subsystem runs the same untrusted submitted C#, Python, SQL, and Go content against server-selected public and hidden tests, including during examinations. This document describes the implemented boundary, the server-controlled controls, the fail-closed behavior, and the limits of container isolation so the project does not make false security claims.
 
 Nothing in this document authorizes executing submitted code inside the ASP.NET Core process. The only execution path is a short-lived Docker container created by `Psel.Modules.Execution`.
 

@@ -216,7 +216,7 @@ Every `source` and `path` value is relative to the package directory.
 subsystem runs together with the learner's submitted files. It is the challenge
 author's contract between the public starter API and a runnable program.
 
-Three languages are executable:
+Four languages are executable:
 
 - **C#** — the runner writes the submitted `.cs` files plus the harness into a
   generated console project, builds it, and runs it in an isolated container.
@@ -227,6 +227,12 @@ Three languages are executable:
   harness imports the submitted solution module with `import solution`; the
   starter file must therefore be named `solution.py` at the package root of the
   workspace.
+- **Go** — the runner writes the submitted `.go` files, a fixed `go.mod`, and the
+  harness into one package, then runs `go build -trimpath -o /tmp/psel-submission .`
+  followed by the binary inside `golang:1.27-alpine`. The container has no
+  network, `GOPROXY=off`, `GOTOOLCHAIN=local`, and `CGO_ENABLED=0`, so harnesses
+  may import only the standard library. The harness must be `package main` with a
+  `func main()` and call the learner's public API.
 - **SQL** — the package declares a `sql` block, and the loader supplies the
   server's built-in harness. The runner writes the single submitted `.sql` file
   and runs the same `python3 -B /workspace/PselHarness.py` command against a
@@ -328,6 +334,81 @@ For Python, the harness is the executable module and must call the submitted
 `solution` module's functions. Wrap each test in `try/except` so one failing case
 does not abort the whole run. Use `math.isclose` for floating-point comparisons.
 
+The equivalent Go harness skeleton:
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+const testsPath = "/workspace/PselTests.json"
+
+type result struct {
+	ID      string `json:"id"`
+	Passed  bool   `json:"passed"`
+	Errored bool   `json:"errored"`
+}
+
+func main() {
+	raw, err := os.ReadFile(testsPath)
+	if err != nil {
+		emit(nil)
+		return
+	}
+
+	var manifest struct {
+		Tests []struct {
+			ID   string          `json:"id"`
+			Data json.RawMessage `json:"data"`
+		} `json:"tests"`
+	}
+	if err := json.Unmarshal(raw, &manifest); err != nil {
+		emit(nil)
+		return
+	}
+
+	results := make([]result, 0, len(manifest.Tests))
+	for _, test := range manifest.Tests {
+		passed := false
+		errored := false
+
+		func() {
+			defer func() {
+				if recover() != nil {
+					errored = true
+				}
+			}()
+			// Decode test.Data, call the learner's exported API, compare.
+			passed = true
+		}()
+
+		results = append(results, result{ID: test.ID, Passed: passed, Errored: errored})
+	}
+	emit(results)
+}
+
+func emit(results []result) {
+	if results == nil {
+		results = []result{}
+	}
+	payload, err := json.Marshal(results)
+	if err != nil {
+		payload = []byte("[]")
+	}
+	fmt.Println("__PSEL_RESULTS_BEGIN__")
+	fmt.Println(string(payload))
+	fmt.Println("__PSEL_RESULTS_END__")
+}
+```
+
+A Go harness lives beside the submission in the same package, so helper types
+and functions do not need an import path. Recover from panics per test so one bad
+case does not abort the run.
+
 The manifest shape is:
 
 ```json
@@ -362,12 +443,16 @@ Rules:
   harness and injects `sql.schema`/`sql.seed` into the test data. An
   author-supplied harness for the `sql` language is rejected.
 - Submitted files named `Submission.csproj`, `PselHarness.cs`, `PselHarness.py`,
-  or `PselTests.json` are rejected before execution.
+  `PselHarness.go`, `go.mod`, or `PselTests.json` are rejected before execution.
 - C# submissions must use `.cs` files; Python submissions must use `.py` files;
-  SQL submissions must use exactly one `.sql` file.
+  SQL submissions must use exactly one `.sql` file; Go submissions must use `.go`
+  files and remain in `package main`.
 - Python harnesses must import the submitted `solution` module rather than
   reading source files directly. Only the standard library is available because
   the container has no network and no package installation step.
+- Go harnesses are compiled with the submitted files in one package, so they must
+  not declare a conflicting `main`, `go.mod`, or duplicate symbol. Only the
+  standard library is available; module downloads fail because `GOPROXY=off`.
 - A C# harness needs a program entry point; a Python harness is executed
   directly as `PselHarness.py` and should keep its work under `main()`.
 
@@ -542,7 +627,7 @@ and solutions in `tests/hidden/` and `solutions/`.
    hidden test data, and reference solutions. Each non-SQL test data file must be
    a JSON object containing `expected`, `cases`, or `expectedStatus`; each SQL test
    file must contain `expected` or `plan`.
-3. To make a C# or Python language executable, add a harness under
+3. To make a C#, Python, or Go language executable, add a harness under
    `harness/<language>/` and reference it from that language entry. Leave it out
    for editable-only languages. For SQL, add the `sql` block and the `sql`
    language entry instead; never add a SQL harness.

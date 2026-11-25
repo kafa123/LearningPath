@@ -21,7 +21,7 @@ Psel.Api ──────────► Psel.Infrastructure
     ├──────────► Psel.Modules.Challenges
     │                       └── contracts, strict loader, catalog, harness/test source, endpoints
     ├──────────► Psel.Modules.Execution
-    │                       └── Docker engine boundary, C#, Python, and SQL runners, test manifest, limits, cleanup
+    │                       └── Docker engine boundary, C#, Python, SQL, and Go runners, test manifest, limits, cleanup
     ├──────────► Psel.Modules.Assessment
     │                       └── deterministic grader, assessment entities, result endpoint
     ├──────────► Psel.Modules.Submissions
@@ -34,7 +34,7 @@ Psel.Api ──────────► Psel.Infrastructure
 - `Psel.Infrastructure` owns persistence concerns: the EF Core `DbContext`, migrations, database initialization, and the module assembly registry.
 - `Psel.Modules.Learning` owns the learning domain entities, EF Core configurations, seed catalog, and HTTP endpoints.
 - `Psel.Modules.Challenges` owns challenge package contracts, filesystem discovery and validation, the in-memory catalog, server-only harness lookup, and challenge HTTP endpoints. It has no EF entities and does not reference `Psel.Infrastructure`.
-- `Psel.Modules.Execution` owns the language-runner contract, Docker process boundary, one runner per supported language (C#, Python, and SQL), execution limits, and cleanup. It depends on no other module.
+- `Psel.Modules.Execution` owns the language-runner contract, Docker process boundary, one runner per supported language (C#, Python, SQL, and Go), execution limits, and cleanup. It depends on no other module.
 - `Psel.Modules.Submissions` owns the submission entity and EF configuration, validation against trusted challenge and language configuration, the in-memory queue, the execution worker, recovery on restart, and submission HTTP endpoints. It references infrastructure, assessment, challenges, and execution.
 - `Psel.Modules.Assessment` owns deterministic grading, assessment and per-test evidence entities, their EF configurations, and the read-only result endpoint. It references infrastructure and the execution status contract. It does not reference submissions or challenges.
 - `Psel.Modules.Progress` owns read-side competency aggregation, assessment history, and examination sessions. It reads the shared `PselDbContext` and challenge catalog, and exposes `IExaminationPolicy` as a narrow contract for submissions. It does not reach into submission types or expose hidden material.
@@ -72,7 +72,7 @@ src/Modules/Psel.Modules.Challenges/
 
 src/Modules/Psel.Modules.Execution/
   Docker/           Narrow Docker process boundary and isolation flags
-  Runners/          C#, Python, and SQL Docker runners plus shared workspace, manifest, and outcome helpers
+  Runners/          C#, Python, SQL, and Go Docker runners plus shared workspace, manifest, and outcome helpers
   ExecutionOptions.cs
   ExecutionFileRules.cs
   ILanguageRunner.cs
@@ -178,7 +178,7 @@ Creating the remaining module projects before they contain real behavior would a
 
 ### `Psel.Modules.Execution`
 
-- `ILanguageRunner` abstraction with one Docker implementation per supported language (`CSharpDockerRunner`, `PythonDockerRunner`, and `SqlDockerRunner`).
+- `ILanguageRunner` abstraction with one Docker implementation per supported language (`CSharpDockerRunner`, `PythonDockerRunner`, `SqlDockerRunner`, and `GoDockerRunner`).
 - Server-configured image per language, command, environment, limits, and workspace root.
 - A per-language submission file limit: C# and Python accept multiple source files, while SQL accepts exactly one query file.
 - Narrow `IDockerEngine` boundary so runners can be tested without a live daemon.
@@ -296,7 +296,7 @@ Submission row (Queued) ──► bounded in-memory queue
 SubmissionWorker (bounded concurrency, one DB scope per attempt)
         │  trust only server-side harness and test plan from IChallengeExecutionSource
         ▼
-ILanguageRunner (C#, Python, or SQL adapter selected by language)
+ILanguageRunner (C#, Python, SQL, or Go adapter selected by language)
         │  writes PselTests.json, the language harness, and submitted files
         ▼
 IDockerEngine / Docker CLI
@@ -478,7 +478,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - Challenge content can be uploaded as a ZIP and reloaded without restart, but there is no in-app package editor or delete action.
 - Workspace drafts are kept in browser `localStorage` and the last Run or Submit attempt is restored from the server. Clearing browser storage loses unsent drafts; server history is not deleted from the UI.
 - The queue is in-memory and single-process. Queued attempts are lost on shutdown and recovered as `Interrupted` at the next startup. A durable queue is out of scope for the local single-user product.
-- Only C#, Python, and SQL execution are implemented. Challenges that declare a language without a harness remain browse-only, and `api-validation` is still C#-only because its executable scenario needs a host application rather than a single function harness.
+- C#, Python, SQL, and Go execution are implemented. Challenges that declare a language without a harness remain browse-only, and `api-validation` is still C#-only because its executable scenario needs a host application rather than a single function harness.
 - SQL challenges use SQLite and a fixed built-in harness. Packages cannot supply a custom harness, cannot use MySQL/PostgreSQL syntax, and cannot require extensions or third-party databases.
 - SQL result comparison is exact after numeric tolerance: column names are optional, ordering is configurable per test, and types are compared as SQLite returns them. A query that produces extra or differently ordered rows fails unless the test opts into unordered comparison.
 - Query-plan checks match `EXPLAIN QUERY PLAN` text fragments. They are deterministic for SQLite but are not a general cost-based performance assertion; an exercise should assert the intended access path rather than a timing threshold.

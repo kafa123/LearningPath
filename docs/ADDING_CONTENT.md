@@ -261,7 +261,7 @@ challenges/<domain>/<slug>/
   starter/<language>/...
   tests/public/*.json
   tests/hidden/*.json
-  harness/<language>/...    (C#/Python; SQL memakai harness server)
+  harness/<language>/...    (C#/Python/Go; SQL memakai harness server)
   solutions/<language>/...  (server-only, tidak pernah dikirim ke client)
   sql/schema.sql            (khusus SQL)
   sql/seed.sql              (opsional, khusus SQL)
@@ -279,19 +279,19 @@ Discovery bersifat rekursif; nama folder tidak menentukan slug. `slug` di manife
    - `statement`, `hints`, `tests`, `evaluation`.
 3. Tulis `statement.md` dan (opsional) `hints.md`.
 4. Sesuaikan starter files dan public/hidden tests.
-5. Tambahkan harness hanya untuk `csharp`/`python`. SQL tidak boleh punya `harness`; server menyediakan harness dan memakai `sql.schema` + `sql.seed`.
+5. Tambahkan harness hanya untuk `csharp`, `python`, atau `go`. Go memakai harness `package main` yang dibaca bersama file submission di dalam container `golang:1.27-alpine` (tanpa network, `GOPROXY=off`). SQL tidak boleh punya `harness`; server menyediakan harness dan memakai `sql.schema` + `sql.seed`.
 6. Tambahkan reference solution di `solutions/` bila ada.
 7. Restart API. Log startup harus menampilkan jumlah package yang berhasil dimuat:
 
 ```text
-Loaded 16 challenge packages from D:\Aku\proyek\challenges.
+Loaded 25 challenge packages from D:\Aku\proyek\challenges.
 ```
 
 Jika satu package tidak valid, API menolak start. Package yang gagal tidak pernah tampil sebagian.
 
 ### 2.3 Format test
 
-Test standard (C#/Python):
+Test standard (C#/Python/Go):
 
 ```json
 {

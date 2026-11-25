@@ -366,7 +366,8 @@ Returns the languages the server is configured to execute. This is server config
 [
   { "id": "csharp", "name": "C#" },
   { "id": "python", "name": "Python" },
-  { "id": "sql", "name": "SQL" }
+  { "id": "sql", "name": "SQL" },
+  { "id": "go", "name": "Go" }
 ]
 ```
 
@@ -384,7 +385,8 @@ Returns read-only runtime diagnostics for the Settings page. The response is lim
   "languages": [
     { "id": "csharp", "name": "C#", "image": "mcr.microsoft.com/dotnet/sdk:10.0" },
     { "id": "python", "name": "Python", "image": "python:3.13-slim" },
-    { "id": "sql", "name": "SQL", "image": "python:3.13-slim" }
+    { "id": "sql", "name": "SQL", "image": "python:3.13-slim" },
+    { "id": "go", "name": "Go", "image": "golang:1.27-alpine" }
   ],
   "limits": {
     "timeLimitSeconds": 60,
@@ -459,6 +461,22 @@ The same request for SQL. Only the learner query is sent; the schema, seed data,
 }
 ```
 
+The same request for Go. The runner writes `go.mod` and the server harness next to the submitted package and compiles it with the image's toolchain:
+
+```json
+{
+  "challengeSlug": "inventory-ledger",
+  "languageId": "go",
+  "purpose": "Submit",
+  "files": [
+    {
+      "path": "solution.go",
+      "content": "package main\n\nfunc NormalizeInventory(items []Item) ([]Item, error) {\n    ...\n}\n"
+    }
+  ]
+}
+```
+
 Rules:
 
 - `challengeSlug` must match a validated package.
@@ -468,8 +486,8 @@ Rules:
 - `Run` selects only public tests. `Submit` selects public and hidden tests.
 - At least one file and at most 10 files are accepted. SQL accepts exactly one file.
 - Paths are relative, may contain subdirectories, and must not be absolute or contain `.`/`..` segments.
-- Server-reserved runner filenames (`Submission.csproj`, `PselHarness.cs`, `PselHarness.py`, `PselTests.json`) are rejected.
-- File extensions must be accepted by the selected runner (`.cs` for C#, `.py` for Python, `.sql` for SQL).
+- Server-reserved runner filenames (`Submission.csproj`, `PselHarness.cs`, `PselHarness.py`, `PselHarness.go`, `go.mod`, `PselTests.json`) are rejected.
+- File extensions must be accepted by the selected runner (`.cs` for C#, `.py` for Python, `.sql` for SQL, `.go` for Go).
 - Each file is limited to 128 KiB and the submission to 256 KiB of source text.
 - SQL content must be a single read-only `SELECT` or `WITH` statement. Syntax errors and non-read-only statements return `CompilationError`; per-test SQL failures are reported as `RuntimeError`.
 - Apply execution isolation server-side: SQL runs in a disposable container against a fresh in-memory SQLite database, not the application database.

@@ -18,7 +18,9 @@ public sealed class RuntimeEndpointTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(runtime);
         Assert.False(runtime.ExecutionEnabled);
-        Assert.Equal(["csharp", "python", "sql"], runtime.Languages.Select(language => language.Id));
+        Assert.Equal(
+            ["csharp", "python", "sql", "go"],
+            runtime.Languages.Select(language => language.Id));
         Assert.All(runtime.Languages, language => Assert.False(string.IsNullOrWhiteSpace(language.Image)));
         Assert.Equal(60, runtime.Limits.TimeLimitSeconds);
         Assert.Equal(512, runtime.Limits.MemoryLimitMb);
