@@ -20,7 +20,7 @@ Submitted code is untrusted input. It may attempt to:
 
 The application must assume that submitted code is hostile even when the learner is the local machine owner.
 
-The server-side execution harness is trusted authoring content, while the submitted files are untrusted. Both are compiled or interpreted together inside the container. C# and Python packages provide their own harness; SQL packages use a server-built harness and cannot replace it. A harness is never accepted from the client and is never returned by a client API. Public and hidden test data are copied into the container by the server; hidden test names, descriptions, identifiers, and data are never returned to the browser. SQL schema and seed SQL are also server content, injected into the execution test manifest.
+The server-side execution harness is trusted authoring content, while the submitted files are untrusted. Both are compiled or interpreted together inside the container. C#, Python, and Go packages provide their own harness; SQL packages use a server-built harness and cannot replace it. A harness is never accepted from the client and is never returned by a client API. Public and hidden test data are copied into the container by the server; hidden test names, descriptions, identifiers, and data are never returned to the browser. SQL schema and seed SQL are also server content, injected into the execution test manifest.
 
 ## 3. Non-negotiable rules
 
@@ -128,10 +128,10 @@ Pull the language images before execution so a run does not depend on registry a
 - `--user 1000:1000` — non-root container user.
 - `--volume <workspace>:/workspace:ro` — the generated workspace is mounted read-only.
 - `--workdir /workspace` — the command runs from the mounted workspace.
-- `--env` — only server-controlled variables: C# build variables (`DOTNET_CLI_HOME`, `NUGET_PACKAGES`, telemetry opt-out, `HOME`), Python variables (`PYTHONDONTWRITEBYTECODE`, `PYTHONPYCACHEPREFIX`, `PYTHONUNBUFFERED`, `PYTHONIOENCODING`, `HOME`), or the same Python variables for the SQL harness.
-- Server-controlled image, `/bin/sh -c`, and a fixed per-language command: a C# build-and-run command, or `python3 -B /workspace/PselHarness.py` for Python and SQL.
+- `--env` — only server-controlled variables: C# build variables (`DOTNET_CLI_HOME`, `NUGET_PACKAGES`, telemetry opt-out, `HOME`), Python variables (`PYTHONDONTWRITEBYTECODE`, `PYTHONPYCACHEPREFIX`, `PYTHONUNBUFFERED`, `PYTHONIOENCODING`, `HOME`), the same Python variables for the SQL harness, or Go build variables (`GOCACHE`, `GOPATH`, `GO111MODULE`, `GOTOOLCHAIN`, `GOPROXY`, `CGO_ENABLED`, `HOME`).
+- Server-controlled image, `/bin/sh -c`, and a fixed per-language command: a C# build-and-run command, a Go `go build` followed by the produced binary, or `python3 -B /workspace/PselHarness.py` for Python and SQL.
 
-The Docker socket is never mounted. There is no `--privileged`, `--pid host`, `--network host`, or host-directory mount. The submission workspace contains only the generated language scaffolding (the C# project file when applicable), the server harness, the server-written `PselTests.json` manifest, and the validated submitted files. Submitted files named `Submission.csproj`, `PselHarness.cs`, `PselHarness.py`, or `PselTests.json` are rejected before the runner starts.
+The Docker socket is never mounted. There is no `--privileged`, `--pid host`, `--network host`, or host-directory mount. The submission workspace contains only the generated language scaffolding (the C# project file or Go `go.mod` when applicable), the server harness, the server-written `PselTests.json` manifest, and the validated submitted files. Submitted files named `Submission.csproj`, `PselHarness.cs`, `PselHarness.py`, `PselHarness.go`, `go.mod`, or `PselTests.json` are rejected before the runner starts.
 
 ## 7. Fail-closed behavior
 
@@ -183,6 +183,7 @@ Specific Phase 8 limitations:
 - The queue is in-memory and single-process; it is not durable and does not survive a restart.
 - The C# runtime image is a full SDK image. It is large and includes a compiler, which enlarges the attack surface relative to a minimal runtime image.
 - The Python and SQL images are slim interpreter images with no optional packages. Executable Python and SQL challenges must use only the standard library because the container has no network and no package installation step.
+- The Go image is a full toolchain image because compilation happens inside the container. It is larger than the interpreter images, and executable Go challenges must use only the standard library because `GOPROXY=off` and the container has no network. cgo and the race detector are unavailable under the default `CGO_ENABLED=0` build.
 - SQL challenges use SQLite syntax and semantics. The harness does not emulate MySQL or PostgreSQL, and it does not load extensions.
 - The SQL harness reads the server-written test manifest, which includes schema, seed, and hidden expectations. The learner supplies only SQL, so it cannot read workspace files; `ATTACH` and extension loading are not available under the authorizer and Python's default SQLite configuration. Hidden data still never reaches the API.
 - SQL statement time is capped per test, and rows/columns are capped, but a query that produces large intermediate results can still consume the container's memory or CPU budget until the outer limits stop it.
@@ -206,11 +207,11 @@ The project must not claim that arbitrary code execution is perfectly safe. Stro
 The automated suite runs without a live Docker daemon:
 
 - Docker argument tests assert the exact isolation flags, read-only mount, non-root user, environment variables, and the absence of privileged or socket access.
-- C#, Python, and SQL runner contract tests use a recording fake engine to verify workspace generation, harness and test-manifest injection, per-language image/command/environment, path rejection before Docker is invoked, cleanup, and outcome mapping.
+- C#, Python, SQL, and Go runner contract tests use a recording fake engine to verify workspace generation, harness and test-manifest injection, per-language image/command/environment, path rejection before Docker is invoked, cleanup, and outcome mapping.
 - Submission endpoint tests verify validation, harness injection, adapter selection by language, terminal results, unavailable execution, reserved filename rejection, and non-disclosure of harness content.
 - SQL tests also verify the single-file limit, the built-in harness, schema/seed injection into server tests, query-plan validation, and that schema, seed, and hidden SQL data are absent from challenge responses.
 - Assessment tests verify that Run selects only public tests, Submit selects public and hidden tests, hidden names and data remain server-side, scoring is deterministic, and every outcome is mapped.
-- Challenge loader tests verify that harness content is absent from the serialized client projection, including Python and SQL harnesses.
+- Challenge loader tests verify that harness content is absent from the serialized client projection, including Python, Go, and SQL harnesses.
 - Recovery tests verify stale rows become `Interrupted`.
 - Progress tests verify derived competency states and assessment history without exposing hidden test material.
 - Examination tests verify server-selected variants, `Submit`-only attempts, challenge matching, expiry with a controllable clock, finish behavior, and the hint-free challenge projection.
@@ -248,6 +249,8 @@ Live SQL container execution was then verified with Docker Desktop 29.9.2, `pyth
 - A query that returned the right rows but wrapped the indexed column in an expression reached `WrongAnswer` with 0/4 tests, confirming the plan check cannot be bypassed by correct rows alone.
 - A non-read-only statement reached `CompilationError` with `PSEL_SQL_COMPILE_ERROR`.
 
+The nine Go challenge packages were validated directly with Go 1.27.4 outside Docker: every reference solution passed all five tests, every starter failed at least one, and `go vet` was clean. Live Go container execution could not be re-verified in this environment because the Docker engine was unavailable; the Go runner is covered by contract tests. The race detector was not run because it requires cgo, which the local toolchain lacks.
+
 The live checks are operational verification, not part of the automated suite; the suite itself still uses a fake Docker engine so it can run anywhere.
 
 ## 14. Related records
@@ -258,4 +261,5 @@ The live checks are operational verification, not part of the automated suite; t
 - [ADR-0008: Python runtime](decisions/ADR-0008-python-runtime.md)
 - [ADR-0009: Evidence-based progress and examinations](decisions/ADR-0009-evidence-based-progress-and-examinations.md)
 - [ADR-0010: SQL execution and SQLite isolation](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md)
+- [ADR-0011: Go runtime](decisions/ADR-0011-go-runtime.md)
 - [PROJECT_SPEC.md](../PROJECT_SPEC.md), sections 10 and 13

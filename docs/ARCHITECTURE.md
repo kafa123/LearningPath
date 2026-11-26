@@ -180,7 +180,7 @@ Creating the remaining module projects before they contain real behavior would a
 
 - `ILanguageRunner` abstraction with one Docker implementation per supported language (`CSharpDockerRunner`, `PythonDockerRunner`, `SqlDockerRunner`, and `GoDockerRunner`).
 - Server-configured image per language, command, environment, limits, and workspace root.
-- A per-language submission file limit: C# and Python accept multiple source files, while SQL accepts exactly one query file.
+- A per-language submission file limit: C#, Python, and Go accept multiple source files, while SQL accepts exactly one query file.
 - Narrow `IDockerEngine` boundary so runners can be tested without a live daemon.
 - Docker flags: network disabled, read-only container filesystem, tmpfs `/tmp`, dropped capabilities, no-new-privileges, non-root user, read-only workspace mount, memory/swap, CPU, process, and output limits.
 - Explicit container removal after success, failure, timeout, cancellation, and startup cleanup of stale labelled containers.
@@ -372,7 +372,7 @@ Derived competency states (NotStarted → Learning → Practicing → Assessment
 
 Examination detail responses reuse `ChallengeDetail` but set `HintsMarkdown` to `null`. Hidden tests are still selected server-side for `Submit`; nothing about them is added to the examination contract.
 
-See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-0002-code-execution-isolation.md), [ADR-0006](decisions/ADR-0006-submission-queue-and-docker-runner.md), [ADR-0008](decisions/ADR-0008-python-runtime.md), [ADR-0009](decisions/ADR-0009-evidence-based-progress-and-examinations.md), and [ADR-0010](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md).
+See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-0002-code-execution-isolation.md), [ADR-0006](decisions/ADR-0006-submission-queue-and-docker-runner.md), [ADR-0008](decisions/ADR-0008-python-runtime.md), [ADR-0009](decisions/ADR-0009-evidence-based-progress-and-examinations.md), [ADR-0010](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md), and [ADR-0011](decisions/ADR-0011-go-runtime.md).
 
 ## 8. Testing strategy
 
@@ -416,7 +416,8 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 ### Phase 6
 
 - Python runner contract tests mirror the C# runner tests: server workspace generation, harness and manifest injection, Python image and command, bytecode-disabled environment, path and reserved-filename rejection before Docker, cleanup, and mapping of success, timeout, syntax error, runtime error, and unavailable execution.
-- Shared runner helpers are covered through both adapters, so a change to workspace or manifest behavior is verified for C# and Python.
+- Go runner contract tests cover the generated `go.mod`, harness and manifest injection, the Go image and build-and-run command, the no-network environment, reserved filenames, path rejection before Docker, cleanup, compile-error detection, runtime errors, timeouts, and unavailable execution.
+- Shared runner helpers are covered through every adapter, so a change to workspace or manifest behavior is verified for C#, Python, SQL, and Go.
 - Integration tests verify that a Python submission uses the Python adapter, receives the server-side Python harness and selected tests, and produces the same deterministic assessment contract as C#. The C# fake runner records no request for a Python submission.
 - Repository package tests verify that every declared Python language has a harness, is executable, and imports the submitted `solution` module.
 - Frontend tests cover Python language selection, its own starter file in the Run request body, and editable access now that Python is executable.
@@ -441,7 +442,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 - Practice-page tests cover progress-aware recommendations, exclusion of read-only packages, difficulty filtering, the no-executable-challenge state, and retrying a failed challenge request.
 - Settings-page tests cover API health, runtime languages, execution status, limits, the disabled-execution state, and retrying a failed runtime request. Runtime endpoint tests assert the diagnostics and the absence of Docker paths, workspace roots, container users, and database locations.
 - App shell tests cover switching between dark and light themes, persisting the choice, and updating the toggle label. Settings tests also cover the explicit appearance controls.
-- The suite still does not require a live Docker daemon. The harness itself is additionally validated directly with Python and SQLite for correctness, plan pass/fail, and compile-error behavior.
+- The suite still does not require a live Docker daemon. The harness itself is additionally validated directly with Python and SQLite for correctness, plan pass/fail, and compile-error behavior, and the nine Go packages were validated with Go 1.27 outside Docker for solution pass, starter failure, and `go vet`.
 
 ### Phase 10
 
@@ -469,6 +470,7 @@ See [EXECUTION_SECURITY.md](EXECUTION_SECURITY.md), [ADR-0002](decisions/ADR-000
 | Python runtime behind the language-runner boundary | [ADR-0008](decisions/ADR-0008-python-runtime.md) |
 | Evidence-based progress and server-controlled examinations | [ADR-0009](decisions/ADR-0009-evidence-based-progress-and-examinations.md) |
 | SQL execution with an in-memory SQLite database | [ADR-0010](decisions/ADR-0010-sql-execution-and-sqlite-isolation.md) |
+| Go runtime behind the language-runner boundary | [ADR-0011](decisions/ADR-0011-go-runtime.md) |
 
 ## 10. Known limitations (through Phase 10)
 
